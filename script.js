@@ -490,9 +490,9 @@ function mostrarTipsDinamicos(resultados) {
     // Limpiar tips anteriores
     tipsContainer.innerHTML = '';
     
-    // Tip sobre cuota recomendada
+    // 1. Tip sobre cuota recomendada (25% de ingresos)
     const cuota = resultados.primeraCuota;
-    const ingresoRecomendado = cuota / 0.4; // 40% del ingreso
+    const ingresoRecomendado = cuota / 0.25; // 25% del ingreso
     
     const tipCuota = document.createElement('div');
     tipCuota.className = 'tip-card info';
@@ -500,11 +500,99 @@ function mostrarTipsDinamicos(resultados) {
         <span class="tip-icon">💡</span>
         <div class="tip-content">
             <strong>Ingreso recomendado:</strong> Para esta cuota de ${formatearPesos(cuota)}, 
-            tu ingreso mensual debería ser al menos ${formatearPesos(ingresoRecomendado)}
+            tu ingreso mensual debería ser al menos ${formatearPesos(ingresoRecomendado)} (25% de tus ingresos)
         </div>
     `;
-    
     tipsContainer.appendChild(tipCuota);
+    
+    // 2. Ancho de banda cambiaria
+    const anchoBanda = CONFIG.tiposCambio.peorCaso - CONFIG.tiposCambio.mejorCaso;
+    const porcentajeAncho = ((anchoBanda / CONFIG.tiposCambio.oficial) * 100).toFixed(1);
+    
+    const tipBanda = document.createElement('div');
+    tipBanda.className = 'tip-card warning';
+    tipBanda.innerHTML = `
+        <span class="tip-icon">📊</span>
+        <div class="tip-content">
+            <strong>Ancho de banda cambiaria:</strong> Entre ${formatearPesos(CONFIG.tiposCambio.mejorCaso)} y ${formatearPesos(CONFIG.tiposCambio.peorCaso)} 
+            (diferencia: ${formatearPesos(anchoBanda)} - ${porcentajeAncho}% de variación)
+        </div>
+    `;
+    tipsContainer.appendChild(tipBanda);
+    
+    // 3. Colchón de seguridad en el peor escenario
+    const datos = obtenerDatosEntrada();
+    if (validarDatos(datos)) {
+        const valorPropiedadPeorCaso = datos.valorPropiedad * CONFIG.tiposCambio.peorCaso;
+        const diferenciaACubrirPeorCaso = valorPropiedadPeorCaso - datos.montoPrestamo;
+        const gastosPeorCaso = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+        const totalNecesarioPeorCaso = diferenciaACubrirPeorCaso + gastosPeorCaso;
+        
+        const tipColchonPeorCaso = document.createElement('div');
+        tipColchonPeorCaso.className = 'tip-card danger';
+        tipColchonPeorCaso.innerHTML = `
+            <span class="tip-icon">🚨</span>
+            <div class="tip-content">
+                <strong>Colchón en el peor escenario:</strong> Con el dólar a ${formatearPesos(CONFIG.tiposCambio.peorCaso)}, 
+                necesitarías ${formatearPesos(totalNecesarioPeorCaso)} (incluye gastos máximos)
+            </div>
+        `;
+        tipsContainer.appendChild(tipColchonPeorCaso);
+        
+        // 4. Margen de seguridad recomendado (20% extra sobre lo necesario)
+        const margenSeguridad = totalNecesarioPeorCaso * 0.20;
+        const totalConMargen = totalNecesarioPeorCaso + margenSeguridad;
+        const margenSeguridadUSD = margenSeguridad / CONFIG.tiposCambio.oficial;
+        const totalConMargenUSD = totalConMargen / CONFIG.tiposCambio.oficial;
+        
+        const tipMargenSeguridad = document.createElement('div');
+        tipMargenSeguridad.className = 'tip-card info';
+        tipMargenSeguridad.innerHTML = `
+            <span class="tip-icon">🛡️</span>
+            <div class="tip-content">
+                <strong>Margen de seguridad recomendado:</strong> Agregá 20% extra = ${formatearPesos(margenSeguridad)} 
+                ($${formatearNumero(margenSeguridadUSD)} USD). 
+                Total con margen: ${formatearPesos(totalConMargen)} ($${formatearNumero(totalConMargenUSD)} USD)
+            </div>
+        `;
+        tipsContainer.appendChild(tipMargenSeguridad);
+        
+        // 5. Colchón de ahorro extra para imprevistos
+        const colchonAhorroExtra = cuota * 6; // 6 meses de cuotas
+        const colchonAhorroExtraUSD = colchonAhorroExtra / CONFIG.tiposCambio.oficial;
+        
+        // 6. Consejo unificado de ahorro total sugerido
+        const ahorroTotalSugerido = totalConMargen + colchonAhorroExtra;
+        const ahorroTotalSugeridoUSD = ahorroTotalSugerido / CONFIG.tiposCambio.oficial;
+        
+        const tipAhorroTotal = document.createElement('div');
+        tipAhorroTotal.className = 'tip-card success highlight';
+        tipAhorroTotal.innerHTML = `
+            <span class="tip-icon">💎</span>
+            <div class="tip-content">
+                <strong>💰 Ahorro total sugerido:</strong> Deberías tener ${formatearPesos(ahorroTotalSugerido)} 
+                ($${formatearNumero(ahorroTotalSugeridoUSD)} USD) que incluye:
+                <br>• Dinero para la compra con margen: ${formatearPesos(totalConMargen)} ($${formatearNumero(totalConMargenUSD)} USD)
+                <br>• Reserva de emergencia (6 meses): ${formatearPesos(colchonAhorroExtra)} ($${formatearNumero(colchonAhorroExtraUSD)} USD)
+            </div>
+        `;
+        tipsContainer.appendChild(tipAhorroTotal);
+    }
+}
+
+// Nueva función para calcular gastos extra en el peor escenario
+function calcularGastosExtraEnPeorEscenario(valorPropiedadUSD) {
+    const valorPesosPeorCaso = valorPropiedadUSD * CONFIG.tiposCambio.peorCaso;
+    const provincia = elementos.provincia.value;
+    const gastos = CONFIG.gastosExtra[provincia];
+    
+    // Usar valores máximos para el peor escenario
+    const escrituraMax = valorPesosPeorCaso * gastos.escritura.max / 100;
+    const inmobiliariaMax = valorPesosPeorCaso * gastos.inmobiliaria.max / 100;
+    const firmasMax = valorPesosPeorCaso * gastos.firmas.max / 100;
+    const sellosMax = valorPesosPeorCaso * gastos.sellos.max / 100;
+    
+    return escrituraMax + inmobiliariaMax + firmasMax + sellosMax;
 }
 
 
