@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://calculadora-firma-hipotecaria-uva-ar.vercel.app/sitemap.xml
+Sitemap: https://kvothesson.github.io/calculadora-firma-hipotecaria-uva-ar/sitemap.xml
 
 # Crawl-delay para ser amigable con los servidores
 Crawl-delay: 1
