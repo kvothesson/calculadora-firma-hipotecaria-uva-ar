@@ -40,7 +40,6 @@ const elementos = {
     valorPropiedad: document.getElementById('valorPropiedad'),
     provincia: document.getElementById('provincia'),
     montoPrestamo: document.getElementById('montoPrestamo'),
-    monedaPrestamo: document.getElementById('monedaPrestamo'),
     plazo: document.getElementById('plazo'),
     tasaInteres: document.getElementById('tasaInteres'),
     
@@ -106,15 +105,15 @@ async function obtenerCotizacionOficial() {
 
 function establecerValoresPorDefecto() {
     elementos.valorPropiedad.value = 90000;
-    elementos.montoPrestamo.value = 70000; // 70,000 USD por defecto
+    elementos.montoPrestamo.value = 89250000; // 89.250.000 pesos por defecto (aprox 70k USD)
     elementos.tasaInteres.value = 8.5;
     elementos.plazo.value = 20;
 }
 
 function agregarEventListeners() {
-    // Recalcular cuando cambien los inputs
+    // Recalcular cuando cambien los inputs (excepto el slider de tipo de cambio)
     Object.values(elementos).forEach(elemento => {
-        if (elemento && elemento.tagName === 'INPUT') {
+        if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcSlider') {
             elemento.addEventListener('input', calcularTodo);
         }
         if (elemento && elemento.tagName === 'SELECT') {
@@ -167,6 +166,16 @@ function limpiarResultados() {
     if (elementos.tcSimuladorTexto) {
         elementos.tcSimuladorTexto.textContent = '1225';
     }
+    
+    // Limpiar elementos del banco
+    const elementoPrestamoSimuladorPesos = document.getElementById('prestamoSimuladorPesos');
+    const elementoPrestamoSimuladorUSD = document.getElementById('prestamoSimuladorUSD');
+    if (elementoPrestamoSimuladorPesos) {
+        elementoPrestamoSimuladorPesos.textContent = '$0';
+    }
+    if (elementoPrestamoSimuladorUSD) {
+        elementoPrestamoSimuladorUSD.textContent = '$0 USD';
+    }
 }
 
 function obtenerDatosEntrada() {
@@ -174,7 +183,6 @@ function obtenerDatosEntrada() {
         valorPropiedad: parseFloat(elementos.valorPropiedad.value) || 0,
         provincia: elementos.provincia.value,
         montoPrestamo: parseFloat(elementos.montoPrestamo.value) || 0,
-        monedaPrestamo: elementos.monedaPrestamo.value,
         plazo: parseInt(elementos.plazo.value) || 20,
         tasaInteres: parseFloat(elementos.tasaInteres.value) || 0
     };
@@ -189,13 +197,8 @@ function validarDatos(datos) {
 }
 
 function calcularCredito(datos) {
-    // Convertir monto a pesos según la moneda seleccionada
-    let montoPrestamoPesos;
-    if (datos.monedaPrestamo === 'USD') {
-        montoPrestamoPesos = datos.montoPrestamo * CONFIG.tiposCambio.oficial;
-    } else {
-        montoPrestamoPesos = datos.montoPrestamo;
-    }
+    // El monto del préstamo siempre está en pesos
+    const montoPrestamoPesos = datos.montoPrestamo;
     
     const tasaMensual = datos.tasaInteres / 12 / 100;
     const totalMeses = datos.plazo * 12;
@@ -221,7 +224,7 @@ function calcularCredito(datos) {
     actualizarValorEnPesos(datos.valorPropiedad);
     
     // Actualizar equivalencia del monto prestado
-    actualizarEquivalenciaMontoPrestado(datos.montoPrestamo, datos.monedaPrestamo);
+    actualizarEquivalenciaMontoPrestado(datos.montoPrestamo);
     
     return {
         primeraCuota,
@@ -332,21 +335,30 @@ function mostrarImpactoSimulador() {
     const datos = obtenerDatosEntrada();
     if (!validarDatos(datos)) return;
     
-    // Calcular diferencia a cubrir con el tipo de cambio del simulador
+    // Calcular valor de la propiedad con el tipo de cambio del simulador
     const valorPropiedadConSimulador = datos.valorPropiedad * CONFIG.tiposCambio.simulador;
     
-    // Calcular monto prestado en pesos
-    let montoPrestamoPesos;
-    if (datos.monedaPrestamo === 'USD') {
-        montoPrestamoPesos = datos.montoPrestamo * CONFIG.tiposCambio.oficial;
-    } else {
-        montoPrestamoPesos = datos.montoPrestamo;
-    }
+    // El monto en pesos que da el banco es siempre fijo (el monto que pediste prestado)
+    // Solo varía el equivalente en USD según el tipo de cambio del simulador
+    const montoPrestamoPesos = datos.montoPrestamo; // Pesos fijo (monto que pediste)
+    const montoPrestamoUSD = datos.montoPrestamo / CONFIG.tiposCambio.simulador; // USD varía con el TC
     
     // Diferencia a cubrir = valor total de la propiedad - monto prestado
     const diferenciaACubrir = valorPropiedadConSimulador - montoPrestamoPesos;
     
-    // Actualizar interfaz con ambas monedas
+    // Mostrar lo que da el banco
+    const elementoPrestamoSimuladorPesos = document.getElementById('prestamoSimuladorPesos');
+    const elementoPrestamoSimuladorUSD = document.getElementById('prestamoSimuladorUSD');
+    
+    if (elementoPrestamoSimuladorPesos) {
+        elementoPrestamoSimuladorPesos.textContent = formatearPesos(montoPrestamoPesos);
+    }
+    
+    if (elementoPrestamoSimuladorUSD) {
+        elementoPrestamoSimuladorUSD.textContent = `$${formatearNumero(montoPrestamoUSD)} USD`;
+    }
+    
+    // Mostrar lo que tienes que poner
     if (elementos.diferenciaSimulador) {
         elementos.diferenciaSimulador.textContent = formatearPesos(diferenciaACubrir);
     }
@@ -400,20 +412,13 @@ function actualizarValorEnPesos(valorUSD) {
     }
 }
 
-function actualizarEquivalenciaMontoPrestado(monto, moneda) {
+function actualizarEquivalenciaMontoPrestado(montoPesos) {
     const elementoEquivalencia = document.getElementById('montoPrestamoEquivalente');
     if (!elementoEquivalencia) return;
     
-    let equivalencia;
-    if (moneda === 'USD') {
-        // Si es USD, mostrar en pesos
-        equivalencia = monto * CONFIG.tiposCambio.oficial;
-        elementoEquivalencia.textContent = formatearPesos(equivalencia);
-    } else {
-        // Si es pesos, mostrar en USD
-        equivalencia = monto / CONFIG.tiposCambio.oficial;
-        elementoEquivalencia.textContent = `$${formatearNumero(equivalencia)} USD`;
-    }
+    // Siempre mostrar el equivalente en USD del monto en pesos
+    const equivalenciaUSD = montoPesos / CONFIG.tiposCambio.oficial;
+    elementoEquivalencia.textContent = `$${formatearNumero(equivalenciaUSD)} USD`;
 }
 
 function actualizarCotizacionEnInterfaz() {
@@ -528,13 +533,8 @@ function validarEnTiempoReal() {
     // Convertir valor de propiedad a pesos para comparar
     const valorPropiedadPesos = datos.valorPropiedad * CONFIG.tiposCambio.oficial;
     
-    // Convertir monto prestado a pesos para comparar
-    let montoPrestamoPesos;
-    if (datos.monedaPrestamo === 'USD') {
-        montoPrestamoPesos = datos.montoPrestamo * CONFIG.tiposCambio.oficial;
-    } else {
-        montoPrestamoPesos = datos.montoPrestamo;
-    }
+    // El monto prestado ya está en pesos
+    const montoPrestamoPesos = datos.montoPrestamo;
     
     if (montoPrestamoPesos > valorPropiedadPesos) {
         mostrarAlerta('⚠️ El monto del préstamo no puede ser mayor al valor de la propiedad', 'warning');

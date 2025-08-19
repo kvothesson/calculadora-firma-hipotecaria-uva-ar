@@ -41,14 +41,17 @@
 
                 <div class="form-group">
                     <label for="montoPrestamo">Monto a Pedir Prestado</label>
-                    <div class="input-group">
-                        <input type="number" id="montoPrestamo" placeholder="70000" min="1000" step="1000" value="70000">
-                        <select id="monedaPrestamo">
-                            <option value="USD">USD</option>
-                            <option value="ARS">Pesos</option>
-                        </select>
+                    <div class="input-group-dual">
+                        <div class="input-primary">
+                            <input type="number" id="montoPrestamo" placeholder="89250000" min="1000000" step="100000" value="89250000">
+                            <span class="currency-label-primary">ARS</span>
+                        </div>
+                        <div class="currency-equivalent">
+                            <span class="equals-sign">=</span>
+                            <span class="usd-amount" id="montoPrestamoEquivalente">$0 USD</span>
+                        </div>
                     </div>
-                    <small class="form-help">Equivale a <span id="montoPrestamoEquivalente">$0</span> en la otra moneda</small>
+                    <small class="form-help">Conversión al tipo de cambio oficial del día</small>
                 </div>
 
                 <div class="form-group">
@@ -153,7 +156,7 @@
             <!-- Sección de escenarios -->
             <section class="scenarios-section">
                 <h2>💱 Simulador al Día de la Firma</h2>
-                <p class="section-description">El tipo de cambio se fija el día que firmás la escritura. Simulá diferentes escenarios:</p>
+                <p class="section-description">El tipo de cambio se fija el día que firmás la escritura. Simulá cuánto dinero necesitarás y cuántos dólares podrás comprar:</p>
                 
                 <div class="tc-slider-container">
                     <label for="tcSlider">Tipo de cambio: $<span id="tcValor">1225</span></label>
@@ -165,23 +168,41 @@
                 </div>
                 
                 <div class="scenario-result">
-                    <div class="scenario-card central">
-                        <h3>📊 Diferencia a Cubrir al Día de la Firma</h3>
-                        <div class="scenario-details">
-                            <div class="dual-currency-display">
-                                <div class="currency-item">
-                                    <span class="currency-label">En Pesos:</span>
-                                    <span class="currency-value" id="diferenciaSimulador">$0</span>
+                    <div class="scenario-grid">
+                        <div class="scenario-card bank">
+                            <h3>🏦 Lo que te da el Banco</h3>
+                            <div class="scenario-details">
+                                <div class="dual-currency-display">
+                                    <div class="currency-item">
+                                        <span class="currency-label">En Pesos:</span>
+                                        <span class="currency-value" id="prestamoSimuladorPesos">$0</span>
+                                    </div>
+                                    <div class="currency-item">
+                                        <span class="currency-label">En Dólares:</span>
+                                        <span class="currency-value" id="prestamoSimuladorUSD">$0 USD</span>
+                                    </div>
                                 </div>
-                                <div class="currency-item">
-                                    <span class="currency-label">En Dólares:</span>
-                                    <span class="currency-value" id="diferenciaSimuladorUSD">$0 USD</span>
-                                </div>
+                                <small class="scenario-note">Préstamo convertido al tipo de cambio del día de la firma</small>
                             </div>
-                            <small class="scenario-note">
-                                Este es el monto adicional que necesitarás si el dólar está a 
-                                $<span id="tcSimuladorTexto">1225</span> el día de la firma
-                            </small>
+                        </div>
+                        
+                        <div class="scenario-card personal">
+                            <h3>💰 Lo que tienes que Poner</h3>
+                            <div class="scenario-details">
+                                <div class="dual-currency-display">
+                                    <div class="currency-item">
+                                        <span class="currency-label">En Pesos:</span>
+                                        <span class="currency-value" id="diferenciaSimulador">$0</span>
+                                    </div>
+                                    <div class="currency-item">
+                                        <span class="currency-label">En Dólares:</span>
+                                        <span class="currency-value" id="diferenciaSimuladorUSD">$0 USD</span>
+                                    </div>
+                                </div>
+                                <small class="scenario-note">
+                                    Con el dólar a $<span id="tcSimuladorTexto">1225</span> el día de la firma
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,7 +226,7 @@
                     <ul>
                         <li><strong>Calculá siempre con el peor escenario</strong> - Usá el techo de la banda cambiaria</li>
                         <li><strong>No llegues con la plata justa</strong> - Dejá un margen de seguridad</li>
-                        <li><strong>El tipo de cambio se fija el día de la escritura</strong> - No se puede congelar antes</li>
+                        <li><strong>El tipo de cambio se fija el día de la escritura</strong> - Afecta cuántos USD podrás comprar</li>
                         <li><strong>Considerá los gastos extra</strong> - Escritura, inmobiliaria, firmas, etc.</li>
                     </ul>
                 </div>
