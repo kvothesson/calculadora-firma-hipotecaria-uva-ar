@@ -61,6 +61,33 @@
             'allow_ad_personalization_signals': false,
             'restricted_data_processing': true
         });
+        
+        // Función para habilitar analytics cuando se acepte el consentimiento
+        window.enableAnalytics = function() {
+            gtag('consent', 'update', {
+                'analytics_storage': 'granted'
+            });
+            console.log('Analytics habilitado desde HTML');
+        };
+        
+        // Función para deshabilitar analytics
+        window.disableAnalytics = function() {
+            gtag('consent', 'update', {
+                'analytics_storage': 'denied'
+            });
+            console.log('Analytics deshabilitado desde HTML');
+        };
+        
+        // Enviar evento de prueba inmediatamente para verificar funcionamiento
+        setTimeout(() => {
+            gtag('event', 'page_view_test', {
+                'event_category': 'Debug',
+                'event_label': 'HTML_Loaded',
+                'page_title': document.title,
+                'timestamp': new Date().toISOString()
+            });
+            console.log('Evento de prueba enviado desde HTML');
+        }, 2000);
     </script>
     
     <link rel="stylesheet" href="styles.css">
@@ -421,7 +448,7 @@
     </script>
 
     <script src="script.js" defer></script>
-    <script src="privacy-config.js" defer></script>
     <script src="analytics.js" defer></script>
+    <script src="privacy-config.js" defer></script>
 </body>
 </html>
