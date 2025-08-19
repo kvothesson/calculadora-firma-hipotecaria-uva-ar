@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Hipotecaria UVA - Argentina</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Calculadora Hipotecaria UVA</h1>
+            <p>Calculá tu crédito hipotecario y todos los gastos asociados</p>
+            <div class="cotizacion-actual">
+                <span>💱 Dólar Oficial: <strong id="cotizacionActual">$0</strong></span>
+                <small>Actualizado automáticamente</small>
+            </div>
+        </header>
+
+        <main>
+            <!-- Sección de datos de entrada -->
+            <section class="input-section">
+                <h2>Datos de la Propiedad</h2>
+                
+                <div class="form-group">
+                    <label for="valorPropiedad">Valor de la Propiedad (USD)</label>
+                    <input type="number" id="valorPropiedad" placeholder="90000" min="10000" step="1000">
+                    <small class="form-help">Equivale a <span id="valorPropiedadPesos">$0</span> en pesos</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="provincia">Provincia</label>
+                    <select id="provincia">
+                        <option value="CABA">CABA</option>
+                        <option value="BSAS">Buenos Aires</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="montoPrestamo">Monto a Pedir Prestado</label>
+                    <div class="input-group">
+                        <input type="number" id="montoPrestamo" placeholder="70000" min="1000" step="1000" value="70000">
+                        <select id="monedaPrestamo">
+                            <option value="USD">USD</option>
+                            <option value="ARS">Pesos</option>
+                        </select>
+                    </div>
+                    <small class="form-help">Equivale a <span id="montoPrestamoEquivalente">$0</span> en la otra moneda</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="plazo">Plazo del Crédito (años)</label>
+                    <input type="number" id="plazo" placeholder="20" min="5" max="35" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="tasaInteres">Tasa de Interés Anual (%)</label>
+                    <input type="number" id="tasaInteres" placeholder="8.5" min="4.5" max="11" step="0.1" inputmode="decimal">
+                </div>
+                
+
+            </section>
+
+            <!-- Sección de resultados -->
+            <section class="results-section">
+                <h2>Resultados del Cálculo</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Primera Cuota</h3>
+                        <div class="result-value" id="primeraCuota">$0</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Total a Pagar</h3>
+                        <div class="result-value" id="totalPagar">$0</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Gastos Extra</h3>
+                        <div class="result-value" id="gastosExtra">$0</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Cuota Mensual Promedio</h3>
+                        <div class="result-value" id="cuotaPromedio">$0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de escenarios -->
+            <section class="scenarios-section">
+                <h2>Escenarios de Tipo de Cambio</h2>
+                
+                <div class="scenarios-grid">
+                    <div class="scenario-card worst-case">
+                        <h3>🔴 Peor Caso (Dólar Alto)</h3>
+                        <div class="scenario-details">
+                            <p><strong>Tipo de cambio:</strong> $1400</p>
+                            <p><strong>Diferencia a cubrir:</strong> <span id="diferenciaAlta">$0</span></p>
+                            <p><strong>Primera cuota:</strong> <span id="cuotaAlta">$0</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card best-case">
+                        <h3>🟢 Mejor Caso (Dólar Bajo)</h3>
+                        <div class="scenario-details">
+                            <p><strong>Tipo de cambio:</strong> $1200</p>
+                            <p><strong>Diferencia a cubrir:</strong> <span id="diferenciaBaja">$0</span></p>
+                            <p><strong>Primera cuota:</strong> <span id="cuotaBaja">$0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de consejos -->
+            <section class="tips-section">
+                <h2>💡 Consejos Importantes</h2>
+                <div class="tips-content">
+                    <ul>
+                        <li><strong>Calculá siempre con el peor escenario</strong> - Usá el techo de la banda cambiaria</li>
+                        <li><strong>No llegues con la plata justa</strong> - Dejá un margen de seguridad</li>
+                        <li><strong>El tipo de cambio se fija el día de la escritura</strong> - No se puede congelar antes</li>
+                        <li><strong>Considerá los gastos extra</strong> - Escritura, inmobiliaria, firmas, etc.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>💡 Esta calculadora es informativa. Consultá siempre con tu banco para datos oficiales.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
