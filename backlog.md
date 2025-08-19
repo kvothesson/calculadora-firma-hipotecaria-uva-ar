@@ -1,0 +1,4 @@
+- Que al cambiar de usd a pesos en el monto prestado se autoconvierta a pesos o dolares
+- El dolar oficial creo que esta roto o hay que revisar si es correcto, puede que si
+- Tono negro
+- Consejos
