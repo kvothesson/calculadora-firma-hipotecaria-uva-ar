@@ -104,8 +104,10 @@ async function obtenerCotizacionOficial() {
 }
 
 function establecerValoresPorDefecto() {
-    elementos.valorPropiedad.value = 90000;
-    elementos.montoPrestamo.value = 89250000; // 89.250.000 pesos por defecto (aprox 70k USD)
+    elementos.valorPropiedad.value = 45000; // USD 45,000
+    // USD 32,000 convertido a pesos según cotización oficial (se actualiza automáticamente)
+    const montoPrestamoPesos = 32000 * CONFIG.tiposCambio.oficial;
+    elementos.montoPrestamo.value = montoPrestamoPesos;
     elementos.tasaInteres.value = 8.5;
     elementos.plazo.value = 20;
 }
