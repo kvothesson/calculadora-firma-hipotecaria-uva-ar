@@ -298,8 +298,10 @@ class PrivacyManager {
             window.calculadoraAnalytics.enable();
         }
         
-        // Configurar gtag con consentimiento
-        if (typeof gtag !== 'undefined') {
+        // Usar función global del HTML
+        if (typeof window.enableAnalytics === 'function') {
+            window.enableAnalytics();
+        } else if (typeof gtag !== 'undefined') {
             gtag('consent', 'update', {
                 'analytics_storage': 'granted'
             });
@@ -314,8 +316,10 @@ class PrivacyManager {
             window.calculadoraAnalytics.disable();
         }
         
-        // Configurar gtag sin consentimiento
-        if (typeof gtag !== 'undefined') {
+        // Usar función global del HTML
+        if (typeof window.disableAnalytics === 'function') {
+            window.disableAnalytics();
+        } else if (typeof gtag !== 'undefined') {
             gtag('consent', 'update', {
                 'analytics_storage': 'denied'
             });
