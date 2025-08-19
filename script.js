@@ -35,6 +35,135 @@ const CONFIG = {
     }
 };
 
+// Sistema de tema
+const THEME_CONFIG = {
+    current: localStorage.getItem('theme') || 'dark',
+    toggle: null,
+    init() {
+        this.toggle = document.getElementById('themeToggle');
+        this.applyTheme();
+        this.setupEventListeners();
+    },
+    applyTheme() {
+        document.body.classList.toggle('light-theme', this.current === 'light');
+        this.updateToggleIcon();
+    },
+    updateToggleIcon() {
+        if (this.toggle) {
+            this.toggle.textContent = this.current === 'light' ? '🌙' : '☀️';
+            this.toggle.classList.toggle('light', this.current === 'light');
+            this.toggle.classList.toggle('dark', this.current === 'dark');
+        }
+    },
+    switchTheme() {
+        this.current = this.current === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', this.current);
+        this.applyTheme();
+    },
+    setupEventListeners() {
+        if (this.toggle) {
+            this.toggle.addEventListener('click', () => this.switchTheme());
+        }
+    }
+};
+
+// Sistema de alertas mejorado
+const ALERT_SYSTEM = {
+    alerts: new Map(),
+    timeouts: new Map(),
+    
+    // Mostrar alerta con retraso
+    showDelayed(message, type = 'info', delay = 2000, elementId = null) {
+        const alertId = `alert_${Date.now()}_${Math.random()}`;
+        
+        // Si ya hay una alerta para este elemento, cancelarla
+        if (elementId && this.alerts.has(elementId)) {
+            this.hide(elementId);
+        }
+        
+        // Crear la alerta
+        const alerta = this.createAlert(message, type);
+        alerta.id = alertId;
+        
+        // Agregar al DOM
+        const container = this.getAlertContainer();
+        container.appendChild(alerta);
+        
+        // Mostrar después del delay
+        const timeout = setTimeout(() => {
+            this.show(alertId);
+        }, delay);
+        
+        // Guardar referencia
+        this.alerts.set(alertId, alerta);
+        this.timeouts.set(alertId, timeout);
+        
+        // Si es para un elemento específico, guardar la referencia
+        if (elementId) {
+            this.alerts.set(elementId, alerta);
+        }
+        
+        return alertId;
+    },
+    
+    // Mostrar alerta inmediatamente
+    show(alertId) {
+        const alerta = this.alerts.get(alertId);
+        if (alerta) {
+            alerta.classList.add('mostrar');
+        }
+    },
+    
+    // Ocultar alerta
+    hide(alertId) {
+        const alerta = this.alerts.get(alertId);
+        if (alerta) {
+            alerta.classList.remove('mostrar');
+            setTimeout(() => {
+                if (alerta.parentNode) {
+                    alerta.parentNode.removeChild(alerta);
+                }
+                this.alerts.delete(alertId);
+                this.timeouts.delete(alertId);
+            }, 300);
+        }
+    },
+    
+    // Crear elemento de alerta
+    createAlert(message, type) {
+        const alerta = document.createElement('div');
+        alerta.className = `alerta alerta-${type}`;
+        alerta.textContent = message;
+        return alerta;
+    },
+    
+    // Obtener contenedor de alertas
+    getAlertContainer() {
+        let container = document.getElementById('alert-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'alert-container';
+            container.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 1000;
+                max-width: 400px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(container);
+        }
+        return container;
+    },
+    
+    // Limpiar todas las alertas
+    clearAll() {
+        this.alerts.forEach((alerta, id) => {
+            this.hide(id);
+        });
+    }
+};
+
 // Elementos del DOM
 const elementos = {
     valorPropiedad: document.getElementById('valorPropiedad'),
@@ -57,6 +186,9 @@ const elementos = {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar sistema de tema
+    THEME_CONFIG.init();
+    
     // Obtener cotización oficial del día
     obtenerCotizacionOficial().then(() => {
         // Establecer valores por defecto
@@ -122,7 +254,21 @@ function agregarEventListeners() {
     // Recalcular cuando cambien los inputs (excepto el slider de tipo de cambio)
     Object.values(elementos).forEach(elemento => {
         if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcSlider') {
-            elemento.addEventListener('input', calcularTodo);
+            // Validación en tiempo real menos intrusiva
+            elemento.addEventListener('input', function() {
+                // Limpiar alertas previas para este campo
+                ALERT_SYSTEM.hide(this.id + '_warning');
+                ALERT_SYSTEM.hide(this.id + '_error');
+                
+                // Validar solo este campo
+                validarCampoIndividual(this);
+                
+                // Calcular después de un pequeño delay para evitar spam
+                clearTimeout(this.calculationTimeout);
+                this.calculationTimeout = setTimeout(() => {
+                    calcularTodo();
+                }, 500);
+            });
         }
         if (elemento && elemento.tagName === 'SELECT') {
             // Tracking especial para cambio de provincia
@@ -148,6 +294,63 @@ function agregarEventListeners() {
     
     // Configurar slider de tipo de cambio
     configurarSliderTC();
+}
+
+// Función para validar campos individuales de manera menos intrusiva
+function validarCampoIndividual(elemento) {
+    const valor = parseFloat(elemento.value) || 0;
+    const id = elemento.id;
+    
+    // Limpiar alertas previas
+    ALERT_SYSTEM.hide(id + '_warning');
+    ALERT_SYSTEM.hide(id + '_error');
+    
+    // Validaciones específicas por campo
+    switch (id) {
+        case 'valorPropiedad':
+            if (valor > 300000) {
+                ALERT_SYSTEM.showDelayed(
+                    'Valor muy alto. ¿Estás seguro?',
+                    'warning',
+                    2000,
+                    id + '_warning'
+                );
+            }
+            break;
+            
+        case 'montoPrestamo':
+            if (valor > 1000000000) { // Más de 1 billón de pesos
+                ALERT_SYSTEM.showDelayed(
+                    'Monto muy alto. Verificá el valor.',
+                    'warning',
+                    2000,
+                    id + '_warning'
+                );
+            }
+            break;
+            
+        case 'tasaInteres':
+            if (valor < 4.5 || valor > 11) {
+                ALERT_SYSTEM.showDelayed(
+                    'Tasa fuera del rango recomendado (4.5% - 11%)',
+                    'warning',
+                    2000,
+                    id + '_warning'
+                );
+            }
+            break;
+            
+        case 'plazo':
+            if (valor < 5 || valor > 35) {
+                ALERT_SYSTEM.showDelayed(
+                    'Plazo fuera del rango recomendado (5 - 35 años)',
+                    'warning',
+                    2000,
+                    id + '_warning'
+                );
+            }
+            break;
+    }
 }
 
 function calcularTodo() {
@@ -220,11 +423,54 @@ function obtenerDatosEntrada() {
 }
 
 function validarDatos(datos) {
-    if (datos.valorPropiedad <= 0) return false;
-    if (datos.montoPrestamo <= 0) return false;
-    if (datos.tasaInteres < 4.5 || datos.tasaInteres > 11) return false;
-    if (datos.plazo <= 0) return false;
-    return true;
+    let isValid = true;
+    const errors = [];
+    
+    // Validar valor de la propiedad
+    if (datos.valorPropiedad <= 0) {
+        errors.push('El valor de la propiedad debe ser mayor a 0');
+        isValid = false;
+    } else if (datos.valorPropiedad > 300000) {
+        // Mostrar advertencia si es muy alto (más de 300k USD)
+        ALERT_SYSTEM.showDelayed(
+            'El valor ingresado es muy alto. ¿Estás seguro de que es correcto?',
+            'warning',
+            3000,
+            'valorPropiedad_warning'
+        );
+    }
+    
+    // Validar monto del préstamo
+    if (datos.montoPrestamo <= 0) {
+        errors.push('El monto del préstamo debe ser mayor a 0');
+        isValid = false;
+    }
+    
+    // Validar tasa de interés
+    if (datos.tasaInteres < 4.5 || datos.tasaInteres > 11) {
+        errors.push('La tasa de interés debe estar entre 4.5% y 11%');
+        isValid = false;
+    }
+    
+    // Validar plazo
+    if (datos.plazo <= 0) {
+        errors.push('El plazo debe ser mayor a 0');
+        isValid = false;
+    }
+    
+    // Mostrar errores de manera menos intrusiva
+    if (!isValid) {
+        errors.forEach((error, index) => {
+            ALERT_SYSTEM.showDelayed(
+                error,
+                'error',
+                2000 + (index * 500), // Espaciar las alertas
+                `validation_error_${index}`
+            );
+        });
+    }
+    
+    return isValid;
 }
 
 function calcularCredito(datos) {
