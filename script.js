@@ -92,6 +92,12 @@ async function obtenerCotizacionOficial() {
         }
     } catch (error) {
         console.log('No se pudo obtener la cotización oficial, usando valor por defecto');
+        
+        // Analytics: Rastrear error al obtener cotización
+        if (window.calculadoraAnalytics) {
+            window.calculadoraAnalytics.trackError('api_cotizacion', error.message, 'obtenerCotizacionOficial');
+        }
+        
         // Si falla, usar valores por defecto
         CONFIG.tiposCambio.oficial = 1225;
         CONFIG.tiposCambio.simulador = 1225;
@@ -119,7 +125,21 @@ function agregarEventListeners() {
             elemento.addEventListener('input', calcularTodo);
         }
         if (elemento && elemento.tagName === 'SELECT') {
-            elemento.addEventListener('change', calcularTodo);
+            // Tracking especial para cambio de provincia
+            if (elemento.id === 'provincia') {
+                let previousProvincia = elemento.value;
+                elemento.addEventListener('change', function() {
+                    // Analytics: Rastrear cambio de provincia
+                    if (window.calculadoraAnalytics) {
+                        window.calculadoraAnalytics.trackProvinceChange(this.value, previousProvincia);
+                    }
+                    previousProvincia = this.value;
+                    
+                    calcularTodo();
+                });
+            } else {
+                elemento.addEventListener('change', calcularTodo);
+            }
         }
     });
     
@@ -142,6 +162,15 @@ function calcularTodo() {
     
     mostrarResultados(resultados);
     mostrarTipsDinamicos(resultados);
+    
+    // Analytics: Rastrear cálculo completado
+    if (window.calculadoraAnalytics) {
+        window.calculadoraAnalytics.trackCalculation({
+            ...datos,
+            primeraCuota: resultados.primeraCuota,
+            gastosExtra: resultados.gastosExtra.total
+        });
+    }
 }
 
 function limpiarResultados() {
@@ -447,15 +476,31 @@ function configurarSliders() {
     const tasaValor = document.getElementById('tasaValor');
     
     if (plazoSlider && plazoValor) {
+        let previousPlazo = plazoSlider.value;
         plazoSlider.addEventListener('input', function() {
             plazoValor.textContent = this.value;
+            
+            // Analytics: Rastrear cambio de plazo
+            if (window.calculadoraAnalytics) {
+                window.calculadoraAnalytics.trackSliderChange('plazo', parseInt(this.value), parseInt(previousPlazo));
+            }
+            previousPlazo = this.value;
+            
             calcularTodo();
         });
     }
     
     if (tasaSlider && tasaValor) {
+        let previousTasa = tasaSlider.value;
         tasaSlider.addEventListener('input', function() {
             tasaValor.textContent = this.value;
+            
+            // Analytics: Rastrear cambio de tasa
+            if (window.calculadoraAnalytics) {
+                window.calculadoraAnalytics.trackSliderChange('tasa_interes', parseFloat(this.value), parseFloat(previousTasa));
+            }
+            previousTasa = this.value;
+            
             calcularTodo();
         });
     }
@@ -474,6 +519,11 @@ function configurarSliderTC() {
         tcSlider.addEventListener('input', function() {
             const nuevoTC = parseInt(this.value);
             tcValor.textContent = nuevoTC;
+            
+            // Analytics: Rastrear cambio en simulador de tipo de cambio
+            if (window.calculadoraAnalytics) {
+                window.calculadoraAnalytics.trackCurrencyScenario(nuevoTC, 'manual');
+            }
             
             // Solo actualizar el simulador, no el oficial
             CONFIG.tiposCambio.simulador = nuevoTC;
@@ -506,6 +556,11 @@ function mostrarTipsDinamicos(resultados) {
         </div>
     `;
     tipsContainer.appendChild(tipCuota);
+    
+    // Analytics: Rastrear visualización de tip de ingreso recomendado
+    if (window.calculadoraAnalytics) {
+        window.calculadoraAnalytics.trackTipsViewed('ingreso_recomendado', tipCuota.innerHTML);
+    }
     
     // 2. Ancho de banda cambiaria
     const anchoBanda = CONFIG.tiposCambio.peorCaso - CONFIG.tiposCambio.mejorCaso;
@@ -579,6 +634,11 @@ function mostrarTipsDinamicos(resultados) {
             </div>
         `;
         tipsContainer.appendChild(tipAhorroTotal);
+        
+        // Analytics: Rastrear visualización completa de todos los tips
+        if (window.calculadoraAnalytics) {
+            window.calculadoraAnalytics.trackTipsViewed('tips_completos', `Tips generados para cuota: ${formatearPesos(cuota)}`);
+        }
     }
 }
 
