@@ -12,15 +12,7 @@
             <h1>🏠 Calculadora Hipotecaria UVA</h1>
             <p>Calculá tu crédito hipotecario y todos los gastos asociados</p>
             
-            <!-- Toggle de Moneda Global -->
-            <div class="moneda-toggle">
-                <button type="button" class="toggle-btn active" data-moneda="USD">
-                    <span>💵 USD</span>
-                </button>
-                <button type="button" class="toggle-btn" data-moneda="ARS">
-                    <span>💰 Pesos</span>
-                </button>
-            </div>
+
             
             <div class="cotizacion-actual">
                 <span>💱 Dólar Oficial: <strong id="cotizacionActual">$0</strong></span>
@@ -89,8 +81,16 @@
                         <h3>Primera Cuota 
                             <span class="tooltip" title="Tu primera cuota mensual, antes de ajustes UVA">ℹ️</span>
                         </h3>
-                        <div class="result-value" id="primeraCuota">$0</div>
-                        <div class="result-equivalent" id="primeraCuotaUSD">$0 USD</div>
+                        <div class="dual-currency-display">
+                            <div class="currency-item">
+                                <span class="currency-value" id="primeraCuota">$0</span>
+                                <span class="currency-label-small">Pesos</span>
+                            </div>
+                            <div class="currency-item">
+                                <span class="currency-value" id="primeraCuotaUSD">$0 USD</span>
+                                <span class="currency-label-small">Dólares</span>
+                            </div>
+                        </div>
                         <small>Al inicio del crédito</small>
                     </div>
                     
@@ -117,9 +117,15 @@
                             </div>
                             <div class="gasto-item total">
                                 <span><strong>Total Gastos:</strong></span>
-                                <div class="gasto-valores">
-                                    <span id="gastosExtra"><strong>$0</strong></span>
-                                    <small id="gastosExtraUSD">$0 USD</small>
+                                <div class="gasto-valores dual-currency">
+                                    <div class="currency-item-inline">
+                                        <span id="gastosExtra" class="currency-value-inline"><strong>$0</strong></span>
+                                        <small class="currency-label-tiny">Pesos</small>
+                                    </div>
+                                    <div class="currency-item-inline">
+                                        <span id="gastosExtraUSD" class="currency-value-inline">$0 USD</span>
+                                        <small class="currency-label-tiny">Dólares</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -129,8 +135,16 @@
                         <h3>Total a Pagar 
                             <span class="tooltip" title="Suma de todas las cuotas durante todo el plazo del crédito">ℹ️</span>
                         </h3>
-                        <div class="result-value" id="totalPagar">$0</div>
-                        <div class="result-equivalent" id="totalPagarUSD">$0 USD</div>
+                        <div class="dual-currency-display">
+                            <div class="currency-item">
+                                <span class="currency-value" id="totalPagar">$0</span>
+                                <span class="currency-label-small">Pesos</span>
+                            </div>
+                            <div class="currency-item">
+                                <span class="currency-value" id="totalPagarUSD">$0 USD</span>
+                                <span class="currency-label-small">Dólares</span>
+                            </div>
+                        </div>
                         <small>Durante todo el crédito</small>
                     </div>
                 </div>
@@ -138,7 +152,8 @@
 
             <!-- Sección de escenarios -->
             <section class="scenarios-section">
-                <h2>Simulador de Tipo de Cambio</h2>
+                <h2>💱 Simulador al Día de la Firma</h2>
+                <p class="section-description">El tipo de cambio se fija el día que firmás la escritura. Simulá diferentes escenarios:</p>
                 
                 <div class="tc-slider-container">
                     <label for="tcSlider">Tipo de cambio: $<span id="tcValor">1225</span></label>
@@ -149,22 +164,24 @@
                     </div>
                 </div>
                 
-                <div class="scenarios-grid">
-                    <div class="scenario-card worst-case">
-                        <h3>🔴 Peor Caso (Dólar Alto)</h3>
+                <div class="scenario-result">
+                    <div class="scenario-card central">
+                        <h3>📊 Diferencia a Cubrir al Día de la Firma</h3>
                         <div class="scenario-details">
-                            <p><strong>Tipo de cambio:</strong> $1400</p>
-                            <p><strong>Diferencia a cubrir:</strong> <span id="diferenciaAlta">$0</span></p>
-                            <p><strong>Primera cuota:</strong> <span id="cuotaAlta">$0</span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="scenario-card best-case">
-                        <h3>🟢 Mejor Caso (Dólar Bajo)</h3>
-                        <div class="scenario-details">
-                            <p><strong>Tipo de cambio:</strong> $1200</p>
-                            <p><strong>Diferencia a cubrir:</strong> <span id="diferenciaBaja">$0</span></p>
-                            <p><strong>Primera cuota:</strong> <span id="cuotaBaja">$0</span></p>
+                            <div class="dual-currency-display">
+                                <div class="currency-item">
+                                    <span class="currency-label">En Pesos:</span>
+                                    <span class="currency-value" id="diferenciaSimulador">$0</span>
+                                </div>
+                                <div class="currency-item">
+                                    <span class="currency-label">En Dólares:</span>
+                                    <span class="currency-value" id="diferenciaSimuladorUSD">$0 USD</span>
+                                </div>
+                            </div>
+                            <small class="scenario-note">
+                                Este es el monto adicional que necesitarás si el dólar está a 
+                                $<span id="tcSimuladorTexto">1225</span> el día de la firma
+                            </small>
                         </div>
                     </div>
                 </div>
