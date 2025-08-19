@@ -35,38 +35,6 @@ const CONFIG = {
     }
 };
 
-// Sistema de tema
-const THEME_CONFIG = {
-    current: localStorage.getItem('theme') || 'dark',
-    toggle: null,
-    init() {
-        this.toggle = document.getElementById('themeToggle');
-        this.applyTheme();
-        this.setupEventListeners();
-    },
-    applyTheme() {
-        document.body.classList.toggle('light-theme', this.current === 'light');
-        this.updateToggleIcon();
-    },
-    updateToggleIcon() {
-        if (this.toggle) {
-            this.toggle.textContent = this.current === 'light' ? '🌙' : '☀️';
-            this.toggle.classList.toggle('light', this.current === 'light');
-            this.toggle.classList.toggle('dark', this.current === 'dark');
-        }
-    },
-    switchTheme() {
-        this.current = this.current === 'light' ? 'dark' : 'light';
-        localStorage.setItem('theme', this.current);
-        this.applyTheme();
-    },
-    setupEventListeners() {
-        if (this.toggle) {
-            this.toggle.addEventListener('click', () => this.switchTheme());
-        }
-    }
-};
-
 // Sistema de alertas mejorado
 const ALERT_SYSTEM = {
     alerts: new Map(),
@@ -186,9 +154,6 @@ const elementos = {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar sistema de tema
-    THEME_CONFIG.init();
-    
     // Obtener cotización oficial del día
     obtenerCotizacionOficial().then(() => {
         // Establecer valores por defecto
