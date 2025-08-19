@@ -16,13 +16,13 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 15px;
+    padding: 12px;
 }
 
 /* Header */
 header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 18px;
     color: #f1f5f9;
 }
 
@@ -67,40 +67,40 @@ header p {
 section {
     background: #0f172a;
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     border: 1px solid rgba(30, 41, 59, 0.6);
 }
 
 section h2 {
     color: #f1f5f9;
-    margin-bottom: 18px;
-    font-size: 1.6rem;
+    margin-bottom: 12px;
+    font-size: 1.4rem;
     border-bottom: 2px solid #3b82f6;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 /* Formulario */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     font-weight: 600;
     color: #e2e8f0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid rgba(71, 85, 105, 0.5);
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 6px;
+    font-size: 15px;
     background: rgba(30, 41, 59, 0.8);
     color: #e2e8f0;
     transition: all 0.3s ease;
@@ -116,8 +116,8 @@ section h2 {
 
 .form-help {
     display: block;
-    margin-top: 5px;
-    font-size: 0.85rem;
+    margin-top: 3px;
+    font-size: 0.8rem;
     color: #6c757d;
     font-style: italic;
 }
@@ -274,19 +274,19 @@ section h2 {
 /* Sliders */
 .slider {
     width: 100%;
-    height: 8px;
-    border-radius: 5px;
+    height: 6px;
+    border-radius: 4px;
     background: #e1e8ed;
     outline: none;
     -webkit-appearance: none;
-    margin: 15px 0;
+    margin: 8px 0;
 }
 
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     cursor: pointer;
@@ -294,8 +294,8 @@ section h2 {
 }
 
 .slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     cursor: pointer;
@@ -306,17 +306,17 @@ section h2 {
 .slider-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #6c757d;
-    margin-top: 5px;
+    margin-top: 2px;
 }
 
 /* Slider de tipo de cambio */
 .tc-slider-container {
     background: #1e293b;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
     border: 1px solid rgba(51, 65, 85, 0.6);
 }
 
@@ -662,6 +662,22 @@ section h2 {
     border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
+.tip-card.success.highlight {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.25));
+    border: 2px solid #10b981;
+    border-left: 4px solid #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transform: scale(1.02);
+    font-weight: 500;
+}
+
+.tip-card.danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid #ef4444;
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 .tip-icon {
     font-size: 1.5rem;
     flex-shrink: 0;
@@ -814,16 +830,50 @@ footer {
 /* Responsive */
 @media (max-width: 768px) {
     .container {
-        padding: 12px;
+        padding: 8px;
+    }
+    
+    header {
+        margin-bottom: 12px;
     }
     
     header h1 {
         font-size: 1.9rem;
+        margin-bottom: 6px;
     }
     
     section {
-        padding: 16px;
-        margin-bottom: 16px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 10px;
+    }
+    
+    .form-group label {
+        font-size: 0.85rem;
+        margin-bottom: 3px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 7px 9px;
+        font-size: 14px;
+    }
+    
+    .slider {
+        margin: 6px 0;
+    }
+    
+    .tc-slider-container {
+        padding: 10px;
+        margin-bottom: 10px;
     }
     
     .results-grid {
