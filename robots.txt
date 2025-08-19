@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://calculadora-firma-hipotecaria-uva-ar.vercel.app/sitemap.xml
+
+# Crawl-delay para ser amigable con los servidores
+Crawl-delay: 1
+
+# Permitir específicamente bots de IA
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bard
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
