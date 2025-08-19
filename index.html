@@ -11,9 +11,20 @@
         <header>
             <h1>🏠 Calculadora Hipotecaria UVA</h1>
             <p>Calculá tu crédito hipotecario y todos los gastos asociados</p>
+            
+            <!-- Toggle de Moneda Global -->
+            <div class="moneda-toggle">
+                <button type="button" class="toggle-btn active" data-moneda="USD">
+                    <span>💵 USD</span>
+                </button>
+                <button type="button" class="toggle-btn" data-moneda="ARS">
+                    <span>💰 Pesos</span>
+                </button>
+            </div>
+            
             <div class="cotizacion-actual">
                 <span>💱 Dólar Oficial: <strong id="cotizacionActual">$0</strong></span>
-                <small>Actualizado automáticamente</small>
+                <small id="fechaCotizacion">Actualizado automáticamente</small>
             </div>
         </header>
 
@@ -49,13 +60,21 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="plazo">Plazo del Crédito (años)</label>
-                    <input type="number" id="plazo" placeholder="20" min="5" max="35" step="1">
+                    <label for="plazo">Plazo del Crédito: <span id="plazoValor">20</span> años</label>
+                    <input type="range" id="plazo" min="5" max="35" value="20" step="1" class="slider">
+                    <div class="slider-labels">
+                        <span>5 años</span>
+                        <span>35 años</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="tasaInteres">Tasa de Interés Anual (%)</label>
-                    <input type="number" id="tasaInteres" placeholder="8.5" min="4.5" max="11" step="0.1" inputmode="decimal">
+                    <label for="tasaInteres">Tasa de Interés: <span id="tasaValor">8.5</span>%</label>
+                    <input type="range" id="tasaInteres" min="4.5" max="11" value="8.5" step="0.1" class="slider">
+                    <div class="slider-labels">
+                        <span>4.5%</span>
+                        <span>11%</span>
+                    </div>
                 </div>
                 
 
@@ -63,34 +82,72 @@
 
             <!-- Sección de resultados -->
             <section class="results-section">
-                <h2>Resultados del Cálculo</h2>
+                <h2>📊 Resumen de tu Crédito</h2>
                 
                 <div class="results-grid">
-                    <div class="result-card">
-                        <h3>Primera Cuota</h3>
+                    <div class="result-card priority">
+                        <h3>Primera Cuota 
+                            <span class="tooltip" title="Tu primera cuota mensual, antes de ajustes UVA">ℹ️</span>
+                        </h3>
                         <div class="result-value" id="primeraCuota">$0</div>
+                        <div class="result-equivalent" id="primeraCuotaUSD">$0 USD</div>
+                        <small>Al inicio del crédito</small>
                     </div>
                     
-                    <div class="result-card">
-                        <h3>Total a Pagar</h3>
+                    <div class="result-card secondary">
+                        <h3>Gastos de Escritura 
+                            <span class="tooltip" title="Desglose detallado de todos los gastos al comprar">ℹ️</span>
+                        </h3>
+                        <div class="gastos-detalle">
+                            <div class="gasto-item">
+                                <span>Escritura: <small class="porcentaje">(2.0-2.5%)</small></span>
+                                <span id="gastoEscritura">$0</span>
+                            </div>
+                            <div class="gasto-item">
+                                <span>Inmobiliaria: <small class="porcentaje">(2.5-3.5%)</small></span>
+                                <span id="gastoInmobiliaria">$0</span>
+                            </div>
+                            <div class="gasto-item">
+                                <span>Firmas: <small class="porcentaje">(0.5-1.0%)</small></span>
+                                <span id="gastoFirmas">$0</span>
+                            </div>
+                            <div class="gasto-item">
+                                <span>Sellos: <small class="porcentaje">(1.0-1.5%)</small></span>
+                                <span id="gastoSellos">$0</span>
+                            </div>
+                            <div class="gasto-item total">
+                                <span><strong>Total Gastos:</strong></span>
+                                <div class="gasto-valores">
+                                    <span id="gastosExtra"><strong>$0</strong></span>
+                                    <small id="gastosExtraUSD">$0 USD</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card secondary">
+                        <h3>Total a Pagar 
+                            <span class="tooltip" title="Suma de todas las cuotas durante todo el plazo del crédito">ℹ️</span>
+                        </h3>
                         <div class="result-value" id="totalPagar">$0</div>
-                    </div>
-                    
-                    <div class="result-card">
-                        <h3>Gastos Extra</h3>
-                        <div class="result-value" id="gastosExtra">$0</div>
-                    </div>
-                    
-                    <div class="result-card">
-                        <h3>Cuota Mensual Promedio</h3>
-                        <div class="result-value" id="cuotaPromedio">$0</div>
+                        <div class="result-equivalent" id="totalPagarUSD">$0 USD</div>
+                        <small>Durante todo el crédito</small>
                     </div>
                 </div>
             </section>
 
             <!-- Sección de escenarios -->
             <section class="scenarios-section">
-                <h2>Escenarios de Tipo de Cambio</h2>
+                <h2>Simulador de Tipo de Cambio</h2>
+                
+                <div class="tc-slider-container">
+                    <label for="tcSlider">Tipo de cambio: $<span id="tcValor">1225</span></label>
+                    <input type="range" id="tcSlider" min="1000" max="1600" value="1225" step="25" class="slider tc-slider">
+                    <div class="tc-labels">
+                        <span>$1000</span>
+                        <span>$1600</span>
+                    </div>
+                </div>
                 
                 <div class="scenarios-grid">
                     <div class="scenario-card worst-case">
@@ -116,6 +173,17 @@
             <!-- Sección de consejos -->
             <section class="tips-section">
                 <h2>💡 Consejos Importantes</h2>
+                
+                <!-- Tips Contextuales Dinámicos -->
+                <div class="tips-dynamic" id="tipsDinamicos">
+                    <div class="tip-card warning" id="tipCuota">
+                        <span class="tip-icon">⚠️</span>
+                        <div class="tip-content">
+                            <strong>Cuota recomendada:</strong> No superes el 40% de tus ingresos mensuales
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="tips-content">
                     <ul>
                         <li><strong>Calculá siempre con el peor escenario</strong> - Usá el techo de la banda cambiaria</li>

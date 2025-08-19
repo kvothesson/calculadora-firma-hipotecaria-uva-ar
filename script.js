@@ -6,13 +6,13 @@ const CONFIG = {
             escritura: 2.5,        // 2.5% del valor
             inmobiliaria: 3.0,     // 3% del valor
             firmas: 0.5,           // 0.5% del valor
-            otros: 1.0             // 1% del valor
+            sellos: 1.5            // 1.5% del valor
         },
         'BSAS': {
             escritura: 2.0,        // 2% del valor
             inmobiliaria: 3.0,     // 3% del valor
             firmas: 0.5,           // 0.5% del valor
-            otros: 1.0             // 1% del valor
+            sellos: 1.0            // 1% del valor
         }
     },
     
@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar event listeners
         agregarEventListeners();
         
+        // Configurar toggle de moneda
+        configurarToggleMoneda();
+        
         // Calcular inicialmente
         calcularTodo();
     });
@@ -114,6 +117,12 @@ function agregarEventListeners() {
             elemento.addEventListener('change', calcularTodo);
         }
     });
+    
+    // Configurar sliders
+    configurarSliders();
+    
+    // Configurar slider de tipo de cambio
+    configurarSliderTC();
 }
 
 function calcularTodo() {
@@ -129,13 +138,24 @@ function calcularTodo() {
     
     mostrarResultados(resultados);
     mostrarEscenarios(escenarios);
+    mostrarTipsDinamicos(resultados);
 }
 
 function limpiarResultados() {
     elementos.primeraCuota.textContent = '$0';
+    document.getElementById('primeraCuotaUSD').textContent = '$0 USD';
+    
     elementos.totalPagar.textContent = '$0';
-    elementos.gastosExtra.textContent = '$0';
-    elementos.cuotaPromedio.textContent = '$0';
+    document.getElementById('totalPagarUSD').textContent = '$0 USD';
+    
+    // Limpiar desglose de gastos
+    document.getElementById('gastoEscritura').textContent = '$0';
+    document.getElementById('gastoInmobiliaria').textContent = '$0';
+    document.getElementById('gastoFirmas').textContent = '$0';
+    document.getElementById('gastoSellos').textContent = '$0';
+    elementos.gastosExtra.innerHTML = '<strong>$0</strong>';
+    document.getElementById('gastosExtraUSD').textContent = '$0 USD';
+    
     elementos.diferenciaAlta.textContent = '$0';
     elementos.cuotaAlta.textContent = '$0';
     elementos.diferenciaBaja.textContent = '$0';
@@ -208,10 +228,15 @@ function calcularCredito(datos) {
 
 function calcularGastosExtra(valorPropiedad, provincia) {
     const gastos = CONFIG.gastosExtra[provincia];
-    const totalGastos = (gastos.escritura + gastos.inmobiliaria + gastos.firmas + gastos.otros) / 100;
+    const valorPesos = valorPropiedad * CONFIG.tiposCambio.actual;
     
-    // Convertir a pesos
-    return valorPropiedad * totalGastos * CONFIG.tiposCambio.actual;
+    return {
+        escritura: valorPesos * gastos.escritura / 100,
+        inmobiliaria: valorPesos * gastos.inmobiliaria / 100,
+        firmas: valorPesos * gastos.firmas / 100,
+        sellos: valorPesos * gastos.sellos / 100,
+        total: valorPesos * (gastos.escritura + gastos.inmobiliaria + gastos.firmas + gastos.sellos) / 100
+    };
 }
 
 function calcularCuotaPromedioConUVA(cuotaInicial, totalMeses) {
@@ -253,10 +278,28 @@ function calcularCuotaConTipoCambio(cuotaBase, tipoCambio) {
 }
 
 function mostrarResultados(resultados) {
+    // Primera cuota en ambas monedas
     elementos.primeraCuota.textContent = formatearPesos(resultados.primeraCuota);
+    const primeraCuotaUSD = resultados.primeraCuota / CONFIG.tiposCambio.actual;
+    document.getElementById('primeraCuotaUSD').textContent = `$${formatearNumero(primeraCuotaUSD)} USD`;
+    
+    // Total a pagar en ambas monedas
     elementos.totalPagar.textContent = formatearPesos(resultados.totalPagar);
-    elementos.gastosExtra.textContent = formatearPesos(resultados.gastosExtra);
-    elementos.cuotaPromedio.textContent = formatearPesos(resultados.cuotaPromedio);
+    const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.actual;
+    document.getElementById('totalPagarUSD').textContent = `$${formatearNumero(totalPagarUSD)} USD`;
+    
+    // Mostrar desglose de gastos
+    if (resultados.gastosExtra && typeof resultados.gastosExtra === 'object') {
+        document.getElementById('gastoEscritura').textContent = formatearPesos(resultados.gastosExtra.escritura);
+        document.getElementById('gastoInmobiliaria').textContent = formatearPesos(resultados.gastosExtra.inmobiliaria);
+        document.getElementById('gastoFirmas').textContent = formatearPesos(resultados.gastosExtra.firmas);
+        document.getElementById('gastoSellos').textContent = formatearPesos(resultados.gastosExtra.sellos);
+        
+        // Total gastos en ambas monedas
+        elementos.gastosExtra.innerHTML = `<strong>${formatearPesos(resultados.gastosExtra.total)}</strong>`;
+        const gastosExtraUSD = resultados.gastosExtra.total / CONFIG.tiposCambio.actual;
+        document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(gastosExtraUSD)} USD`;
+    }
 }
 
 function mostrarEscenarios(escenarios) {
@@ -305,9 +348,108 @@ function actualizarEquivalenciaMontoPrestado(monto, moneda) {
 
 function actualizarCotizacionEnInterfaz() {
     const elementoCotizacion = document.getElementById('cotizacionActual');
+    const fechaCotizacion = document.getElementById('fechaCotizacion');
+    
     if (elementoCotizacion) {
         elementoCotizacion.textContent = formatearPesos(CONFIG.tiposCambio.actual);
     }
+    
+    if (fechaCotizacion) {
+        const ahora = new Date();
+        fechaCotizacion.textContent = `Actualizado: ${ahora.toLocaleTimeString('es-AR')}`;
+    }
+}
+
+// Configurar toggle de moneda global
+function configurarToggleMoneda() {
+    const toggleBtns = document.querySelectorAll('.toggle-btn');
+    
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remover clase active de todos los botones
+            toggleBtns.forEach(b => b.classList.remove('active'));
+            // Agregar clase active al botón clickeado
+            this.classList.add('active');
+            
+            // Cambiar moneda global
+            const moneda = this.dataset.moneda;
+            cambiarMonedaGlobal(moneda);
+        });
+    });
+}
+
+// Cambiar moneda global
+function cambiarMonedaGlobal(moneda) {
+    // Aquí podrías implementar la lógica para cambiar toda la interfaz
+    // Por ahora solo actualizamos el selector del monto prestado
+    if (elementos.monedaPrestamo) {
+        elementos.monedaPrestamo.value = moneda;
+        calcularTodo();
+    }
+}
+
+// Configurar sliders
+function configurarSliders() {
+    const plazoSlider = document.getElementById('plazo');
+    const plazoValor = document.getElementById('plazoValor');
+    const tasaSlider = document.getElementById('tasaInteres');
+    const tasaValor = document.getElementById('tasaValor');
+    
+    if (plazoSlider && plazoValor) {
+        plazoSlider.addEventListener('input', function() {
+            plazoValor.textContent = this.value;
+            calcularTodo();
+        });
+    }
+    
+    if (tasaSlider && tasaValor) {
+        tasaSlider.addEventListener('input', function() {
+            tasaValor.textContent = this.value;
+            calcularTodo();
+        });
+    }
+}
+
+// Configurar slider de tipo de cambio
+function configurarSliderTC() {
+    const tcSlider = document.getElementById('tcSlider');
+    const tcValor = document.getElementById('tcValor');
+    
+    if (tcSlider && tcValor) {
+        tcSlider.addEventListener('input', function() {
+            const nuevoTC = parseInt(this.value);
+            tcValor.textContent = nuevoTC;
+            
+            // Actualizar tipo de cambio y recalcular
+            CONFIG.tiposCambio.actual = nuevoTC;
+            calcularTodo();
+        });
+    }
+}
+
+// Mostrar tips dinámicos
+function mostrarTipsDinamicos(resultados) {
+    const tipsContainer = document.getElementById('tipsDinamicos');
+    if (!tipsContainer) return;
+    
+    // Limpiar tips anteriores
+    tipsContainer.innerHTML = '';
+    
+    // Tip sobre cuota recomendada
+    const cuota = resultados.primeraCuota;
+    const ingresoRecomendado = cuota / 0.4; // 40% del ingreso
+    
+    const tipCuota = document.createElement('div');
+    tipCuota.className = 'tip-card info';
+    tipCuota.innerHTML = `
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+            <strong>Ingreso recomendado:</strong> Para esta cuota de ${formatearPesos(cuota)}, 
+            tu ingreso mensual debería ser al menos ${formatearPesos(ingresoRecomendado)}
+        </div>
+    `;
+    
+    tipsContainer.appendChild(tipCuota);
 }
 
 
