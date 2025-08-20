@@ -101,19 +101,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function obtenerCotizacionOficial() {
     try {
-        // Intentar obtener la cotización del BCRA o API pública
+        // Intentar obtener de cache primero
+        const cotizacionCacheada = obtenerCotizacionDeCache();
+        if (cotizacionCacheada) {
+            aplicarCotizacion(cotizacionCacheada.valor, cotizacionCacheada.fuente);
+            actualizarCotizacionEnInterfaz(cotizacionCacheada.fuente, cotizacionCacheada.fecha);
+            return;
+        }
+
+        // Intentar API del BCRA (oficial)
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const bcraUrl = `https://api.bcra.gob.ar/estadisticascambiarias/v1.0/Cotizaciones/USD?fechaDesde=${today}&fechaHasta=${today}`;
+        
+        try {
+            const bcraResponse = await fetch(bcraUrl);
+            const bcraData = await bcraResponse.json();
+            
+            if (bcraData && bcraData.results && bcraData.results[0] && bcraData.results[0].detalle && bcraData.results[0].detalle[0]) {
+                const cotizacionBCRA = bcraData.results[0].detalle[0].tipoCotizacion;
+                if (cotizacionBCRA && cotizacionBCRA > 0) {
+                    aplicarCotizacion(cotizacionBCRA, 'BCRA');
+                    guardarCotizacionEnCache(cotizacionBCRA, 'BCRA');
+                    actualizarCotizacionEnInterfaz('BCRA', today);
+                    return;
+                }
+            }
+        } catch (bcraError) {
+            console.log('API del BCRA no disponible, intentando con API alternativa:', bcraError.message);
+        }
+
+        // Fallback: API alternativa
         const response = await fetch('https://api-dolar-argentina.herokuapp.com/api/dolares/oficial');
         const data = await response.json();
         
         if (data && data.venta) {
-            CONFIG.tiposCambio.oficial = parseFloat(data.venta);
-            CONFIG.tiposCambio.simulador = CONFIG.tiposCambio.oficial;
-            CONFIG.tiposCambio.peorCaso = Math.round(CONFIG.tiposCambio.oficial * 1.15); // 15% más
-            CONFIG.tiposCambio.mejorCaso = Math.round(CONFIG.tiposCambio.oficial * 0.95); // 5% menos
-            
-            // Actualizar la interfaz con la cotización actual
-            actualizarCotizacionEnInterfaz();
+            aplicarCotizacion(parseFloat(data.venta), 'API alternativa');
+            guardarCotizacionEnCache(parseFloat(data.venta), 'API alternativa');
+            actualizarCotizacionEnInterfaz('API alternativa', today);
+            return;
         }
+
+        // Si todo falla, usar valores por defecto
+        throw new Error('Todas las APIs fallaron');
+        
     } catch (error) {
         console.log('No se pudo obtener la cotización oficial, usando valor por defecto');
         
@@ -123,13 +153,64 @@ async function obtenerCotizacionOficial() {
         }
         
         // Si falla, usar valores por defecto
-        CONFIG.tiposCambio.oficial = 1225;
-        CONFIG.tiposCambio.simulador = 1225;
-        CONFIG.tiposCambio.peorCaso = 1400;
-        CONFIG.tiposCambio.mejorCaso = 1200;
+        aplicarCotizacion(1225, 'Valor por defecto');
+        actualizarCotizacionEnInterfaz('Valor por defecto', new Date().toISOString().split('T')[0]);
+    }
+}
+
+// Función auxiliar para aplicar cotización
+function aplicarCotizacion(valor, fuente) {
+    CONFIG.tiposCambio.oficial = valor;
+    CONFIG.tiposCambio.simulador = valor;
+    CONFIG.tiposCambio.peorCaso = Math.round(valor * 1.15); // 15% más
+    CONFIG.tiposCambio.mejorCaso = Math.round(valor * 0.95); // 5% menos
+    
+    console.log(`Cotización obtenida de ${fuente}: $${valor}`);
+}
+
+// Sistema de cache en localStorage
+function obtenerCotizacionDeCache() {
+    try {
+        const cache = localStorage.getItem('cotizacion_cache');
+        if (!cache) return null;
         
-        // Actualizar la interfaz con la cotización por defecto
-        actualizarCotizacionEnInterfaz();
+        const datos = JSON.parse(cache);
+        const ahora = new Date();
+        const fechaCache = new Date(datos.timestamp);
+        
+        // Cache válido por 1 hora
+        const horasTranscurridas = (ahora - fechaCache) / (1000 * 60 * 60);
+        
+        if (horasTranscurridas < 1) {
+            console.log(`Usando cotización desde cache (${datos.fuente}): $${datos.valor}`);
+            return datos;
+        }
+        
+        // Cache expirado
+        localStorage.removeItem('cotizacion_cache');
+        return null;
+        
+    } catch (error) {
+        console.log('Error al leer cache:', error);
+        localStorage.removeItem('cotizacion_cache');
+        return null;
+    }
+}
+
+function guardarCotizacionEnCache(valor, fuente) {
+    try {
+        const datos = {
+            valor: valor,
+            fuente: fuente,
+            fecha: new Date().toISOString().split('T')[0],
+            timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('cotizacion_cache', JSON.stringify(datos));
+        console.log(`Cotización guardada en cache: $${valor} (${fuente})`);
+        
+    } catch (error) {
+        console.log('Error al guardar en cache:', error);
     }
 }
 
@@ -727,7 +808,7 @@ function actualizarEquivalenciaMontoPrestado(montoPesos) {
     elementoEquivalencia.textContent = `$${formatearNumero(equivalenciaUSD)} USD`;
 }
 
-function actualizarCotizacionEnInterfaz() {
+function actualizarCotizacionEnInterfaz(fuente = 'Automático', fecha = null) {
     const elementoCotizacion = document.getElementById('cotizacionActual');
     const fechaCotizacion = document.getElementById('fechaCotizacion');
     
@@ -737,7 +818,19 @@ function actualizarCotizacionEnInterfaz() {
     
     if (fechaCotizacion) {
         const ahora = new Date();
-        fechaCotizacion.textContent = `Actualizado: ${ahora.toLocaleTimeString('es-AR')}`;
+        let textoActualizacion = '';
+        
+        if (fuente === 'BCRA') {
+            textoActualizacion = `✅ BCRA Oficial - ${fecha || ahora.toLocaleDateString('es-AR')}`;
+        } else if (fuente === 'API alternativa') {
+            textoActualizacion = `⚠️ API alternativa - ${ahora.toLocaleTimeString('es-AR')}`;
+        } else if (fuente === 'Valor por defecto') {
+            textoActualizacion = `❌ Sin conexión - Valor estimado`;
+        } else {
+            textoActualizacion = `Desde cache - ${ahora.toLocaleTimeString('es-AR')}`;
+        }
+        
+        fechaCotizacion.textContent = textoActualizacion;
     }
 }
 
