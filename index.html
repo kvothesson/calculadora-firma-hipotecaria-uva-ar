@@ -103,6 +103,12 @@
             <div class="cotizacion-actual">
                 <span>💱 Dólar Oficial: <strong id="cotizacionActual">$0</strong></span>
                 <small id="fechaCotizacion">Actualizado automáticamente</small>
+                
+                <!-- Indicador sutil de estado de validación -->
+                <div id="validation-status" class="validation-status hidden">
+                    <span class="status-dot"></span>
+                    <small class="status-text">Completá los datos para calcular</small>
+                </div>
             </div>
         </header>
 
@@ -191,20 +197,44 @@
                         </h3>
                         <div class="gastos-detalle">
                             <div class="gasto-item">
-                                <span>Escritura: <small class="porcentaje">(2.0-2.5%)</small></span>
-                                <span id="gastoEscritura">$0</span>
+                                <div class="gasto-header">
+                                    <span>Escritura: <small class="porcentaje">(ref: 2.0-2.5%)</small></span>
+                                    <span id="gastoEscritura">$0</span>
+                                </div>
+                                <div class="gasto-control">
+                                    <input type="range" id="escrituraSlider" min="0" max="10" value="2.25" step="0.05" class="slider gasto-slider">
+                                    <span class="slider-value"><span id="escrituraValor">2.25</span>%</span>
+                                </div>
                             </div>
                             <div class="gasto-item">
-                                <span>Inmobiliaria: <small class="porcentaje">(2.5-3.5%)</small></span>
-                                <span id="gastoInmobiliaria">$0</span>
+                                <div class="gasto-header">
+                                    <span>Inmobiliaria: <small class="porcentaje">(ref: 2.5-3.5%)</small></span>
+                                    <span id="gastoInmobiliaria">$0</span>
+                                </div>
+                                <div class="gasto-control">
+                                    <input type="range" id="inmobiliariaSlider" min="0" max="10" value="3.0" step="0.05" class="slider gasto-slider">
+                                    <span class="slider-value"><span id="inmobiliariaValor">3.0</span>%</span>
+                                </div>
                             </div>
                             <div class="gasto-item">
-                                <span>Firmas: <small class="porcentaje">(0.5-1.0%)</small></span>
-                                <span id="gastoFirmas">$0</span>
+                                <div class="gasto-header">
+                                    <span>Firmas: <small class="porcentaje">(ref: 0.5-1.0%)</small></span>
+                                    <span id="gastoFirmas">$0</span>
+                                </div>
+                                <div class="gasto-control">
+                                    <input type="range" id="firmasSlider" min="0" max="10" value="0.75" step="0.05" class="slider gasto-slider">
+                                    <span class="slider-value"><span id="firmasValor">0.75</span>%</span>
+                                </div>
                             </div>
                             <div class="gasto-item">
-                                <span>Sellos: <small class="porcentaje">(1.0-1.5%)</small></span>
-                                <span id="gastoSellos">$0</span>
+                                <div class="gasto-header">
+                                    <span>Sellos: <small class="porcentaje">(ref: 1.0-1.5%)</small></span>
+                                    <span id="gastoSellos">$0</span>
+                                </div>
+                                <div class="gasto-control">
+                                    <input type="range" id="sellosSlider" min="0" max="10" value="1.25" step="0.05" class="slider gasto-slider">
+                                    <span class="slider-value"><span id="sellosValor">1.25</span>%</span>
+                                </div>
                             </div>
                             <div class="gasto-item total">
                                 <span><strong>Total Gastos:</strong></span>

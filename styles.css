@@ -61,6 +61,55 @@ header p {
     font-size: 0.9rem;
 }
 
+/* Indicador sutil de estado de validación */
+.validation-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    transition: all 0.3s ease;
+}
+
+.validation-status.hidden {
+    display: none;
+}
+
+.validation-status.ready {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.validation-status.warning {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.2);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3b82f6;
+    transition: background-color 0.3s ease;
+}
+
+.validation-status.ready .status-dot {
+    background: #22c55e;
+}
+
+.validation-status.warning .status-dot {
+    background: #fbbf24;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
 
 
 /* Secciones principales */
@@ -281,6 +330,7 @@ section h2 {
     background: #e1e8ed;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
     margin: 8px 0;
 }
 
@@ -925,13 +975,109 @@ footer {
     box-shadow: 0 15px 35px rgba(0,0,0,0.15);
 }
 
-/* Estados de los inputs */
+/* Sistema de validación no intrusivo */
+.form-group {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Estados de validación sutiles */
+.form-group.field-error {
+    border-left: 3px solid rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.03);
+    border-radius: 0 8px 8px 0;
+    padding-left: 12px;
+    margin-left: -12px;
+}
+
+.form-group.field-warning {
+    border-left: 3px solid rgba(251, 191, 36, 0.6);
+    background: rgba(251, 191, 36, 0.03);
+    border-radius: 0 8px 8px 0;
+    padding-left: 12px;
+    margin-left: -12px;
+}
+
+.form-group.field-info {
+    border-left: 3px solid rgba(59, 130, 246, 0.6);
+    background: rgba(59, 130, 246, 0.03);
+    border-radius: 0 8px 8px 0;
+    padding-left: 12px;
+    margin-left: -12px;
+}
+
+/* Mensajes de validación sutiles */
+.field-message {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(-5px);
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+.field-message-error {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.field-message-warning {
+    color: #d97706;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.field-message-info {
+    color: #2563eb;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Animación para mensajes */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de inputs - versión más sutil */
+.form-group.field-error input,
+.form-group.field-error select {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.02);
+}
+
+.form-group.field-warning input,
+.form-group.field-warning select {
+    border-color: rgba(251, 191, 36, 0.4);
+    background: rgba(251, 191, 36, 0.02);
+}
+
+.form-group.field-info input,
+.form-group.field-info select {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.02);
+}
+
+/* Focus states mantienen prioridad */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+}
+
+/* Estados legacy simplificados */
 .form-group input:invalid {
-    border-color: #e74c3c;
+    border-color: rgba(239, 68, 68, 0.3);
 }
 
 .form-group input:valid {
-    border-color: #27ae60;
+    border-color: rgba(34, 197, 94, 0.3);
 }
 
 /* Mejoras para inputs numéricos */
@@ -981,5 +1127,55 @@ footer {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Estilos para controles de gastos intermedios */
+.gasto-item {
+    margin-bottom: 15px;
+}
+
+.gasto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.gasto-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+}
+
+.gasto-slider {
+    flex: 1;
+    min-width: 150px;
+}
+
+.slider-value {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9em;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+    .gasto-control {
+        flex-direction: column;
+        gap: 5px;
+        align-items: stretch;
+    }
+    
+    .slider-value {
+        text-align: left;
+        min-width: auto;
+    }
+    
+    .gasto-slider {
+        min-width: 100%;
     }
 }

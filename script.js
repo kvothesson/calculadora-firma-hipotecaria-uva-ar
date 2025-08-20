@@ -3,16 +3,16 @@ const CONFIG = {
     // Gastos extra por provincia (en % del valor de la propiedad)
     gastosExtra: {
         'CABA': {
-            escritura: { min: 2.0, max: 2.5, actual: 2.5 },        // 2.0-2.5% del valor
-            inmobiliaria: { min: 2.5, max: 3.5, actual: 3.0 },     // 2.5-3.5% del valor
-            firmas: { min: 0.5, max: 1.0, actual: 0.5 },           // 0.5-1.0% del valor
-            sellos: { min: 1.0, max: 1.5, actual: 1.5 }            // 1.0-1.5% del valor
+            escritura: { min: 2.0, max: 2.5, intermedio: 2.25 },        // 2.0-2.5% del valor
+            inmobiliaria: { min: 2.5, max: 3.5, intermedio: 3.0 },     // 2.5-3.5% del valor
+            firmas: { min: 0.5, max: 1.0, intermedio: 0.75 },           // 0.5-1.0% del valor
+            sellos: { min: 1.0, max: 1.5, intermedio: 1.25 }            // 1.0-1.5% del valor
         },
         'BSAS': {
-            escritura: { min: 2.0, max: 2.5, actual: 2.0 },        // 2.0-2.5% del valor
-            inmobiliaria: { min: 2.5, max: 3.5, actual: 3.0 },     // 2.5-3.5% del valor
-            firmas: { min: 0.5, max: 1.0, actual: 0.5 },           // 0.5-1.0% del valor
-            sellos: { min: 1.0, max: 1.5, actual: 1.0 }            // 1.0-1.5% del valor
+            escritura: { min: 2.0, max: 2.5, intermedio: 2.25 },        // 2.0-2.5% del valor
+            inmobiliaria: { min: 2.5, max: 3.5, intermedio: 3.0 },     // 2.5-3.5% del valor
+            firmas: { min: 0.5, max: 1.0, intermedio: 0.75 },           // 0.5-1.0% del valor
+            sellos: { min: 1.0, max: 1.5, intermedio: 1.25 }            // 1.0-1.5% del valor
         }
     },
     
@@ -35,100 +35,24 @@ const CONFIG = {
     }
 };
 
-// Sistema de alertas mejorado
+// Sistema de alertas simplificado (solo para casos excepcionales)
 const ALERT_SYSTEM = {
-    alerts: new Map(),
-    timeouts: new Map(),
-    
-    // Mostrar alerta con retraso
+    // Función legacy mantenida para compatibilidad pero desactivada
     showDelayed(message, type = 'info', delay = 2000, elementId = null) {
-        const alertId = `alert_${Date.now()}_${Math.random()}`;
-        
-        // Si ya hay una alerta para este elemento, cancelarla
-        if (elementId && this.alerts.has(elementId)) {
-            this.hide(elementId);
-        }
-        
-        // Crear la alerta
-        const alerta = this.createAlert(message, type);
-        alerta.id = alertId;
-        
-        // Agregar al DOM
-        const container = this.getAlertContainer();
-        container.appendChild(alerta);
-        
-        // Mostrar después del delay
-        const timeout = setTimeout(() => {
-            this.show(alertId);
-        }, delay);
-        
-        // Guardar referencia
-        this.alerts.set(alertId, alerta);
-        this.timeouts.set(alertId, timeout);
-        
-        // Si es para un elemento específico, guardar la referencia
-        if (elementId) {
-            this.alerts.set(elementId, alerta);
-        }
-        
-        return alertId;
+        // Sistema desactivado para evitar intrusiones
+        return null;
     },
     
-    // Mostrar alerta inmediatamente
     show(alertId) {
-        const alerta = this.alerts.get(alertId);
-        if (alerta) {
-            alerta.classList.add('mostrar');
-        }
+        // Desactivado
     },
     
-    // Ocultar alerta
     hide(alertId) {
-        const alerta = this.alerts.get(alertId);
-        if (alerta) {
-            alerta.classList.remove('mostrar');
-            setTimeout(() => {
-                if (alerta.parentNode) {
-                    alerta.parentNode.removeChild(alerta);
-                }
-                this.alerts.delete(alertId);
-                this.timeouts.delete(alertId);
-            }, 300);
-        }
+        // Desactivado
     },
     
-    // Crear elemento de alerta
-    createAlert(message, type) {
-        const alerta = document.createElement('div');
-        alerta.className = `alerta alerta-${type}`;
-        alerta.textContent = message;
-        return alerta;
-    },
-    
-    // Obtener contenedor de alertas
-    getAlertContainer() {
-        let container = document.getElementById('alert-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'alert-container';
-            container.style.cssText = `
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                z-index: 1000;
-                max-width: 400px;
-                pointer-events: none;
-            `;
-            document.body.appendChild(container);
-        }
-        return container;
-    },
-    
-    // Limpiar todas las alertas
     clearAll() {
-        this.alerts.forEach((alerta, id) => {
-            this.hide(id);
-        });
+        // Desactivado
     }
 };
 
@@ -163,6 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
         agregarEventListeners();
         
 
+        
+        // Inicializar sliders de gastos
+        actualizarSlidersGastos(elementos.provincia.value);
         
         // Calcular inicialmente
         calcularTodo();
@@ -219,20 +146,31 @@ function agregarEventListeners() {
     // Recalcular cuando cambien los inputs (excepto el slider de tipo de cambio)
     Object.values(elementos).forEach(elemento => {
         if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcSlider') {
-            // Validación en tiempo real menos intrusiva
+            // Validación progresiva no intrusiva
             elemento.addEventListener('input', function() {
-                // Limpiar alertas previas para este campo
-                ALERT_SYSTEM.hide(this.id + '_warning');
-                ALERT_SYSTEM.hide(this.id + '_error');
-                
-                // Validar solo este campo
-                validarCampoIndividual(this);
-                
-                // Calcular después de un pequeño delay para evitar spam
+                // Calcular inmediatamente sin validación visual para mejor UX
                 clearTimeout(this.calculationTimeout);
                 this.calculationTimeout = setTimeout(() => {
                     calcularTodo();
-                }, 500);
+                }, 300); // Reducido el delay
+            });
+            
+            // Validación sutil solo cuando el usuario termina de escribir
+            elemento.addEventListener('blur', function() {
+                VALIDATION_SYSTEM.validateField(this);
+            });
+            
+            // Validación inmediata solo para valores claramente inválidos
+            elemento.addEventListener('input', function() {
+                const valor = parseFloat(this.value) || 0;
+                
+                // Solo mostrar errores críticos inmediatamente
+                if (this.value && valor <= 0 && ['valorPropiedad', 'montoPrestamo', 'tasaInteres', 'plazo'].includes(this.id)) {
+                    VALIDATION_SYSTEM.validateField(this);
+                } else if (this.value === '') {
+                    // Limpiar validación cuando el campo está vacío
+                    VALIDATION_SYSTEM.clearFieldState(this);
+                }
             });
         }
         if (elemento && elemento.tagName === 'SELECT') {
@@ -245,6 +183,9 @@ function agregarEventListeners() {
                         window.calculadoraAnalytics.trackProvinceChange(this.value, previousProvincia);
                     }
                     previousProvincia = this.value;
+                    
+                    // Actualizar sliders de gastos para la nueva provincia
+                    actualizarSlidersGastos(this.value);
                     
                     calcularTodo();
                 });
@@ -259,85 +200,260 @@ function agregarEventListeners() {
     
     // Configurar slider de tipo de cambio
     configurarSliderTC();
+    
+    // Configurar sliders de gastos
+    configurarSlidersGastos();
 }
 
-// Función para validar campos individuales de manera menos intrusiva
-function validarCampoIndividual(elemento) {
-    const valor = parseFloat(elemento.value) || 0;
-    const id = elemento.id;
+// Sistema de validación no intrusivo con indicadores visuales sutiles
+const VALIDATION_SYSTEM = {
+    // Estados de validación
+    states: new Map(),
     
-    // Limpiar alertas previas
-    ALERT_SYSTEM.hide(id + '_warning');
-    ALERT_SYSTEM.hide(id + '_error');
+    // Validar campo con indicadores sutiles
+    validateField(element) {
+        const valor = parseFloat(element.value) || 0;
+        const id = element.id;
+        
+        // Limpiar estado anterior
+        this.clearFieldState(element);
+        
+        let validation = { isValid: true, level: 'valid', message: '' };
+        
+        // Validaciones específicas por campo
+        switch (id) {
+            case 'valorPropiedad':
+                if (valor <= 0) {
+                    validation = { isValid: false, level: 'error', message: 'Valor requerido' };
+                } else if (valor > 300000) {
+                    validation = { isValid: true, level: 'warning', message: 'Valor muy alto' };
+                } else if (valor < 10000) {
+                    validation = { isValid: true, level: 'info', message: 'Valor bajo para una propiedad' };
+                }
+                break;
+                
+            case 'montoPrestamo':
+                if (valor <= 0) {
+                    validation = { isValid: false, level: 'error', message: 'Monto requerido' };
+                } else if (valor > 1000000000) {
+                    validation = { isValid: true, level: 'warning', message: 'Monto muy alto' };
+                }
+                break;
+                
+            case 'tasaInteres':
+                if (valor <= 0) {
+                    validation = { isValid: false, level: 'error', message: 'Tasa requerida' };
+                } else if (valor < 4.5 || valor > 11) {
+                    validation = { isValid: true, level: 'warning', message: 'Fuera del rango típico (4.5% - 11%)' };
+                }
+                break;
+                
+            case 'plazo':
+                if (valor <= 0) {
+                    validation = { isValid: false, level: 'error', message: 'Plazo requerido' };
+                } else if (valor < 5 || valor > 35) {
+                    validation = { isValid: true, level: 'warning', message: 'Fuera del rango típico (5-35 años)' };
+                }
+                break;
+        }
+        
+        // Aplicar estado visual
+        this.applyFieldState(element, validation);
+        this.states.set(id, validation);
+        
+        // Actualizar indicador global después de un breve delay
+        setTimeout(() => this.updateGlobalStatus(), 100);
+        
+        return validation;
+    },
     
-    // Validaciones específicas por campo
-    switch (id) {
-        case 'valorPropiedad':
-            if (valor > 300000) {
-                ALERT_SYSTEM.showDelayed(
-                    'Valor muy alto. ¿Estás seguro?',
-                    'warning',
-                    2000,
-                    id + '_warning'
-                );
+    // Aplicar estado visual al campo
+    applyFieldState(element, validation) {
+        const formGroup = element.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Remover clases previas
+        formGroup.classList.remove('field-valid', 'field-warning', 'field-error', 'field-info');
+        
+        // Aplicar nueva clase
+        if (validation.level !== 'valid') {
+            formGroup.classList.add(`field-${validation.level}`);
+        }
+        
+        // Mostrar/ocultar mensaje sutil
+        this.updateFieldMessage(formGroup, validation);
+    },
+    
+    // Actualizar mensaje sutil del campo
+    updateFieldMessage(formGroup, validation) {
+        let messageEl = formGroup.querySelector('.field-message');
+        
+        if (validation.level === 'valid' || !validation.message) {
+            // Ocultar mensaje
+            if (messageEl) {
+                messageEl.remove();
             }
-            break;
-            
-        case 'montoPrestamo':
-            if (valor > 1000000000) { // Más de 1 billón de pesos
-                ALERT_SYSTEM.showDelayed(
-                    'Monto muy alto. Verificá el valor.',
-                    'warning',
-                    2000,
-                    id + '_warning'
-                );
+            return;
+        }
+        
+        // Crear o actualizar mensaje
+        if (!messageEl) {
+            messageEl = document.createElement('small');
+            messageEl.className = 'field-message';
+            formGroup.appendChild(messageEl);
+        }
+        
+        messageEl.textContent = validation.message;
+        messageEl.className = `field-message field-message-${validation.level}`;
+    },
+    
+    // Limpiar estado de campo
+    clearFieldState(element) {
+        const formGroup = element.closest('.form-group');
+        if (formGroup) {
+            formGroup.classList.remove('field-valid', 'field-warning', 'field-error', 'field-info');
+            const messageEl = formGroup.querySelector('.field-message');
+            if (messageEl) {
+                messageEl.remove();
             }
-            break;
-            
-        case 'tasaInteres':
-            if (valor < 4.5 || valor > 11) {
-                ALERT_SYSTEM.showDelayed(
-                    'Tasa fuera del rango recomendado (4.5% - 11%)',
-                    'warning',
-                    2000,
-                    id + '_warning'
-                );
+        }
+    },
+    
+    // Obtener estado de validación general
+    getOverallValidation() {
+        let hasErrors = false;
+        let hasWarnings = false;
+        
+        for (const [id, validation] of this.states) {
+            if (validation.level === 'error') {
+                hasErrors = true;
+            } else if (validation.level === 'warning') {
+                hasWarnings = true;
             }
-            break;
-            
-        case 'plazo':
-            if (valor < 5 || valor > 35) {
-                ALERT_SYSTEM.showDelayed(
-                    'Plazo fuera del rango recomendado (5 - 35 años)',
-                    'warning',
-                    2000,
-                    id + '_warning'
-                );
+        }
+        
+        if (hasErrors) return 'error';
+        if (hasWarnings) return 'warning';
+        return 'valid';
+    },
+    
+    // Actualizar indicador global de estado
+    updateGlobalStatus() {
+        const statusElement = document.getElementById('validation-status');
+        const statusText = statusElement?.querySelector('.status-text');
+        
+        if (!statusElement || !statusText) return;
+        
+        const datos = obtenerDatosEntrada();
+        const overall = this.getOverallValidation();
+        
+        // Determinar estado y mensaje
+        let state = 'hidden';
+        let message = '';
+        
+        if (datos.valorPropiedad > 0 && datos.montoPrestamo > 0 && datos.tasaInteres > 0 && datos.plazo > 0) {
+            if (overall === 'error') {
+                state = 'warning';
+                message = 'Revisá los valores ingresados';
+            } else if (overall === 'warning') {
+                state = 'warning';
+                message = 'Datos listos, revisá las recomendaciones';
+            } else {
+                state = 'ready';
+                message = 'Todos los datos están completos';
             }
-            break;
+        } else {
+            state = 'hidden'; // Ocultar cuando faltan muchos datos
+        }
+        
+        // Aplicar estado
+        statusElement.className = `validation-status ${state}`;
+        statusText.textContent = message;
     }
+};
+
+// Función legacy mantenida para compatibilidad
+function validarCampoIndividual(elemento) {
+    return VALIDATION_SYSTEM.validateField(elemento);
 }
 
 function calcularTodo() {
     const datos = obtenerDatosEntrada();
-    if (!validarDatos(datos)) {
+    
+    // Actualizar indicador global de estado
+    VALIDATION_SYSTEM.updateGlobalStatus();
+    
+    // Siempre intentar calcular, incluso con datos incompletos
+    if (validarDatos(datos)) {
+        const resultados = calcularCredito(datos);
+        mostrarResultados(resultados);
+        mostrarTipsDinamicos(resultados);
+        
+        // Validación progresiva y consejos contextuales
+        mostrarValidacionProgresiva(datos, resultados);
+        
+        // Analytics: Rastrear cálculo completado
+        if (window.calculadoraAnalytics) {
+            window.calculadoraAnalytics.trackCalculation({
+                ...datos,
+                primeraCuota: resultados.primeraCuota,
+                gastosExtra: resultados.gastosExtra.total
+            });
+        }
+    } else {
         // Limpiar resultados si los datos no son válidos
         limpiarResultados();
-        return;
+        // Mostrar guía sutil de qué falta completar
+        mostrarGuiaCompletar(datos);
+    }
+}
+
+// Validación progresiva integrada en los resultados
+function mostrarValidacionProgresiva(datos, resultados) {
+    // Revisar ratios y relaciones importantes
+    const valorPropiedadPesos = datos.valorPropiedad * CONFIG.tiposCambio.oficial;
+    const ratioLTV = (datos.montoPrestamo / valorPropiedadPesos) * 100;
+    
+    // Mostrar insights útiles en lugar de errores
+    if (ratioLTV > 90) {
+        // Agregar un tip contextual sobre el alto ratio préstamo/valor
+        FEEDBACK_SYSTEM.showContextualTip(
+            'Considerá que necesitarás al menos 10% extra para gastos de escritura e inmobiliaria',
+            'info'
+        );
     }
     
-    const resultados = calcularCredito(datos);
+    // Validar cuota vs ingresos recomendados
+    const cuota = resultados.primeraCuota;
+    const ingresoRecomendado = cuota / 0.25;
     
-    mostrarResultados(resultados);
-    mostrarTipsDinamicos(resultados);
+    if (ingresoRecomendado > 500000) { // Si requiere más de $500k de ingreso
+        FEEDBACK_SYSTEM.showContextualTip(
+            'Esta cuota requiere ingresos familiares altos. Considerá ajustar el monto o plazo',
+            'info'
+        );
+    }
+}
+
+// Guía sutil de campos faltantes
+function mostrarGuiaCompletar(datos) {
+    const camposFaltantes = [];
     
-    // Analytics: Rastrear cálculo completado
-    if (window.calculadoraAnalytics) {
-        window.calculadoraAnalytics.trackCalculation({
-            ...datos,
-            primeraCuota: resultados.primeraCuota,
-            gastosExtra: resultados.gastosExtra.total
-        });
+    if (datos.valorPropiedad <= 0) camposFaltantes.push('valor de la propiedad');
+    if (datos.montoPrestamo <= 0) camposFaltantes.push('monto del préstamo');
+    if (datos.tasaInteres <= 0) camposFaltantes.push('tasa de interés');
+    if (datos.plazo <= 0) camposFaltantes.push('plazo del crédito');
+    
+    // Solo mostrar si hay muchos campos vacíos (evitar spam)
+    if (camposFaltantes.length >= 2) {
+        const mensaje = `Completá ${camposFaltantes.join(', ')} para ver los resultados`;
+        
+        // Mostrar en lugar de los resultados principales
+        const elemento = document.getElementById('primeraCuota');
+        if (elemento) {
+            elemento.textContent = '—';
+            elemento.title = mensaje;
+        }
     }
 }
 
@@ -349,12 +465,12 @@ function limpiarResultados() {
     document.getElementById('totalPagarUSD').textContent = '$0 USD';
     
     // Limpiar desglose de gastos
-    document.getElementById('gastoEscritura').textContent = '$0 - $0';
-    document.getElementById('gastoInmobiliaria').textContent = '$0 - $0';
-    document.getElementById('gastoFirmas').textContent = '$0 - $0';
-    document.getElementById('gastoSellos').textContent = '$0 - $0';
-    elementos.gastosExtra.innerHTML = '<strong>$0 - $0</strong>';
-    document.getElementById('gastosExtraUSD').textContent = '$0 - $0 USD';
+    document.getElementById('gastoEscritura').textContent = '$0';
+    document.getElementById('gastoInmobiliaria').textContent = '$0';
+    document.getElementById('gastoFirmas').textContent = '$0';
+    document.getElementById('gastoSellos').textContent = '$0';
+    elementos.gastosExtra.innerHTML = '<strong>$0</strong>';
+    document.getElementById('gastosExtraUSD').textContent = '$0 USD';
     
     if (elementos.diferenciaSimulador) {
         elementos.diferenciaSimulador.textContent = '$0';
@@ -388,54 +504,17 @@ function obtenerDatosEntrada() {
 }
 
 function validarDatos(datos) {
-    let isValid = true;
-    const errors = [];
+    // Validación básica solo para cálculos, sin interrupciones al usuario
+    const isValidValue = datos.valorPropiedad > 0;
+    const isValidLoan = datos.montoPrestamo > 0;
+    const isValidRate = datos.tasaInteres > 0;
+    const isValidTerm = datos.plazo > 0;
     
-    // Validar valor de la propiedad
-    if (datos.valorPropiedad <= 0) {
-        errors.push('El valor de la propiedad debe ser mayor a 0');
-        isValid = false;
-    } else if (datos.valorPropiedad > 300000) {
-        // Mostrar advertencia si es muy alto (más de 300k USD)
-        ALERT_SYSTEM.showDelayed(
-            'El valor ingresado es muy alto. ¿Estás seguro de que es correcto?',
-            'warning',
-            3000,
-            'valorPropiedad_warning'
-        );
-    }
+    // Permitir cálculo si todos los valores básicos están presentes
+    const canCalculate = isValidValue && isValidLoan && isValidRate && isValidTerm;
     
-    // Validar monto del préstamo
-    if (datos.montoPrestamo <= 0) {
-        errors.push('El monto del préstamo debe ser mayor a 0');
-        isValid = false;
-    }
-    
-    // Validar tasa de interés
-    if (datos.tasaInteres < 4.5 || datos.tasaInteres > 11) {
-        errors.push('La tasa de interés debe estar entre 4.5% y 11%');
-        isValid = false;
-    }
-    
-    // Validar plazo
-    if (datos.plazo <= 0) {
-        errors.push('El plazo debe ser mayor a 0');
-        isValid = false;
-    }
-    
-    // Mostrar errores de manera menos intrusiva
-    if (!isValid) {
-        errors.forEach((error, index) => {
-            ALERT_SYSTEM.showDelayed(
-                error,
-                'error',
-                2000 + (index * 500), // Espaciar las alertas
-                `validation_error_${index}`
-            );
-        });
-    }
-    
-    return isValid;
+    // No mostrar alertas intrusivas, solo validar para el cálculo
+    return canCalculate;
 }
 
 function calcularCredito(datos) {
@@ -482,40 +561,33 @@ function calcularGastosExtra(valorPropiedad, provincia) {
     const gastos = CONFIG.gastosExtra[provincia];
     const valorPesos = valorPropiedad * CONFIG.tiposCambio.oficial;
     
-    // Calcular con valores actuales
-    const escritura = valorPesos * gastos.escritura.actual / 100;
-    const inmobiliaria = valorPesos * gastos.inmobiliaria.actual / 100;
-    const firmas = valorPesos * gastos.firmas.actual / 100;
-    const sellos = valorPesos * gastos.sellos.actual / 100;
+    // Calcular con valores intermedios
+    const escritura = valorPesos * gastos.escritura.intermedio / 100;
+    const inmobiliaria = valorPesos * gastos.inmobiliaria.intermedio / 100;
+    const firmas = valorPesos * gastos.firmas.intermedio / 100;
+    const sellos = valorPesos * gastos.sellos.intermedio / 100;
     
-    // Calcular rangos min-max
-    const escrituraMin = valorPesos * gastos.escritura.min / 100;
-    const escrituraMax = valorPesos * gastos.escritura.max / 100;
-    const inmobiliariaMin = valorPesos * gastos.inmobiliaria.min / 100;
-    const inmobiliariaMax = valorPesos * gastos.inmobiliaria.max / 100;
-    const firmasMin = valorPesos * gastos.firmas.min / 100;
-    const firmasMax = valorPesos * gastos.firmas.max / 100;
-    const sellosMin = valorPesos * gastos.sellos.min / 100;
-    const sellosMax = valorPesos * gastos.sellos.max / 100;
-    
-    const totalActual = escritura + inmobiliaria + firmas + sellos;
-    const totalMin = escrituraMin + inmobiliariaMin + firmasMin + sellosMin;
-    const totalMax = escrituraMax + inmobiliariaMax + firmasMax + sellosMax;
+    const totalIntermedio = escritura + inmobiliaria + firmas + sellos;
     
     return {
         escritura,
         inmobiliaria,
         firmas,
         sellos,
-        total: totalActual,
-        rangos: {
-            escritura: { min: escrituraMin, max: escrituraMax },
-            inmobiliaria: { min: inmobiliariaMin, max: inmobiliariaMax },
-            firmas: { min: firmasMin, max: firmasMax },
-            sellos: { min: sellosMin, max: sellosMax },
-            total: { min: totalMin, max: totalMax }
+        total: totalIntermedio,
+        // Mantener referencias de rangos para información
+        referencias: {
+            escritura: { min: gastos.escritura.min, max: gastos.escritura.max },
+            inmobiliaria: { min: gastos.inmobiliaria.min, max: gastos.inmobiliaria.max },
+            firmas: { min: gastos.firmas.min, max: gastos.firmas.max },
+            sellos: { min: gastos.sellos.min, max: gastos.sellos.max }
         }
     };
+}
+
+// Función para actualizar valores intermedios
+function actualizarValorIntermedio(tipo, valor, provincia) {
+    CONFIG.gastosExtra[provincia][tipo].intermedio = parseFloat(valor);
 }
 
 function calcularCuotaPromedioConUVA(cuotaInicial, totalMeses) {
@@ -544,29 +616,21 @@ function mostrarResultados(resultados) {
     const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.oficial;
     document.getElementById('totalPagarUSD').textContent = `$${formatearNumero(totalPagarUSD)} USD`;
     
-    // Mostrar desglose de gastos con rangos
+    // Mostrar desglose de gastos con valores intermedios
     if (resultados.gastosExtra && typeof resultados.gastosExtra === 'object') {
         const gastos = resultados.gastosExtra;
-        const rangos = gastos.rangos;
         
-        // Mostrar gastos con rangos min-max
-        document.getElementById('gastoEscritura').textContent = 
-            `${formatearPesos(rangos.escritura.min)} - ${formatearPesos(rangos.escritura.max)}`;
-        document.getElementById('gastoInmobiliaria').textContent = 
-            `${formatearPesos(rangos.inmobiliaria.min)} - ${formatearPesos(rangos.inmobiliaria.max)}`;
-        document.getElementById('gastoFirmas').textContent = 
-            `${formatearPesos(rangos.firmas.min)} - ${formatearPesos(rangos.firmas.max)}`;
-        document.getElementById('gastoSellos').textContent = 
-            `${formatearPesos(rangos.sellos.min)} - ${formatearPesos(rangos.sellos.max)}`;
+        // Mostrar gastos intermedios
+        document.getElementById('gastoEscritura').textContent = formatearPesos(gastos.escritura);
+        document.getElementById('gastoInmobiliaria').textContent = formatearPesos(gastos.inmobiliaria);
+        document.getElementById('gastoFirmas').textContent = formatearPesos(gastos.firmas);
+        document.getElementById('gastoSellos').textContent = formatearPesos(gastos.sellos);
         
-        // Total gastos con rango en ambas monedas
-        const totalMinUSD = rangos.total.min / CONFIG.tiposCambio.oficial;
-        const totalMaxUSD = rangos.total.max / CONFIG.tiposCambio.oficial;
+        // Total gastos en ambas monedas
+        const totalUSD = gastos.total / CONFIG.tiposCambio.oficial;
         
-        elementos.gastosExtra.innerHTML = 
-            `<strong>${formatearPesos(rangos.total.min)} - ${formatearPesos(rangos.total.max)}</strong>`;
-        document.getElementById('gastosExtraUSD').textContent = 
-            `$${formatearNumero(totalMinUSD)} - $${formatearNumero(totalMaxUSD)} USD`;
+        elementos.gastosExtra.innerHTML = `<strong>${formatearPesos(gastos.total)}</strong>`;
+        document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(totalUSD)} USD`;
     }
 }
 
@@ -745,6 +809,51 @@ function configurarSliderTC() {
     }
 }
 
+// Configurar sliders de gastos
+function configurarSlidersGastos() {
+    const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
+    
+    tiposGasto.forEach(tipo => {
+        const slider = document.getElementById(tipo + 'Slider');
+        const valor = document.getElementById(tipo + 'Valor');
+        
+        if (slider && valor) {
+            slider.addEventListener('input', function() {
+                const nuevoValor = parseFloat(this.value);
+                valor.textContent = nuevoValor.toFixed(2);
+                
+                // Actualizar valor intermedio para la provincia actual
+                const provinciaActual = elementos.provincia.value;
+                actualizarValorIntermedio(tipo, nuevoValor, provinciaActual);
+                
+                // Recalcular todo
+                calcularTodo();
+                
+                // Analytics: Rastrear cambio de gasto intermedio
+                if (window.calculadoraAnalytics) {
+                    window.calculadoraAnalytics.trackSliderChange(`gasto_${tipo}`, nuevoValor, 0);
+                }
+            });
+        }
+    });
+}
+
+// Función para actualizar sliders cuando cambie la provincia
+function actualizarSlidersGastos(provincia) {
+    const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
+    
+    tiposGasto.forEach(tipo => {
+        const slider = document.getElementById(tipo + 'Slider');
+        const valor = document.getElementById(tipo + 'Valor');
+        
+        if (slider && valor) {
+            const valorIntermedio = CONFIG.gastosExtra[provincia][tipo].intermedio;
+            slider.value = valorIntermedio;
+            valor.textContent = valorIntermedio.toFixed(2);
+        }
+    });
+}
+
 // Mostrar tips dinámicos
 function mostrarTipsDinamicos(resultados) {
     const tipsContainer = document.getElementById('tipsDinamicos');
@@ -870,57 +979,76 @@ function calcularGastosExtraEnPeorEscenario(valorPropiedadUSD) {
 
 
 
-// Función para mostrar alertas de validación
+// Sistema de feedback contextual no intrusivo
+const FEEDBACK_SYSTEM = {
+    // Mostrar feedback sutil en la UI
+    showContextualTip(message, type = 'info', targetElement = null) {
+        // Solo mostrar tips realmente útiles, no cada error de validación
+        if (type === 'info' && message.includes('Considerá')) {
+            // Agregar a los tips dinámicos existentes
+            this.addToTips(message, type);
+        }
+    },
+    
+    // Agregar tip a la sección de consejos
+    addToTips(message, type) {
+        const tipsContainer = document.getElementById('tipsDinamicos');
+        if (!tipsContainer) return;
+        
+        // Evitar duplicados
+        const existing = tipsContainer.querySelector(`[data-message="${message}"]`);
+        if (existing) return;
+        
+        const tip = document.createElement('div');
+        tip.className = `tip-card ${type}`;
+        tip.setAttribute('data-message', message);
+        tip.innerHTML = `
+            <span class="tip-icon">💡</span>
+            <div class="tip-content">${message}</div>
+        `;
+        
+        tipsContainer.appendChild(tip);
+        
+        // Auto-remover después de un tiempo
+        setTimeout(() => {
+            if (tip.parentNode) {
+                tip.remove();
+            }
+        }, 10000);
+    }
+};
+
+// Función legacy simplificada
 function mostrarAlerta(mensaje, tipo = 'info') {
-    // Crear elemento de alerta
-    const alerta = document.createElement('div');
-    alerta.className = `alerta alerta-${tipo}`;
-    alerta.textContent = mensaje;
-    
-    // Insertar después del header
-    const header = document.querySelector('header');
-    header.parentNode.insertBefore(alerta, header.nextSibling);
-    
-    // Remover después de 5 segundos
-    setTimeout(() => {
-        alerta.remove();
-    }, 5000);
+    // Redirigir al sistema no intrusivo
+    FEEDBACK_SYSTEM.showContextualTip(mensaje, tipo);
 }
 
-// Validación en tiempo real
-function validarEnTiempoReal() {
+// Validación contextual para consejos (no intrusiva)
+function validarDatosParaConsejos() {
     const datos = obtenerDatosEntrada();
+    const consejos = [];
     
     // Convertir valor de propiedad a pesos para comparar
     const valorPropiedadPesos = datos.valorPropiedad * CONFIG.tiposCambio.oficial;
-    
-    // El monto prestado ya está en pesos
     const montoPrestamoPesos = datos.montoPrestamo;
     
+    // Generar consejos sutiles basados en la data
     if (montoPrestamoPesos > valorPropiedadPesos) {
-        mostrarAlerta('⚠️ El monto del préstamo no puede ser mayor al valor de la propiedad', 'warning');
+        consejos.push({
+            tipo: 'warning',
+            mensaje: 'El préstamo es mayor al valor de la propiedad'
+        });
     }
     
     if (montoPrestamoPesos > valorPropiedadPesos * 0.9) {
-        mostrarAlerta('⚠️ Considerá que necesitarás al menos 10% para gastos extra', 'warning');
+        consejos.push({
+            tipo: 'info',
+            mensaje: 'Considerá reservar al menos 10% extra para gastos'
+        });
     }
     
-    // Validar plazo
-    if (datos.plazo < 5 || datos.plazo > 35) {
-        mostrarAlerta('⚠️ El plazo debe estar entre 5 y 35 años', 'warning');
-    }
-    
-    // Validar tasa
-    if (datos.tasaInteres < 4.5 || datos.tasaInteres > 11) {
-        mostrarAlerta('⚠️ La tasa debe estar entre 4.5% y 11%', 'warning');
-    }
+    return consejos;
 }
-
-// Agregar validación en tiempo real
-Object.values(elementos).forEach(elemento => {
-    if (elemento && elemento.tagName === 'INPUT') {
-        elemento.addEventListener('input', validarEnTiempoReal);
-    }
-});
 
 
