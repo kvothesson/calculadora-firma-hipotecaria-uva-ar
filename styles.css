@@ -1145,10 +1145,60 @@ footer {
 .gasto-control {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-end;
     margin-left: 15px;
 }
 
+/* Nuevos estilos para inputs de porcentaje */
+.percentage-input {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.9);
+    transition: border-color 0.3s ease;
+    min-width: 120px;
+}
+
+.percentage-input:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.percentage-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+}
+
+.percentage-field::-webkit-outer-spin-button,
+.percentage-field::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.percentage-field[type=number] {
+    -moz-appearance: textfield;
+}
+
+.percentage-symbol {
+    padding: 8px 12px;
+    background: #3b82f6;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Legacy slider styles (mantenemos para compatibilidad) */
 .gasto-slider {
     flex: 1;
     min-width: 150px;
@@ -1165,11 +1215,27 @@ footer {
 /* Ajustes para dispositivos móviles */
 @media (max-width: 768px) {
     .gasto-control {
-        flex-direction: column;
-        gap: 5px;
-        align-items: stretch;
+        justify-content: center;
+        margin-left: 0;
+        margin-top: 8px;
     }
     
+    .percentage-input {
+        min-width: 140px;
+        max-width: 200px;
+    }
+    
+    .percentage-field {
+        font-size: 18px; /* Evita zoom en iOS */
+        padding: 10px 12px;
+    }
+    
+    .percentage-symbol {
+        padding: 10px 15px;
+        font-size: 18px;
+    }
+    
+    /* Legacy slider styles para mobile */
     .slider-value {
         text-align: left;
         min-width: auto;

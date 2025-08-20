@@ -809,27 +809,38 @@ function configurarSliderTC() {
     }
 }
 
-// Configurar sliders de gastos
+// Configurar campos de gastos (ahora inputs numéricos)
 function configurarSlidersGastos() {
     const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
     
     tiposGasto.forEach(tipo => {
-        const slider = document.getElementById(tipo + 'Slider');
-        const valor = document.getElementById(tipo + 'Valor');
+        const input = document.getElementById(tipo + 'Slider'); // Mantenemos el ID por compatibilidad
         
-        if (slider && valor) {
-            slider.addEventListener('input', function() {
-                const nuevoValor = parseFloat(this.value);
-                valor.textContent = nuevoValor.toFixed(2);
+        if (input) {
+            // Evento para cambios inmediatos
+            input.addEventListener('input', function() {
+                const nuevoValor = parseFloat(this.value) || 0;
+                
+                // Validar rango
+                if (nuevoValor < 0) this.value = 0;
+                if (nuevoValor > 10) this.value = 10;
                 
                 // Actualizar valor intermedio para la provincia actual
                 const provinciaActual = elementos.provincia.value;
-                actualizarValorIntermedio(tipo, nuevoValor, provinciaActual);
+                actualizarValorIntermedio(tipo, parseFloat(this.value), provinciaActual);
                 
-                // Recalcular todo
-                calcularTodo();
+                // Recalcular con delay para mejor performance
+                clearTimeout(this.gastoTimeout);
+                this.gastoTimeout = setTimeout(() => {
+                    calcularTodo();
+                }, 300);
+            });
+            
+            // Evento para cambios finales (blur)
+            input.addEventListener('blur', function() {
+                const nuevoValor = parseFloat(this.value) || 0;
                 
-                // Analytics: Rastrear cambio de gasto intermedio
+                // Analytics: Rastrear cambio de gasto
                 if (window.calculadoraAnalytics) {
                     window.calculadoraAnalytics.trackSliderChange(`gasto_${tipo}`, nuevoValor, 0);
                 }
@@ -838,18 +849,16 @@ function configurarSlidersGastos() {
     });
 }
 
-// Función para actualizar sliders cuando cambie la provincia
+// Función para actualizar campos de gastos cuando cambie la provincia
 function actualizarSlidersGastos(provincia) {
     const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
     
     tiposGasto.forEach(tipo => {
-        const slider = document.getElementById(tipo + 'Slider');
-        const valor = document.getElementById(tipo + 'Valor');
+        const input = document.getElementById(tipo + 'Slider'); // Ahora son inputs numéricos
         
-        if (slider && valor) {
+        if (input) {
             const valorIntermedio = CONFIG.gastosExtra[provincia][tipo].intermedio;
-            slider.value = valorIntermedio;
-            valor.textContent = valorIntermedio.toFixed(2);
+            input.value = valorIntermedio.toFixed(2);
         }
     });
 }
