@@ -92,8 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calcularTodo();
         }, 100);
         
-        // Mostrar impacto inicial del simulador
-        mostrarImpactoSimulador();
+                 // Mostrar impacto inicial del simulador (eliminado - función no existe)
     });
 });
 
@@ -899,11 +898,19 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
             setText(`delta${prefix}ARS`, deltaARS);
             setText(`delta${prefix}USD`, deltaUSD);
 
-            // Colorear según signo
+            // Colorear según impacto económico intuitivo
+            let cls;
+            if (deltaARS === 0) {
+                cls = 'igual'; // Dorado: sin cambio
+            } else if (deltaARS < 0) {
+                cls = 'mejor'; // Verde: necesitás menos dinero (mejor para vos)
+            } else {
+                cls = 'peor'; // Rojo: necesitás más dinero (peor para vos)
+            }
+
             const colValores = document.getElementById(`delta${prefix}ARS`)?.closest('.col-valores');
             if (colValores) {
-                const cls = deltaARS >= 0 ? 'positivo' : 'negativo';
-                colValores.classList.remove('positivo','negativo');
+                colValores.classList.remove('mejor','peor','igual');
                 colValores.classList.add(cls);
             }
 
@@ -911,8 +918,8 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
             if (resumenEl) {
                 const signo = deltaARS > 0 ? '+' : '';
                 resumenEl.textContent = `${signo}${formatearNumero(Math.round(deltaARS))} ARS vs. Oficial (${signo}${formatearNumero(Math.round(deltaUSD))} USD)`;
-                resumenEl.classList.remove('positivo','negativo');
-                resumenEl.classList.add(deltaARS >= 0 ? 'negativo' : 'positivo');
+                resumenEl.classList.remove('mejor','peor','igual');
+                resumenEl.classList.add(cls);
             }
         }
     }
@@ -970,9 +977,9 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     limpiarResultados = function() {
         original();
         const ids = [
-            'prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD',
-            'prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD',
-            'prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD'
+            'prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD','deltaPisoARS','deltaPisoUSD',
+            'prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD','deltaOficialARS','deltaOficialUSD',
+            'prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD','deltaTechoARS','deltaTechoUSD'
         ];
         ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '$0'; });
     }
