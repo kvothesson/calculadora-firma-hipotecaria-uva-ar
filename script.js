@@ -628,11 +628,12 @@ function calcularCredito(datos) {
     // Primera cuota (sin ajuste UVA)
     const primeraCuota = cuotaMensual;
     
-    // Total a pagar (aproximado)
-    const totalPagar = cuotaMensual * totalMeses;
-    
     // Gastos extra
     const gastosExtra = calcularGastosExtra(datos.valorPropiedad, datos.provincia);
+    
+    // Total de la operación = valor de la casa + gastos
+    const valorCasaPesos = datos.valorPropiedad * CONFIG.tiposCambio.oficial;
+    const totalOperacion = valorCasaPesos + gastosExtra.total;
     
     // Cuota promedio considerando UVA
     const cuotaPromedio = calcularCuotaPromedioConUVA(cuotaMensual, totalMeses);
@@ -645,7 +646,7 @@ function calcularCredito(datos) {
     
     return {
         primeraCuota,
-        totalPagar,
+        totalPagar: totalOperacion, // Ahora es casa + gastos
         gastosExtra,
         cuotaPromedio,
         montoPrestamoPesos,
