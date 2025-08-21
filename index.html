@@ -279,6 +279,76 @@
                 </div>
             </section>
 
+            <!-- Ejemplo práctico dinámico - CORE de la aplicación -->
+            <section class="practical-example-section" id="ejemploPractico" style="display: none;">
+                <h2>📝 Ejemplo Práctico con Tus Valores</h2>
+                <p class="section-description">Este es el desglose completo de cuánto dinero necesitás ahorrar para comprar tu casa con el crédito UVA:</p>
+                
+                <div class="example-content">
+                    <div class="example-summary">
+                        <p><strong>Situación:</strong> Querés comprar una casa de <span id="ejemploValorCasa">USD 0</span> con un crédito de <span id="ejemploPrestamo">$0</span></p>
+                    </div>
+                    
+                    <div class="example-breakdown">
+                        <div class="example-item">
+                            <span class="example-label">🏠 Valor de la casa (dólar a <span id="ejemploDolarTecho">$0</span>)</span>
+                            <span class="example-value" id="ejemploValorCasaPesos">$0</span>
+                        </div>
+                        <div class="example-item">
+                            <span class="example-label">🏦 Lo que te presta el banco</span>
+                            <span class="example-value" id="ejemploPrestamoBanco">$0</span>
+                        </div>
+                        <div class="example-item highlight">
+                            <span class="example-label">💰 Lo que tenés que poner vos</span>
+                            <span class="example-value" id="ejemploDiferencia">$0</span>
+                        </div>
+                        
+                        <!-- Desglose detallado de gastos -->
+                        <div class="example-gastos-breakdown">
+                            <h5>📋 Desglose de Gastos:</h5>
+                            <div class="gasto-ejemplo-item">
+                                <span class="gasto-ejemplo-label">📄 Escritura:</span>
+                                <span class="gasto-ejemplo-value" id="ejemploGastoEscritura">$0</span>
+                            </div>
+                            <div class="gasto-ejemplo-item">
+                                <span class="gasto-ejemplo-label">🏪 Inmobiliaria:</span>
+                                <span class="gasto-ejemplo-value" id="ejemploGastoInmobiliaria">$0</span>
+                            </div>
+                            <div class="gasto-ejemplo-item">
+                                <span class="gasto-ejemplo-label">✍️ Firmas:</span>
+                                <span class="gasto-ejemplo-value" id="ejemploGastoFirmas">$0</span>
+                            </div>
+                            <div class="gasto-ejemplo-item">
+                                <span class="gasto-ejemplo-label">🏷️ Sellos:</span>
+                                <span class="gasto-ejemplo-value" id="ejemploGastoSellos">$0</span>
+                            </div>
+                            <div class="gasto-ejemplo-total">
+                                <span class="gasto-ejemplo-label"><strong>Total Gastos:</strong></span>
+                                <span class="gasto-ejemplo-value"><strong id="ejemploGastosTotal">$0</strong></span>
+                            </div>
+                        </div>
+                        
+                        <div class="example-item">
+                            <span class="example-label">🛡️ Margen de seguridad (20%)</span>
+                            <span class="example-value" id="ejemploMargen">$0</span>
+                        </div>
+                        <div class="example-item">
+                            <span class="example-label">🚨 Reserva de emergencia (6 cuotas)</span>
+                            <span class="example-value" id="ejemploReserva">$0</span>
+                        </div>
+                        <div class="example-total">
+                            <span class="example-label"><strong>🎯 Total que necesitás ahorrar</strong></span>
+                            <span class="example-value"><strong id="ejemploTotal">$0</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-note">
+                        <p>💡 Con esta plata podés comprar la casa sin sustos, usando el dólar más alto posible (techo de banda)</p>
+                        <p>🚨 <strong>Importante:</strong> Este cálculo usa el peor escenario posible para que estés preparado para cualquier situación</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sección de consejos -->
             <section class="tips-section">
                 <h2>💡 Consejos para Sacar un Crédito Hipotecario UVA</h2>
@@ -306,67 +376,6 @@
                         
                         <li><strong>🏪 Los gastos extras varían:</strong> Los costos de tramites (escritura, inmobiliaria, etc.) pueden cambiar según la provincia donde compres y el momento. Siempre consultá valores actualizados</li>
                     </ul>
-                    
-                    <!-- Ejemplo práctico dinámico -->
-                    <div class="practical-example" id="ejemploPractico" style="display: none;">
-                        <h4>📝 Ejemplo Práctico con Tus Valores</h4>
-                        <div class="example-content">
-                            <p><strong>Situación:</strong> Querés comprar una casa de <span id="ejemploValorCasa">USD 0</span> con un crédito de <span id="ejemploPrestamo">$0</span></p>
-                            <div class="example-breakdown">
-                                <div class="example-item">
-                                    <span class="example-label">🏠 Valor de la casa (dólar a <span id="ejemploDolarTecho">$0</span>)</span>
-                                    <span class="example-value" id="ejemploValorCasaPesos">$0</span>
-                                </div>
-                                <div class="example-item">
-                                    <span class="example-label">🏦 Lo que te presta el banco</span>
-                                    <span class="example-value" id="ejemploPrestamoBanco">$0</span>
-                                </div>
-                                <div class="example-item highlight">
-                                    <span class="example-label">💰 Lo que tenés que poner vos</span>
-                                    <span class="example-value" id="ejemploDiferencia">$0</span>
-                                </div>
-                                
-                                <!-- Desglose detallado de gastos -->
-                                <div class="example-gastos-breakdown">
-                                    <h5>📋 Desglose de Gastos:</h5>
-                                    <div class="gasto-ejemplo-item">
-                                        <span class="gasto-ejemplo-label">📄 Escritura:</span>
-                                        <span class="gasto-ejemplo-value" id="ejemploGastoEscritura">$0</span>
-                                    </div>
-                                    <div class="gasto-ejemplo-item">
-                                        <span class="gasto-ejemplo-label">🏪 Inmobiliaria:</span>
-                                        <span class="gasto-ejemplo-value" id="ejemploGastoInmobiliaria">$0</span>
-                                    </div>
-                                    <div class="gasto-ejemplo-item">
-                                        <span class="gasto-ejemplo-label">✍️ Firmas:</span>
-                                        <span class="gasto-ejemplo-value" id="ejemploGastoFirmas">$0</span>
-                                    </div>
-                                    <div class="gasto-ejemplo-item">
-                                        <span class="gasto-ejemplo-label">🏷️ Sellos:</span>
-                                        <span class="gasto-ejemplo-value" id="ejemploGastoSellos">$0</span>
-                                    </div>
-                                    <div class="gasto-ejemplo-total">
-                                        <span class="gasto-ejemplo-label"><strong>Total Gastos:</strong></span>
-                                        <span class="gasto-ejemplo-value"><strong id="ejemploGastosTotal">$0</strong></span>
-                                    </div>
-                                </div>
-                                
-                                <div class="example-item">
-                                    <span class="example-label">🛡️ Margen de seguridad (20%)</span>
-                                    <span class="example-value" id="ejemploMargen">$0</span>
-                                </div>
-                                <div class="example-item">
-                                    <span class="example-label">🚨 Reserva de emergencia (6 cuotas)</span>
-                                    <span class="example-value" id="ejemploReserva">$0</span>
-                                </div>
-                                <div class="example-total">
-                                    <span class="example-label"><strong>🎯 Total que necesitás ahorrar</strong></span>
-                                    <span class="example-value"><strong id="ejemploTotal">$0</strong></span>
-                                </div>
-                            </div>
-                            <p class="example-note">💡 Con esta plata podés comprar la casa sin sustos, usando el dólar más alto posible (techo de banda)</p>
-                        </div>
-                    </div>
                 </div>
             </section>
         </main>
