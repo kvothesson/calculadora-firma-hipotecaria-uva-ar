@@ -1090,10 +1090,17 @@ function configurarSlidersGastos() {
                 const provinciaActual = elementos.provincia.value;
                 actualizarValorIntermedio(tipo, parseFloat(this.value), provinciaActual);
                 
+                // Agregar feedback visual inmediato
+                this.classList.add('updating');
+                
                 // Recalcular con delay para mejor performance
                 clearTimeout(this.gastoTimeout);
                 this.gastoTimeout = setTimeout(() => {
                     calcularTodo();
+                    // Remover clase de actualización después de un breve delay
+                    setTimeout(() => {
+                        this.classList.remove('updating');
+                    }, 500);
                 }, 300);
             });
             
@@ -1101,10 +1108,35 @@ function configurarSlidersGastos() {
             input.addEventListener('blur', function() {
                 const nuevoValor = parseFloat(this.value) || 0;
                 
+                // Validar y formatear el valor
+                if (nuevoValor < 0) {
+                    this.value = 0;
+                } else if (nuevoValor > 10) {
+                    this.value = 10;
+                } else {
+                    // Formatear a 2 decimales
+                    this.value = nuevoValor.toFixed(2);
+                }
+                
                 // Analytics: Rastrear cambio de gasto
                 if (window.calculadoraAnalytics) {
                     window.calculadoraAnalytics.trackSliderChange(`gasto_${tipo}`, nuevoValor, 0);
                 }
+                
+                // Feedback visual de confirmación
+                this.classList.add('confirmed');
+                setTimeout(() => {
+                    this.classList.remove('confirmed');
+                }, 1000);
+            });
+            
+            // Evento para focus - mejorar la experiencia visual
+            input.addEventListener('focus', function() {
+                this.closest('.gasto-item').classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.closest('.gasto-item').classList.remove('focused');
             });
         }
     });

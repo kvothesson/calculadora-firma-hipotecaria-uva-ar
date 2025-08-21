@@ -1194,386 +1194,70 @@ footer {
     font-weight: 700;
 }
 
-/* Desglose de gastos */
-.gastos-detalle {
-    margin-top: 15px;
-}
+/* Desglose de gastos - Estilo unificado con la calculadora principal */
+/* Esta sección se movió al formulario principal, manteniendo solo el resumen aquí */
 
-.gasto-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 8px;
-    border-bottom: 1px solid rgba(71, 85, 105, 0.4);
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-    min-height: 45px;
-    color: #f1f5f9;
-}
-
-.gasto-item:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    border-radius: 6px;
-    padding-left: 12px;
-    padding-right: 12px;
-}
-
-.gasto-item:last-child {
-    border-bottom: none;
-}
-
-.gasto-item.total {
-    margin-top: 15px;
-    padding: 15px 12px;
-    border-top: 2px solid #34d399;
-    border-radius: 8px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%);
-    font-size: 1rem;
-    color: #f1f5f9;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-    align-items: center;
-    min-height: 55px;
-    border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-.gasto-item span:first-child {
-    color: #e2e8f0;
-    font-weight: 500;
-}
-
-.gasto-item span:last-child {
-    font-weight: 600;
-    color: #ffffff;
-}
-
-.gasto-item.total span:last-child {
-    color: #10b981;
-    font-weight: 700;
-}
-
-/* Porcentajes de gastos */
+/* Porcentajes de gastos - Estilo mejorado */
 .porcentaje {
     color: #94a3b8;
     font-size: 0.75rem;
     font-weight: 400;
-    margin-left: 5px;
-}
-
-/* Valores equivalentes en USD - Legacy */
-.result-equivalent {
-    display: none; /* Ocultamos cuando usamos dual currency */
-}
-
-.gasto-valores {
-    text-align: right;
-}
-
-.gasto-valores small {
-    display: block;
-    font-size: 0.8rem;
-    color: #94a3b8;
-    margin-top: 2px;
-    font-weight: 400;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .container {
-        padding: 8px;
-    }
-    
-    header {
-        margin-bottom: 12px;
-    }
-    
-    header h1 {
-        font-size: 1.9rem;
-        margin-bottom: 6px;
-    }
-    
-    section {
-        padding: 12px;
-        margin-bottom: 12px;
-    }
-    
-    section h2 {
-        font-size: 1.3rem;
-        margin-bottom: 10px;
-    }
-    
-    .form-group {
-        margin-bottom: 10px;
-    }
-    
-    .form-group label {
-        font-size: 0.85rem;
-        margin-bottom: 3px;
-    }
-    
-    .form-group input,
-    .form-group select {
-        padding: 7px 9px;
-        font-size: 14px;
-    }
-    
-    .slider {
-        margin: 6px 0;
-    }
-    
-    .tc-slider-container {
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .results-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-    
-    .scenario-card.central {
-        padding: 16px;
-    }
-    
-    .scenario-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .result-card {
-        min-height: 160px;
-        padding: 15px;
-    }
-    
-    .currency-value {
-        font-size: 1.4rem;
-    }
-}
-
-@media (max-width: 480px) {
-    header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .form-group input,
-    .form-group select {
-        font-size: 16px; /* Evita zoom en iOS */
-    }
-}
-
-/* Animaciones */
-.result-card,
-.scenario-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.result-card:hover,
-.scenario-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-/* Sistema de validación no intrusivo */
-.form-group {
-    position: relative;
+    margin-left: 8px;
+    padding: 2px 6px;
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
     transition: all 0.3s ease;
 }
 
-/* Estados de validación sutiles */
-.form-group.field-error {
-    border-left: 3px solid rgba(239, 68, 68, 0.6);
-    background: rgba(239, 68, 68, 0.03);
-    border-radius: 0 8px 8px 0;
-    padding-left: 12px;
-    margin-left: -12px;
-}
-
-.form-group.field-warning {
-    border-left: 3px solid rgba(251, 191, 36, 0.6);
-    background: rgba(251, 191, 36, 0.03);
-    border-radius: 0 8px 8px 0;
-    padding-left: 12px;
-    margin-left: -12px;
-}
-
-.form-group.field-info {
-    border-left: 3px solid rgba(59, 130, 246, 0.6);
-    background: rgba(59, 130, 246, 0.03);
-    border-radius: 0 8px 8px 0;
-    padding-left: 12px;
-    margin-left: -12px;
-}
-
-/* Mensajes de validación sutiles */
-.field-message {
-    display: block;
-    margin-top: 6px;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-    opacity: 0;
-    transform: translateY(-5px);
-    animation: fadeInUp 0.3s ease forwards;
-}
-
-.field-message-error {
-    color: #dc2626;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.field-message-warning {
-    color: #d97706;
-    background: rgba(251, 191, 36, 0.1);
-    border: 1px solid rgba(251, 191, 36, 0.2);
-}
-
-.field-message-info {
-    color: #2563eb;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-/* Animación para mensajes */
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Estados de inputs - versión más sutil */
-.form-group.field-error input,
-.form-group.field-error select {
-    border-color: rgba(239, 68, 68, 0.4);
-    background: rgba(239, 68, 68, 0.02);
-}
-
-.form-group.field-warning input,
-.form-group.field-warning select {
-    border-color: rgba(251, 191, 36, 0.4);
-    background: rgba(251, 191, 36, 0.02);
-}
-
-.form-group.field-info input,
-.form-group.field-info select {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: rgba(59, 130, 246, 0.02);
-}
-
-/* Focus states mantienen prioridad */
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
-    background: rgba(15, 23, 42, 0.98) !important;
-}
-
-/* Estados legacy simplificados */
-.form-group input:invalid {
-    border-color: rgba(239, 68, 68, 0.3);
-}
-
-.form-group input:valid {
-    border-color: rgba(34, 197, 94, 0.3);
-}
-
-/* Mejoras para inputs numéricos */
-.form-group input[type="number"] {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    text-align: left;
-}
-
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-    opacity: 1;
-    height: 20px;
-}
-
-/* Estilos para las alertas */
-.alerta {
-    padding: 15px 20px;
-    margin: 20px 0;
-    border-radius: 8px;
-    font-weight: 500;
-    animation: slideIn 0.3s ease;
-}
-
-.alerta-info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border-left: 4px solid #17a2b8;
-}
-
-.alerta-warning {
-    background: #fff3cd;
-    color: #856404;
-    border-left: 4px solid #ffc107;
-}
-
-.alerta-error {
-    background: #f8d7da;
-    color: #721c24;
-    border-left: 4px solid #dc3545;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Estilos para controles de gastos intermedios */
-.gasto-item {
-    margin-bottom: 15px;
-}
-
-.gasto-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
+/* Controles de gastos - Estilo unificado */
 .gasto-control {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    margin-left: 15px;
+    margin-left: 20px;
 }
 
-/* Nuevos estilos para inputs de porcentaje */
+/* Inputs de porcentaje - Estilo mejorado y unificado */
 .percentage-input {
     display: flex;
     align-items: center;
-    border: 2px solid rgba(59, 130, 246, 0.3);
-    border-radius: 8px;
+    border: 2px solid rgba(59, 130, 246, 0.25);
+    border-radius: 10px;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.9);
-    transition: border-color 0.3s ease;
-    min-width: 120px;
+    background: rgba(15, 23, 42, 0.8);
+    transition: all 0.3s ease;
+    min-width: 130px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.percentage-input:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
 .percentage-input:focus-within {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 4px 16px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
 }
 
 .percentage-field {
     flex: 1;
     border: none;
     outline: none;
-    padding: 8px 12px;
+    padding: 10px 14px;
     background: transparent;
     color: #ffffff;
     font-size: 16px;
     font-weight: 600;
     text-align: center;
     min-width: 80px;
+    transition: all 0.3s ease;
+}
+
+.percentage-field:focus {
+    background: rgba(59, 130, 246, 0.05);
 }
 
 .percentage-field::-webkit-outer-spin-button,
@@ -1588,30 +1272,88 @@ footer {
 }
 
 .percentage-symbol {
-    padding: 8px 12px;
-    background: #3b82f6;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     font-weight: 700;
     font-size: 16px;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
 }
 
-/* Legacy slider styles (mantenemos para compatibilidad) */
-.gasto-slider {
-    flex: 1;
-    min-width: 150px;
+.percentage-symbol::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    pointer-events: none;
 }
 
-.slider-value {
-    color: var(--accent-color);
+/* Valores duales de gastos - Estilo mejorado */
+.gasto-valores {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dual-currency {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+.currency-item-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.currency-label-small {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(148, 163, 184, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.currency-value-inline {
     font-weight: 600;
-    font-size: 0.9em;
-    min-width: 50px;
-    text-align: center;
+    color: #ffffff;
 }
 
-/* Ajustes para dispositivos móviles */
+/* Responsive mejorado para gastos */
 @media (max-width: 768px) {
+    .gastos-detalle {
+        padding: 12px;
+        margin-top: 12px;
+    }
+    
+    .gasto-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+        min-height: auto;
+    }
+    
+    .gasto-item:hover {
+        transform: none;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    
+    .gasto-item:hover::after {
+        display: none;
+    }
+    
     .gasto-control {
         justify-content: center;
         margin-left: 0;
@@ -1621,25 +1363,510 @@ footer {
     .percentage-input {
         min-width: 140px;
         max-width: 200px;
+        width: 100%;
     }
     
     .percentage-field {
-        font-size: 18px; /* Evita zoom en iOS */
-        padding: 10px 12px;
+        font-size: 18px;
+        padding: 12px 14px;
     }
     
     .percentage-symbol {
-        padding: 10px 15px;
+        padding: 12px 18px;
         font-size: 18px;
     }
     
-    /* Legacy slider styles para mobile */
-    .slider-value {
-        text-align: left;
+    .gasto-item.total {
+        padding: 16px;
+        margin-top: 16px;
+    }
+    
+    .gasto-item.total::after {
+        display: none;
+    }
+    
+    .gasto-valores {
+        text-align: center;
+        align-items: center;
+    }
+    
+    .dual-currency {
+        align-items: center;
+    }
+}
+
+/* Estados visuales para feedback de interacción en gastos */
+/* Estos estilos se mantienen para la funcionalidad en el formulario principal */
+
+/* Mejoras en la transición de valores */
+.gasto-item span:last-child {
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+}
+
+.gasto-item.updating span:last-child {
+    color: #f59e0b;
+    transform: scale(1.05);
+}
+
+.gasto-item.confirmed span:last-child {
+    color: #10b981;
+    transform: scale(1.02);
+}
+
+/* Indicador de cambio en tiempo real */
+.gasto-item .change-indicator {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3b82f6;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.gasto-item.updating .change-indicator {
+    opacity: 1;
+    background: #f59e0b;
+    animation: updatingDot 1s infinite;
+}
+
+.gasto-item.confirmed .change-indicator {
+    opacity: 1;
+    background: #10b981;
+    animation: confirmedDot 0.8s ease-out;
+}
+
+@keyframes updatingDot {
+    0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateY(-50%) scale(1.3);
+    }
+}
+
+@keyframes confirmedDot {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0);
+    }
+}
+
+/* Mejoras finales para la integración visual completa */
+.results-section {
+    position: relative;
+}
+
+.results-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+}
+
+.result-card.secondary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.result-card.secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+.result-card.secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
+    opacity: 0.8;
+}
+
+.result-card.secondary::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+}
+
+/* Mejoras en el título de la sección de gastos */
+.result-card.secondary h3 {
+    position: relative;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.result-card.secondary h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, transparent);
+    border-radius: 1px;
+}
+
+/* Mejoras en la transición entre secciones */
+.results-grid {
+    gap: 20px;
+}
+
+.results-grid .result-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.results-grid .result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Mejoras en la responsividad general */
+@media (max-width: 768px) {
+    .results-grid {
+        gap: 16px;
+    }
+    
+    .result-card.secondary:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+    }
+    
+    .results-section::before {
+        width: 90%;
+    }
+}
+
+/* Mejoras en la accesibilidad visual */
+.gasto-item:focus-within {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
+}
+
+.percentage-input:focus-within {
+    outline: none;
+}
+
+/* Mejoras en la legibilidad */
+.gasto-item .gasto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.gasto-item .gasto-header span:first-child {
+    flex: 1;
+    min-width: 0;
+    margin-right: 12px;
+}
+
+.gasto-item .gasto-header span:last-child {
+    flex-shrink: 0;
+    text-align: right;
+    min-width: 80px;
+}
+
+/* Mejoras en el contraste y legibilidad */
+.porcentaje {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 400;
+    margin-left: 8px;
+    padding: 2px 6px;
+    background: rgba(148, 163, 184, 0.15);
+    border-radius: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+/* Mejoras en la animación de entrada */
+.gastos-detalle {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejoras en el estado de carga */
+.gastos-detalle.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.gastos-detalle.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Sección de gastos integrada en el formulario principal */
+.gastos-form-section {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gastos-form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
+    opacity: 0.8;
+}
+
+.gastos-form-section h3 {
+    margin: 0 0 20px 0;
+    color: #f1f5f9;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gastos-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.gasto-form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gasto-form-item label {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gasto-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gasto-input-group .percentage-input {
+    flex: 1;
+    min-width: 120px;
+}
+
+.gasto-reference {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    background: rgba(148, 163, 184, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.gasto-form-item:hover .gasto-reference {
+    background: rgba(148, 163, 184, 0.15);
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+/* Responsive para la sección de gastos integrada */
+@media (max-width: 768px) {
+    .gastos-form-section {
+        padding: 16px;
+        margin-top: 16px;
+    }
+    
+    .gastos-form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .gasto-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .gasto-input-group .percentage-input {
+        width: 100%;
         min-width: auto;
     }
     
-    .gasto-slider {
-        min-width: 100%;
+    .gasto-reference {
+        text-align: center;
+        align-self: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .gastos-form-section {
+        padding: 12px;
+    }
+    
+    .gastos-form-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+    }
+}
+
+/* Resumen de gastos en la sección de resultados */
+.gastos-summary {
+    margin-top: 15px;
+}
+
+.gastos-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.gasto-summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(71, 85, 105, 0.2);
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.gasto-summary-item:hover {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateX(2px);
+}
+
+.gasto-summary-item span:first-child {
+    color: #e2e8f0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gasto-summary-item span:last-child {
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.gastos-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.08) 100%);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 12px;
+    font-size: 1.05rem;
+    color: #f1f5f9;
+    position: relative;
+    overflow: hidden;
+}
+
+.gastos-total::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #10b981, #34d399, #10b981);
+    border-radius: 12px 12px 0 0;
+}
+
+.gastos-total span:first-child {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.gastos-total .gasto-valores {
+    text-align: right;
+}
+
+/* Responsive para el resumen de gastos */
+@media (max-width: 768px) {
+    .gastos-breakdown {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .gasto-summary-item {
+        padding: 10px 12px;
+    }
+    
+    .gastos-total {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 16px;
+    }
+    
+    .gastos-total .gasto-valores {
+        text-align: center;
     }
 }
