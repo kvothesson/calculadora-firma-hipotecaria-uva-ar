@@ -230,10 +230,9 @@ function guardarCotizacionEnCache(valor, fuente) {
 }
 
 function establecerValoresPorDefecto() {
-    elementos.valorPropiedad.value = 45000; // USD 45,000
-    // USD 32,000 convertido a pesos según cotización oficial (se actualiza automáticamente)
-    const montoPrestamoPesos = 32000 * CONFIG.tiposCambio.oficial;
-    elementos.montoPrestamo.value = montoPrestamoPesos;
+    elementos.valorPropiedad.value = 155000; // USD 155,000
+    // Monto prestado fijo en pesos
+    elementos.montoPrestamo.value = 70000000; // $70,000,000 ARS
     elementos.tasaInteres.value = 8.5;
     elementos.plazo.value = 20;
 }
