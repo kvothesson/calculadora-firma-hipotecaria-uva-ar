@@ -1719,37 +1719,64 @@ footer {
     }
 }
 
-/* Resumen de gastos en la sección de resultados */
-.gastos-summary {
-    margin-top: 15px;
+/* Desglose de gastos en el ejemplo práctico */
+.example-gastos-breakdown {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    position: relative;
+    overflow: hidden;
 }
 
-.gastos-breakdown {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
+.example-gastos-breakdown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
+    opacity: 0.8;
 }
 
-.gasto-summary-item {
+.example-gastos-breakdown h5 {
+    margin: 0 0 16px 0;
+    color: #f1f5f9;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gasto-ejemplo-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    background: rgba(15, 23, 42, 0.3);
+    background: rgba(15, 23, 42, 0.2);
     border-radius: 8px;
     border: 1px solid rgba(71, 85, 105, 0.2);
     font-size: 0.85rem;
     transition: all 0.3s ease;
+    margin-bottom: 6px;
 }
 
-.gasto-summary-item:hover {
-    background: rgba(15, 23, 42, 0.4);
+.gasto-ejemplo-item:hover {
+    background: rgba(15, 23, 42, 0.3);
     border-color: rgba(59, 130, 246, 0.3);
     transform: translateX(2px);
 }
 
-.gasto-summary-item span:first-child {
+.gasto-ejemplo-item:last-of-type {
+    margin-bottom: 0;
+}
+
+.gasto-ejemplo-label {
     color: #e2e8f0;
     font-weight: 500;
     display: flex;
@@ -1757,27 +1784,28 @@ footer {
     gap: 6px;
 }
 
-.gasto-summary-item span:last-child {
+.gasto-ejemplo-value {
     font-weight: 600;
     color: #ffffff;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
-.gastos-total {
+.gasto-ejemplo-total {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.08) 100%);
     border: 1px solid rgba(52, 211, 153, 0.25);
-    border-radius: 12px;
-    font-size: 1.05rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
     color: #f1f5f9;
     position: relative;
     overflow: hidden;
+    margin-top: 12px;
 }
 
-.gastos-total::before {
+.gasto-ejemplo-total::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1785,37 +1813,34 @@ footer {
     right: 0;
     height: 2px;
     background: linear-gradient(90deg, #10b981, #34d399, #10b981);
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
 }
 
-.gastos-total span:first-child {
+.gasto-ejemplo-total .gasto-ejemplo-label {
     color: #e2e8f0;
     font-weight: 600;
 }
 
-.gastos-total .gasto-valores {
-    text-align: right;
+.gasto-ejemplo-total .gasto-ejemplo-value {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1rem;
 }
 
-/* Responsive para el resumen de gastos */
+/* Responsive para el desglose de gastos en el ejemplo */
 @media (max-width: 768px) {
-    .gastos-breakdown {
-        grid-template-columns: 1fr;
-        gap: 8px;
+    .example-gastos-breakdown {
+        padding: 12px;
+        margin: 12px 0;
     }
     
-    .gasto-summary-item {
+    .gasto-ejemplo-item {
         padding: 10px 12px;
+        font-size: 0.9rem;
     }
     
-    .gastos-total {
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-        padding: 16px;
-    }
-    
-    .gastos-total .gasto-valores {
-        text-align: center;
+    .gasto-ejemplo-total {
+        padding: 14px 16px;
+        margin-top: 10px;
     }
 }
