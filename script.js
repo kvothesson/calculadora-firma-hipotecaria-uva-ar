@@ -554,10 +554,10 @@ function mostrarGuiaCompletar(datos) {
 
 function limpiarResultados() {
     elementos.primeraCuota.textContent = '$0';
-    document.getElementById('primeraCuotaUSD').textContent = '$0 USD';
+    document.getElementById('primeraCuotaUSD').textContent = '$0';
     
     elementos.totalPagar.textContent = '$0';
-    document.getElementById('totalPagarUSD').textContent = '$0 USD';
+    document.getElementById('totalPagarUSD').textContent = '$0';
     
     // Limpiar desglose de gastos
     document.getElementById('gastoEscritura').textContent = '$0';
@@ -565,13 +565,13 @@ function limpiarResultados() {
     document.getElementById('gastoFirmas').textContent = '$0';
     document.getElementById('gastoSellos').textContent = '$0';
     elementos.gastosExtra.innerHTML = '<strong>$0</strong>';
-    document.getElementById('gastosExtraUSD').textContent = '$0 USD';
+    document.getElementById('gastosExtraUSD').textContent = '$0';
     
     if (elementos.diferenciaSimulador) {
         elementos.diferenciaSimulador.textContent = '$0';
     }
     if (elementos.diferenciaSimuladorUSD) {
-        elementos.diferenciaSimuladorUSD.textContent = '$0 USD';
+        elementos.diferenciaSimuladorUSD.textContent = '$0';
     }
     if (elementos.tcSimuladorTexto) {
         elementos.tcSimuladorTexto.textContent = '1225';
@@ -584,7 +584,7 @@ function limpiarResultados() {
         elementoPrestamoSimuladorPesos.textContent = '$0';
     }
     if (elementoPrestamoSimuladorUSD) {
-        elementoPrestamoSimuladorUSD.textContent = '$0 USD';
+        elementoPrestamoSimuladorUSD.textContent = '$0';
     }
 }
 
@@ -725,14 +725,14 @@ function calcularCuotaPromedioConUVA(cuotaInicial, totalMeses) {
 
 function mostrarResultados(resultados) {
     // Primera cuota en ambas monedas
-    elementos.primeraCuota.textContent = formatearPesos(resultados.primeraCuota);
+    elementos.primeraCuota.textContent = formatearARS(resultados.primeraCuota);
     const primeraCuotaUSD = resultados.primeraCuota / CONFIG.tiposCambio.oficial;
-    document.getElementById('primeraCuotaUSD').textContent = `$${formatearNumero(primeraCuotaUSD)} USD`;
+    document.getElementById('primeraCuotaUSD').textContent = formatearUSD(primeraCuotaUSD);
     
     // Total a pagar en ambas monedas
-    elementos.totalPagar.textContent = formatearPesos(resultados.totalPagar);
+    elementos.totalPagar.textContent = formatearARS(resultados.totalPagar);
     const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.oficial;
-    document.getElementById('totalPagarUSD').textContent = `$${formatearNumero(totalPagarUSD)} USD`;
+    document.getElementById('totalPagarUSD').textContent = formatearUSD(totalPagarUSD);
     
     // Mostrar desglose de gastos con valores intermedios
     if (resultados.gastosExtra && typeof resultados.gastosExtra === 'object') {
@@ -748,7 +748,7 @@ function mostrarResultados(resultados) {
         const totalUSD = gastos.total / CONFIG.tiposCambio.oficial;
         
         elementos.gastosExtra.innerHTML = `<strong>${formatearPesos(gastos.total)}</strong>`;
-        document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(totalUSD)} USD`;
+        document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(totalUSD)}`;
     }
 }
 
@@ -787,7 +787,7 @@ function mostrarImpactoSimulador() {
     }
     
     if (elementoPrestamoSimuladorUSD) {
-        elementoPrestamoSimuladorUSD.textContent = `$${formatearNumero(montoPrestamoUSD)} USD`;
+        elementoPrestamoSimuladorUSD.textContent = `$${formatearNumero(montoPrestamoUSD)}`;
     }
     
     // Mostrar lo que tienes que poner
@@ -800,8 +800,8 @@ function mostrarImpactoSimulador() {
     
     if (elementos.diferenciaSimuladorUSD) {
         const diferenciaUSD = diferenciaACubrir / CONFIG.tiposCambio.simulador;
-        elementos.diferenciaSimuladorUSD.textContent = `$${formatearNumero(diferenciaUSD)} USD`;
-        console.log('Actualizado diferenciaSimuladorUSD:', `$${formatearNumero(diferenciaUSD)} USD`);
+        elementos.diferenciaSimuladorUSD.textContent = `$${formatearNumero(diferenciaUSD)}`;
+        console.log('Actualizado diferenciaSimuladorUSD:', `$${formatearNumero(diferenciaUSD)}`);
     } else {
         console.log('ERROR: elemento diferenciaSimuladorUSD no encontrado');
     }
@@ -819,7 +819,7 @@ function mostrarImpactoSimulador() {
     
     if (elementoDiferenciaPropiedadUSD) {
         const diferenciaPropiedadUSD = diferenciaPropiedad / CONFIG.tiposCambio.simulador;
-        elementoDiferenciaPropiedadUSD.textContent = `$${formatearNumero(diferenciaPropiedadUSD)} USD`;
+        elementoDiferenciaPropiedadUSD.textContent = `$${formatearNumero(diferenciaPropiedadUSD)}`;
     }
     
     if (elementoGastosSimulador) {
@@ -828,7 +828,7 @@ function mostrarImpactoSimulador() {
     
     if (elementoGastosSimuladorUSD) {
         const gastosSimuladorUSD = gastosExtraSimulador.total / CONFIG.tiposCambio.simulador;
-        elementoGastosSimuladorUSD.textContent = `$${formatearNumero(gastosSimuladorUSD)} USD`;
+        elementoGastosSimuladorUSD.textContent = `$${formatearNumero(gastosSimuladorUSD)}`;
     }
     
     if (elementos.tcSimuladorTexto) {
@@ -867,6 +867,14 @@ function formatearNumero(valor) {
     }).format(valor);
 }
 
+function formatearUSD(valor) {
+    return formatearNumero(valor);
+}
+
+function formatearARS(valor) {
+    return formatearPesos(valor);
+}
+
 function actualizarValorEnPesos(valorUSD) {
     const valorPesos = valorUSD * CONFIG.tiposCambio.oficial;
     const elementoValorPesos = document.getElementById('valorPropiedadPesos');
@@ -881,7 +889,7 @@ function actualizarEquivalenciaMontoPrestado(montoPesos) {
     
     // Siempre mostrar el equivalente en USD del monto en pesos
     const equivalenciaUSD = montoPesos / CONFIG.tiposCambio.oficial;
-    elementoEquivalencia.textContent = `$${formatearNumero(equivalenciaUSD)} USD`;
+    elementoEquivalencia.textContent = formatearUSD(equivalenciaUSD);
 }
 
 function actualizarCotizacionEnInterfaz(fuente = 'Automático', fecha = null) {
@@ -1176,8 +1184,8 @@ function mostrarTipsDinamicos(resultados) {
             <span class="tip-icon">🛡️</span>
             <div class="tip-content">
                 <strong>Margen de seguridad recomendado:</strong> Agregá 20% extra = ${formatearPesos(margenSeguridad)} 
-                ($${formatearNumero(margenSeguridadUSD)} USD). 
-                Total con margen: ${formatearPesos(totalConMargen)} ($${formatearNumero(totalConMargenUSD)} USD)
+                (${formatearUSD(margenSeguridadUSD)}). 
+                Total con margen: ${formatearPesos(totalConMargen)} (${formatearUSD(totalConMargenUSD)})
             </div>
         `;
         tipsContainer.appendChild(tipMargenSeguridad);
@@ -1196,9 +1204,9 @@ function mostrarTipsDinamicos(resultados) {
             <span class="tip-icon">💎</span>
             <div class="tip-content">
                 <strong>💰 Ahorro total sugerido:</strong> Deberías tener ${formatearPesos(ahorroTotalSugerido)} 
-                ($${formatearNumero(ahorroTotalSugeridoUSD)} USD) que incluye:
-                <br>• Dinero para la compra con margen: ${formatearPesos(totalConMargen)} ($${formatearNumero(totalConMargenUSD)} USD)
-                <br>• Reserva de emergencia (6 meses): ${formatearPesos(colchonAhorroExtra)} ($${formatearNumero(colchonAhorroExtraUSD)} USD)
+                (${formatearUSD(ahorroTotalSugeridoUSD)}) que incluye:
+                <br>• Dinero para la compra con margen: ${formatearPesos(totalConMargen)} (${formatearUSD(totalConMargenUSD)})
+                <br>• Reserva de emergencia (6 meses): ${formatearPesos(colchonAhorroExtra)} (${formatearUSD(colchonAhorroExtraUSD)})
             </div>
         `;
         tipsContainer.appendChild(tipAhorroTotal);
