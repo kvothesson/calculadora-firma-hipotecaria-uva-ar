@@ -506,40 +506,11 @@
                 </div>
             </section>
 
-            <!-- Ejemplo práctico simplificado - ahora secundario -->
-            <section class="practical-example-section" id="ejemploPractico" style="display: none;">
-                <h2>📝 Resumen Ejecutivo</h2>
-                <p class="section-description">Resumen de cuánto dinero necesitás ahorrar para estar cubierto en cualquier escenario:</p>
-                
-                <div class="example-content">
-                    <div class="example-summary">
-                        <p><strong>Situación:</strong> Casa de <span id="ejemploValorCasa">USD 0</span> con crédito de <span id="ejemploPrestamo">$0</span></p>
-                    </div>
-                    
-                    <div class="example-breakdown">
-                        <div class="example-item">
-                            <span class="example-label">🛡️ Margen de seguridad (20%)</span>
-                            <span class="example-value" id="ejemploMargen">$0</span>
-                        </div>
-                        <div class="example-item">
-                            <span class="example-label">🚨 Reserva de emergencia (6 cuotas)</span>
-                            <span class="example-value" id="ejemploReserva">$0</span>
-                        </div>
-                        <div class="example-total">
-                            <span class="example-label"><strong>🎯 Total recomendado para ahorrar</strong></span>
-                            <span class="example-value"><strong id="ejemploTotal">$0</strong></span>
-                        </div>
-                    </div>
-                    
-                    <div class="example-note">
-                        <p>💡 Este cálculo incluye un colchón del 20% y reserva para 6 cuotas, cubriendo el peor escenario posible</p>
-                    </div>
-                </div>
-            </section>
 
-            <!-- Sección de consejos -->
+
+            <!-- Sección de consejos mejorada -->
             <section class="tips-section">
-                <h2>💡 Consejos para Sacar un Crédito Hipotecario UVA</h2>
+                <h2>💡 Guía Completa para Tu Crédito Hipotecario UVA</h2>
                 
                 <!-- Tips Contextuales Dinámicos -->
                 <div class="tips-dynamic" id="tipsDinamicos">
@@ -547,23 +518,94 @@
                 </div>
                 
                 <div class="tips-content">
-                    <h3>📋 Guía Paso a Paso para Tu Crédito Hipotecario</h3>
-                    <ul>
-                        <li><strong>🏠 ¿Puedo pagar la cuota?</strong> Tu cuota mensual no debería ser más del 25% de lo que gana tu familia. Por ejemplo: si la cuota es $500.000, necesitás ganar al menos $2.000.000 por mes</li>
+                    <div class="tips-grid">
+                        <!-- Columna 1: Planificación Financiera -->
+                        <div class="tips-column">
+                            <h3>💰 Planificación Financiera</h3>
+                            <div class="tip-item">
+                                <span class="tip-icon">🏠</span>
+                                <div class="tip-content">
+                                    <strong>¿Podés pagar la cuota?</strong>
+                                    <p>Tu cuota no debe superar el 25% de los ingresos familiares. Si tu cuota es $500.000, necesitás ganar al menos $2.000.000 por mes.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tip-item">
+                                <span class="tip-icon">💸</span>
+                                <div class="tip-content">
+                                    <strong>¿Cuánto ahorrar?</strong>
+                                    <p>Necesitás cubrir: diferencia casa-préstamo + gastos de escritura (6-8%) + 20% de margen de seguridad.</p>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <li><strong>💸 ¿Cuánta plata necesito tener ahorrada?</strong> Además del préstamo del banco, vas a necesitar dinero extra para:
-                            <br>• La diferencia entre lo que vale la casa y lo que te presta el banco
-                            <br>• Gastos de escritura, inmobiliaria, sellos (entre 6% y 8% del valor de la casa)
-                            <br>• Un 20% extra por las dudas</li>
+                        <!-- Columna 2: Riesgos y Protección -->
+                        <div class="tips-column">
+                            <h3>🛡️ Riesgos y Protección</h3>
+                            <div class="tip-item">
+                                <span class="tip-icon">📈</span>
+                                <div class="tip-content">
+                                    <strong>Riesgo cambiario</strong>
+                                    <p>El dólar se fija el día de la escritura. Si sube, necesitarás más pesos. Siempre calculá con el escenario más desfavorable.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tip-item">
+                                <span class="tip-icon">🚨</span>
+                                <div class="tip-content">
+                                    <strong>Reserva de emergencia</strong>
+                                    <p>Guardá el equivalente a 6 cuotas por separado. Te dará tiempo para resolver imprevistos.</p>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <li><strong>📈 ¿Qué pasa si sube el dólar?</strong> El día que firmés la escritura se fija el valor del dólar. Si sube, vas a necesitar más pesos para comprar los dólares de la casa. Por eso siempre calculá con el dólar más alto posible</li>
-                        
-                        <li><strong>🚨 Reserva de emergencia:</strong> Además de todo lo anterior, guardá el equivalente a 6 cuotas por separado. Si algún mes no podés pagar, tenés tiempo para resolverlo</li>
-                        
-                        <li><strong>📅 ¿Cuándo se fija todo?</strong> Los precios y el dólar se confirman el día de la escritura, no cuando aplicás al crédito. Por eso es importante estar preparado para cualquier escenario</li>
-                        
-                        <li><strong>🏪 Los gastos extras varían:</strong> Los costos de tramites (escritura, inmobiliaria, etc.) pueden cambiar según la provincia donde compres y el momento. Siempre consultá valores actualizados</li>
-                    </ul>
+                        <!-- Columna 3: Proceso y Timing -->
+                        <div class="tips-column">
+                            <h3>📅 Proceso y Timing</h3>
+                            <div class="tip-item">
+                                <span class="tip-icon">📋</span>
+                                <div class="tip-content">
+                                    <strong>¿Cuándo se fija todo?</strong>
+                                    <p>Los precios y el dólar se confirman el día de la escritura, no cuando aplicás al crédito.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tip-item">
+                                <span class="tip-icon">🏪</span>
+                                <div class="tip-content">
+                                    <strong>Gastos variables</strong>
+                                    <p>Los costos de escritura, inmobiliaria, etc. varían según la provincia y el momento. Consultá valores actualizados.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Checklist de acción -->
+                    <div class="action-checklist">
+                        <h3>✅ Checklist de Preparación</h3>
+                        <div class="checklist-grid">
+                            <div class="checklist-item">
+                                <input type="checkbox" id="check1" disabled>
+                                <label for="check1">Verificar que la cuota no supere 25% de ingresos</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="check2" disabled>
+                                <label for="check2">Calcular gastos totales (casa + escritura + inmobiliaria)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="check3" disabled>
+                                <label for="check3">Agregar 20% de margen de seguridad</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="check4" disabled>
+                                <label for="check4">Reservar 6 cuotas como fondo de emergencia</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="check5" disabled>
+                                <label for="check5">Simular escenarios con dólar alto</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>

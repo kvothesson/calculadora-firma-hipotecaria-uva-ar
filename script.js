@@ -635,9 +635,7 @@ function limpiarResultados() {
     ];
     idsEsc.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '$0'; });
     
-    // Ocultar resumen ejecutivo
-    const ejemploContainer = document.getElementById('ejemploPractico');
-    if (ejemploContainer) ejemploContainer.style.display = 'none';
+
 }
 
 function obtenerDatosEntrada() {
@@ -836,8 +834,8 @@ function mostrarResultados(resultados) {
     // Calcular y mostrar escenarios de tipo de cambio
     mostrarEscenariosTipoCambio(datos, resultados);
     
-    // Generar y mostrar el resumen ejecutivo
-    generarEjemploPractico(datos, resultados);
+    // Actualizar checklist de preparación
+    actualizarChecklist(datos, resultados);
 }
 
 // Nueva función para mostrar gastos detallados en el CORE
@@ -1331,7 +1329,7 @@ function actualizarSlidersGastos(provincia) {
     });
 }
 
-// Mostrar tips dinámicos
+// Mostrar tips dinámicos simplificados
 function mostrarTipsDinamicos(resultados) {
     const tipsContainer = document.getElementById('tipsDinamicos');
     if (!tipsContainer) return;
@@ -1339,120 +1337,89 @@ function mostrarTipsDinamicos(resultados) {
     // Limpiar tips anteriores
     tipsContainer.innerHTML = '';
     
-    // 1. Tip sobre cuota recomendada (25% de ingresos)
+    const datos = obtenerDatosEntrada();
+    if (!validarDatos(datos)) return;
+    
+    // 1. Tip personalizado sobre cuota vs ingresos (solo si es relevante)
     const cuota = resultados.primeraCuota;
-    const ingresoRecomendado = cuota / 0.25; // 25% del ingreso
+    const ingresoRecomendado = cuota / 0.25;
     
-    const tipCuota = document.createElement('div');
-    tipCuota.className = 'tip-card info';
-    tipCuota.innerHTML = `
-        <span class="tip-icon">💡</span>
-        <div class="tip-content">
-            <strong>¿Podés pagar esta cuota?</strong> Para una cuota de ${formatearPesos(cuota)}, 
-            necesitás ganar al menos ${formatearPesos(ingresoRecomendado)} por mes en tu familia. 
-            <br><small>💡 Esto es porque tu cuota no debería ser más del 25% de lo que ganás</small>
-        </div>
-    `;
-    tipsContainer.appendChild(tipCuota);
-    
-    // Analytics: Rastrear visualización de tip de ingreso recomendado
-    if (window.calculadoraAnalytics) {
-        window.calculadoraAnalytics.trackTipsViewed('ingreso_recomendado', tipCuota.innerHTML);
+    // Solo mostrar si la cuota es alta (requiere más de $400k de ingreso)
+    if (ingresoRecomendado > 400000) {
+        const tipCuota = document.createElement('div');
+        tipCuota.className = 'tip-card warning';
+        tipCuota.innerHTML = `
+            <span class="tip-icon">⚠️</span>
+            <div class="tip-content">
+                <strong>Cuota alta detectada</strong>
+                <p>Para esta cuota de ${formatearPesos(cuota)} necesitás ingresos de al menos ${formatearPesos(ingresoRecomendado)} por mes. Considerá ajustar el monto o plazo del crédito.</p>
+            </div>
+        `;
+        tipsContainer.appendChild(tipCuota);
     }
     
-    // 2. Ancho de banda cambiaria
+    // 2. Tip sobre riesgo cambiario (solo si hay diferencia significativa)
     const bandasInfo = calcularBandasCambiarias();
-    const anchoBanda = bandasInfo.techo - bandasInfo.piso;
-    const porcentajeAncho = ((anchoBanda / CONFIG.tiposCambio.oficial) * 100).toFixed(1);
+    const diferenciaTC = bandasInfo.techo - bandasInfo.piso;
+    const porcentajeDiferencia = ((diferenciaTC / CONFIG.tiposCambio.oficial) * 100).toFixed(1);
     
-    const tipBanda = document.createElement('div');
-    tipBanda.className = 'tip-card warning';
-    tipBanda.innerHTML = `
-        <span class="tip-icon">📊</span>
-        <div class="tip-content">
-            <strong>El dólar puede variar cuando firmés:</strong> El gobierno fija una banda donde el dólar puede moverse 
-            entre ${formatearPesos(bandasInfo.piso)} y ${formatearPesos(bandasInfo.techo)}. 
-            <br><small>📈 Esto significa que podría subir hasta ${formatearPesos(anchoBanda)} más (${porcentajeAncho}% de diferencia)</small>
-            <br><small>📅 Ambas bandas se ajustan mensualmente (base: ${bandasInfo.fechaBase})</small>
-        </div>
-    `;
-    tipsContainer.appendChild(tipBanda);
-    
-    // 3. Colchón de seguridad en el peor escenario
-    const datos = obtenerDatosEntrada();
-    if (validarDatos(datos)) {
-        const bandasInfo = calcularBandasCambiarias();
-        const valorPropiedadTecho = datos.valorPropiedad * bandasInfo.techo;
-        const diferenciaACubrirTecho = valorPropiedadTecho - datos.montoPrestamo;
-        const gastosTecho = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
-        const totalNecesarioTecho = diferenciaACubrirTecho + gastosTecho;
-        
-        const tipColchonTecho = document.createElement('div');
-        tipColchonTecho.className = 'tip-card danger';
-        tipColchonTecho.innerHTML = `
+    if (porcentajeDiferencia > 30) {
+        const tipRiesgo = document.createElement('div');
+        tipRiesgo.className = 'tip-card danger';
+        tipRiesgo.innerHTML = `
             <span class="tip-icon">🚨</span>
             <div class="tip-content">
-                <strong>En el peor de los casos:</strong> Si el dólar sube a ${formatearPesos(bandasInfo.techo)} cuando firmés, 
-                vas a necesitar ${formatearPesos(totalNecesarioTecho)} en total.
-                <br><small>⚠️ Esto incluye la casa, todos los gastos extras y el máximo que podrían costar</small>
+                <strong>Alto riesgo cambiario</strong>
+                <p>La banda cambiaria tiene ${porcentajeDiferencia}% de variación (${formatearPesos(diferenciaTC)}). Planificá con el escenario más desfavorable.</p>
             </div>
         `;
-        tipsContainer.appendChild(tipColchonTecho);
-        
-        // 4. Margen de seguridad recomendado (20% extra sobre lo necesario)
-        const margenSeguridad = totalNecesarioTecho * 0.20;
-        const totalConMargen = totalNecesarioTecho + margenSeguridad;
-        const margenSeguridadUSD = margenSeguridad / CONFIG.tiposCambio.oficial;
-        const totalConMargenUSD = totalConMargen / CONFIG.tiposCambio.oficial;
-        
-        const tipMargenSeguridad = document.createElement('div');
-        tipMargenSeguridad.className = 'tip-card info';
-        tipMargenSeguridad.innerHTML = `
-            <span class="tip-icon">🛡️</span>
-            <div class="tip-content">
-                <strong>Agregá un colchón extra:</strong> Siempre tenés que sumar 20% más por las dudas. 
-                Son ${formatearPesos(margenSeguridad)} extra (USD ${formatearUSD(margenSeguridadUSD)}). 
-                <br><small>🎯 Total recomendado para estar tranquilo: ${formatearPesos(totalConMargen)}</small>
-            </div>
-        `;
-        tipsContainer.appendChild(tipMargenSeguridad);
-        
-        // 5. Colchón de ahorro extra para imprevistos
-        const colchonAhorroExtra = cuota * 6; // 6 meses de cuotas
-        const colchonAhorroExtraUSD = colchonAhorroExtra / CONFIG.tiposCambio.oficial;
-        
-        // 6. Consejo unificado de ahorro total sugerido
-        const ahorroTotalSugerido = totalConMargen + colchonAhorroExtra;
-        const ahorroTotalSugeridoUSD = ahorroTotalSugerido / CONFIG.tiposCambio.oficial;
-        
-        const tipAhorroTotal = document.createElement('div');
-        tipAhorroTotal.className = 'tip-card success highlight';
-        tipAhorroTotal.innerHTML = `
-            <span class="tip-icon">💎</span>
-            <div class="tip-content">
-                <strong>💰 Cuánto necesitás ahorrar en total:</strong> Te recomendamos tener ${formatearPesos(ahorroTotalSugerido)} 
-                (USD ${formatearUSD(ahorroTotalSugeridoUSD)}) dividido así:
-                <br><br>
-                <span class="breakdown-line">🏠 Para comprar la casa (con margen): ${formatearPesos(totalConMargen)}</span>
-                <br><span class="breakdown-line">🚨 Reserva de emergencia (6 cuotas): ${formatearPesos(colchonAhorroExtra)}</span>
-                <br><br><small>✅ Con esta plata vas a estar cubierto para cualquier situación</small>
-            </div>
-        `;
-        tipsContainer.appendChild(tipAhorroTotal);
-        
-        // Analytics: Rastrear generación de tips dinámicos
-        if (window.calculadoraAnalytics) {
-            const tipsCount = tipsContainer.children.length;
-            window.calculadoraAnalytics.trackDynamicTipsGenerated(tipsCount, cuota, {
-                provincia: datos.provincia,
-                valorPropiedad: datos.valorPropiedad,
-                montoPrestamo: datos.montoPrestamo
-            });
-        }
+        tipsContainer.appendChild(tipRiesgo);
     }
     
-    // Generar ejemplo práctico dinámico
-    generarEjemploPractico(datos, resultados);
+    // 3. Tip sobre margen de seguridad personalizado
+    const valorCasaPesos = datos.valorPropiedad * bandasInfo.techo; // Usar techo para peor caso
+    const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
+    const gastosTecho = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+    const totalNecesario = diferenciaACubrir + gastosTecho.total;
+    const margenSeguridad = totalNecesario * 0.20;
+    const reservaEmergencia = cuota * 6;
+    const totalRecomendado = totalNecesario + margenSeguridad + reservaEmergencia;
+    
+    const tipAhorro = document.createElement('div');
+    tipAhorro.className = 'tip-card success highlight';
+    tipAhorro.innerHTML = `
+        <span class="tip-icon">💎</span>
+        <div class="tip-content">
+            <strong>Plan de ahorro personalizado</strong>
+            <p>Para estar cubierto en cualquier escenario, necesitás ahorrar ${formatearPesos(totalRecomendado)}. Esto incluye margen del 20% y reserva para 6 cuotas.</p>
+        </div>
+    `;
+    tipsContainer.appendChild(tipAhorro);
+    
+    // 4. Tip sobre gastos específicos de la provincia (solo si son altos)
+    const gastosPorcentaje = (gastosTecho.total / valorCasaPesos * 100).toFixed(1);
+    if (gastosPorcentaje > 8) {
+        const tipGastos = document.createElement('div');
+        tipGastos.className = 'tip-card info';
+        tipGastos.innerHTML = `
+            <span class="tip-icon">💡</span>
+            <div class="tip-content">
+                <strong>Gastos altos en ${datos.provincia}</strong>
+                <p>Los gastos de escritura e inmobiliaria representan ${gastosPorcentaje}% del valor de la casa. Considerá esto en tu presupuesto.</p>
+            </div>
+        `;
+        tipsContainer.appendChild(tipGastos);
+    }
+    
+    // Analytics: Rastrear generación de tips dinámicos
+    if (window.calculadoraAnalytics) {
+        const tipsCount = tipsContainer.children.length;
+        window.calculadoraAnalytics.trackDynamicTipsGenerated(tipsCount, cuota, {
+            provincia: datos.provincia,
+            valorPropiedad: datos.valorPropiedad,
+            montoPrestamo: datos.montoPrestamo
+        });
+    }
 }
 
 // Nueva función para calcular gastos extra en el peor escenario
@@ -1655,82 +1622,7 @@ function calcularPisoBandaCambiaria() {
     };
 }
 
-// Función para generar ejemplo práctico simplificado (resumen ejecutivo)
-function generarEjemploPractico(datos, resultados) {
-    const ejemploContainer = document.getElementById('ejemploPractico');
-    if (!ejemploContainer) {
-        console.log('ERROR: No se encontró el contenedor del ejemplo práctico');
-        return;
-    }
-    
-    console.log('Generando resumen ejecutivo con datos:', datos);
-    console.log('Y resultados:', resultados);
-    
-    // Solo mostrar si tenemos datos válidos
-    if (!validarDatos(datos)) {
-        console.log('Resumen ejecutivo: datos no válidos, ocultando sección');
-        ejemploContainer.style.display = 'none';
-        
-        // Analytics: Rastrear ocultación del resumen ejecutivo
-        if (window.calculadoraAnalytics) {
-            window.calculadoraAnalytics.trackSectionVisibility('ejemploPractico', false, { reason: 'datos_invalidos' });
-        }
-        return;
-    }
-    
-    // Usar el dólar del techo de la banda (peor escenario) para el cálculo
-    const dolarTecho = calcularBandasCambiarias().techo;
-    console.log('Usando dólar techo para resumen ejecutivo:', dolarTecho);
-    
-    // Calcular valores del peor escenario
-    const valorCasaPesos = datos.valorPropiedad * dolarTecho;
-    const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
-    
-    // Calcular gastos detallados en el peor escenario
-    const gastosDetallados = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
-    const gastosTotal = gastosDetallados.total;
-    
-    // Calcular margen de seguridad (20% sobre lo necesario)
-    const totalNecesario = diferenciaACubrir + gastosTotal;
-    const margenSeguridad = totalNecesario * 0.20;
-    
-    // Reserva de emergencia (6 cuotas)
-    const reservaEmergencia = resultados.primeraCuota * 6;
-    
-    // Total recomendado para ahorrar
-    const totalRecomendado = totalNecesario + margenSeguridad + reservaEmergencia;
-    
-    console.log('Cálculos del resumen ejecutivo:', {
-        valorCasaPesos,
-        diferenciaACubrir,
-        gastosTotal,
-        margenSeguridad,
-        reservaEmergencia,
-        totalRecomendado
-    });
-    
-    // Actualizar valores en el HTML
-    document.getElementById('ejemploValorCasa').textContent = `USD ${formatearNumero(datos.valorPropiedad)}`;
-    document.getElementById('ejemploPrestamo').textContent = formatearPesos(datos.montoPrestamo);
-    
-    // Solo mostrar margen de seguridad y reserva de emergencia
-    document.getElementById('ejemploMargen').textContent = formatearPesos(margenSeguridad);
-    document.getElementById('ejemploReserva').textContent = formatearPesos(reservaEmergencia);
-    document.getElementById('ejemploTotal').textContent = formatearPesos(totalRecomendado);
-    
-    // Mostrar el resumen ejecutivo
-    ejemploContainer.style.display = 'block';
-    console.log('Resumen ejecutivo mostrado correctamente');
-    
-    // Analytics: Rastrear visualización de resumen ejecutivo
-    if (window.calculadoraAnalytics) {
-        window.calculadoraAnalytics.trackSectionVisibility('ejemploPractico', true, { 
-            property_value_usd: datos.valorPropiedad,
-            total_recommended_ars: totalRecomendado,
-            scenario_type: 'techo_banda'
-        });
-    }
-}
+
 
 // Función para validar el tipo de cambio contra las bandas cambiarias
 function validarTipoCambioConBandas(valorTC) {
@@ -1810,6 +1702,63 @@ function setLineaMoneda(id, currency, valor, bold = false) {
     } else {
         el.innerHTML = lineaUSD(valor, bold);
     }
+}
+
+// Función para actualizar el checklist de preparación
+function actualizarChecklist(datos, resultados) {
+    if (!validarDatos(datos)) return;
+    
+    const checklistItems = [
+        { id: 'check1', condition: () => {
+            const cuota = resultados.primeraCuota;
+            const ingresoRecomendado = cuota / 0.25;
+            return ingresoRecomendado <= 1000000; // Si requiere menos de $1M de ingreso
+        }},
+        { id: 'check2', condition: () => {
+            return datos.valorPropiedad > 0 && datos.montoPrestamo > 0;
+        }},
+        { id: 'check3', condition: () => {
+            const bandasInfo = calcularBandasCambiarias();
+            const valorCasaPesos = datos.valorPropiedad * bandasInfo.techo;
+            const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
+            const gastosTecho = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+            const totalNecesario = diferenciaACubrir + gastosTecho.total;
+            const margenSeguridad = totalNecesario * 0.20;
+            return margenSeguridad > 0;
+        }},
+        { id: 'check4', condition: () => {
+            const cuota = resultados.primeraCuota;
+            const reservaEmergencia = cuota * 6;
+            return reservaEmergencia > 0;
+        }},
+        { id: 'check5', condition: () => {
+            const bandasInfo = calcularBandasCambiarias();
+            const diferenciaTC = bandasInfo.techo - bandasInfo.piso;
+            const porcentajeDiferencia = (diferenciaTC / CONFIG.tiposCambio.oficial * 100);
+            return porcentajeDiferencia > 20; // Si hay más de 20% de variación
+        }}
+    ];
+    
+    checklistItems.forEach(item => {
+        const checkbox = document.getElementById(item.id);
+        if (checkbox) {
+            const isChecked = item.condition();
+            checkbox.checked = isChecked;
+            
+            // Agregar clase visual según el estado
+            const checklistItem = checkbox.closest('.checklist-item');
+            if (checklistItem) {
+                checklistItem.classList.toggle('completed', isChecked);
+                if (isChecked) {
+                    checklistItem.style.borderLeftColor = '#22c55e';
+                    checklistItem.style.background = 'rgba(34, 197, 94, 0.1)';
+                } else {
+                    checklistItem.style.borderLeftColor = '#22c55e';
+                    checklistItem.style.background = 'rgba(15, 23, 42, 0.6)';
+                }
+            }
+        }
+    });
 }
 
 
