@@ -914,13 +914,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
                 colValores.classList.add(cls);
             }
 
-            const resumenEl = document.getElementById(`resumen${prefix}`);
-            if (resumenEl) {
-                const signo = deltaARS > 0 ? '+' : '';
-                resumenEl.textContent = `${signo}${formatearNumero(Math.round(deltaARS))} ARS vs. Oficial (${signo}${formatearNumero(Math.round(deltaUSD))} USD)`;
-                resumenEl.classList.remove('mejor','peor','igual');
-                resumenEl.classList.add(cls);
-            }
+
         }
     }
     
