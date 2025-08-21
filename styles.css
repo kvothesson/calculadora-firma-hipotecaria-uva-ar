@@ -817,6 +817,80 @@ section h2 {
     }
 }
 
+/* Estilos para el desglose del simulador */
+.breakdown-container {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.breakdown-title {
+    display: block;
+    font-weight: 600;
+    color: #60a5fa;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.breakdown-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+}
+
+.breakdown-item span:first-child {
+    color: #94a3b8;
+}
+
+.breakdown-item span:last-child {
+    font-weight: 600;
+    color: #60a5fa;
+}
+
+/* Estilos para breakdown con dual currency */
+.breakdown-item-dual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+}
+
+.breakdown-label {
+    color: #94a3b8;
+    flex: 1;
+}
+
+.breakdown-values {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 2px;
+}
+
+.breakdown-values span {
+    font-weight: 600;
+    color: #60a5fa;
+    font-size: 0.9rem;
+}
+
+.breakdown-values small {
+    font-weight: 500;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
 /* Consejos */
 .tips-content ul {
     list-style: none;

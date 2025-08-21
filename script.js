@@ -681,6 +681,28 @@ function calcularGastosExtra(valorPropiedad, provincia) {
     };
 }
 
+// Función para calcular gastos extra con un tipo de cambio específico
+function calcularGastosExtraConTC(valorPropiedad, provincia, tipoCambio) {
+    const gastos = CONFIG.gastosExtra[provincia];
+    const valorPesos = valorPropiedad * tipoCambio;
+    
+    // Calcular con valores intermedios
+    const escritura = valorPesos * gastos.escritura.intermedio / 100;
+    const inmobiliaria = valorPesos * gastos.inmobiliaria.intermedio / 100;
+    const firmas = valorPesos * gastos.firmas.intermedio / 100;
+    const sellos = valorPesos * gastos.sellos.intermedio / 100;
+    
+    const totalIntermedio = escritura + inmobiliaria + firmas + sellos;
+    
+    return {
+        escritura,
+        inmobiliaria,
+        firmas,
+        sellos,
+        total: totalIntermedio
+    };
+}
+
 // Función para actualizar valores intermedios
 function actualizarValorIntermedio(tipo, valor, provincia) {
     CONFIG.gastosExtra[provincia][tipo].intermedio = parseFloat(valor);
@@ -745,13 +767,16 @@ function mostrarImpactoSimulador() {
     // Calcular valor de la propiedad con el tipo de cambio del simulador
     const valorPropiedadConSimulador = datos.valorPropiedad * CONFIG.tiposCambio.simulador;
     
+    // Calcular gastos extra con el tipo de cambio del simulador
+    const gastosExtraSimulador = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, CONFIG.tiposCambio.simulador);
+    
     // El monto en pesos que da el banco es siempre fijo (el monto que pediste prestado)
     // Solo varía el equivalente en USD según el tipo de cambio del simulador
     const montoPrestamoPesos = datos.montoPrestamo; // Pesos fijo (monto que pediste)
     const montoPrestamoUSD = datos.montoPrestamo / CONFIG.tiposCambio.simulador; // USD varía con el TC
     
-    // Diferencia a cubrir = valor total de la propiedad - monto prestado
-    const diferenciaACubrir = valorPropiedadConSimulador - montoPrestamoPesos;
+    // Lo que tienes que poner = valor propiedad + gastos - préstamo
+    const diferenciaACubrir = valorPropiedadConSimulador + gastosExtraSimulador.total - montoPrestamoPesos;
     
     // Mostrar lo que da el banco
     const elementoPrestamoSimuladorPesos = document.getElementById('prestamoSimuladorPesos');
@@ -779,6 +804,31 @@ function mostrarImpactoSimulador() {
         console.log('Actualizado diferenciaSimuladorUSD:', `$${formatearNumero(diferenciaUSD)} USD`);
     } else {
         console.log('ERROR: elemento diferenciaSimuladorUSD no encontrado');
+    }
+    
+    // Mostrar desglose de componentes
+    const diferenciaPropiedad = valorPropiedadConSimulador - montoPrestamoPesos;
+    const elementoDiferenciaPropiedad = document.getElementById('diferenciaPropiedad');
+    const elementoDiferenciaPropiedadUSD = document.getElementById('diferenciaPropiedadUSD');
+    const elementoGastosSimulador = document.getElementById('gastosSimulador');
+    const elementoGastosSimuladorUSD = document.getElementById('gastosSimuladorUSD');
+    
+    if (elementoDiferenciaPropiedad) {
+        elementoDiferenciaPropiedad.textContent = formatearPesos(diferenciaPropiedad);
+    }
+    
+    if (elementoDiferenciaPropiedadUSD) {
+        const diferenciaPropiedadUSD = diferenciaPropiedad / CONFIG.tiposCambio.simulador;
+        elementoDiferenciaPropiedadUSD.textContent = `$${formatearNumero(diferenciaPropiedadUSD)} USD`;
+    }
+    
+    if (elementoGastosSimulador) {
+        elementoGastosSimulador.textContent = formatearPesos(gastosExtraSimulador.total);
+    }
+    
+    if (elementoGastosSimuladorUSD) {
+        const gastosSimuladorUSD = gastosExtraSimulador.total / CONFIG.tiposCambio.simulador;
+        elementoGastosSimuladorUSD.textContent = `$${formatearNumero(gastosSimuladorUSD)} USD`;
     }
     
     if (elementos.tcSimuladorTexto) {
