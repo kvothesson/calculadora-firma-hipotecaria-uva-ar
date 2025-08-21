@@ -254,7 +254,7 @@ function establecerValoresPorDefecto() {
 function agregarEventListeners() {
     // Recalcular cuando cambien los inputs (excepto el slider de tipo de cambio)
     Object.values(elementos).forEach(elemento => {
-        if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcSlider') {
+        if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcInput') {
             // Validación progresiva no intrusiva
             elemento.addEventListener('input', function() {
                 // Calcular inmediatamente sin validación visual para mejor UX
@@ -1292,9 +1292,10 @@ function configurarSlidersGastos() {
                     this.value = nuevoValor.toFixed(2);
                 }
                 
-                // Analytics: Rastrear cambio de gasto
+                // Analytics: Rastrear cambio de gasto personalizable
                 if (window.calculadoraAnalytics) {
-                    window.calculadoraAnalytics.trackSliderChange(`gasto_${tipo}`, nuevoValor, 0);
+                    const provinciaActual = elementos.provincia.value;
+                    window.calculadoraAnalytics.trackGastoInputChange(tipo, nuevoValor, provinciaActual);
                 }
                 
                 // Feedback visual de confirmación
@@ -1439,9 +1440,14 @@ function mostrarTipsDinamicos(resultados) {
         `;
         tipsContainer.appendChild(tipAhorroTotal);
         
-        // Analytics: Rastrear visualización completa de todos los tips
+        // Analytics: Rastrear generación de tips dinámicos
         if (window.calculadoraAnalytics) {
-            window.calculadoraAnalytics.trackTipsViewed('tips_completos', `Tips generados para cuota: ${formatearPesos(cuota)}`);
+            const tipsCount = tipsContainer.children.length;
+            window.calculadoraAnalytics.trackDynamicTipsGenerated(tipsCount, cuota, {
+                provincia: datos.provincia,
+                valorPropiedad: datos.valorPropiedad,
+                montoPrestamo: datos.montoPrestamo
+            });
         }
     }
     
@@ -1664,6 +1670,11 @@ function generarEjemploPractico(datos, resultados) {
     if (!validarDatos(datos)) {
         console.log('Resumen ejecutivo: datos no válidos, ocultando sección');
         ejemploContainer.style.display = 'none';
+        
+        // Analytics: Rastrear ocultación del resumen ejecutivo
+        if (window.calculadoraAnalytics) {
+            window.calculadoraAnalytics.trackSectionVisibility('ejemploPractico', false, { reason: 'datos_invalidos' });
+        }
         return;
     }
     
@@ -1711,9 +1722,13 @@ function generarEjemploPractico(datos, resultados) {
     ejemploContainer.style.display = 'block';
     console.log('Resumen ejecutivo mostrado correctamente');
     
-    // Analytics: Rastrear generación de resumen ejecutivo
+    // Analytics: Rastrear visualización de resumen ejecutivo
     if (window.calculadoraAnalytics) {
-        window.calculadoraAnalytics.trackTipsViewed('resumen_ejecutivo', `Resumen generado para casa USD ${datos.valorPropiedad}`);
+        window.calculadoraAnalytics.trackSectionVisibility('ejemploPractico', true, { 
+            property_value_usd: datos.valorPropiedad,
+            total_recommended_ars: totalRecomendado,
+            scenario_type: 'techo_banda'
+        });
     }
 }
 

@@ -90,6 +90,20 @@ class CalculadoraAnalytics {
         });
     }
 
+    // Rastrear cambios en inputs de gastos personalizables
+    trackGastoInputChange(gastoType, percentage, provincia) {
+        if (!this.isEnabled) return;
+
+        gtag('event', 'gasto_input_changed', {
+            'event_category': 'Gastos_Personalizables',
+            'event_label': `Gasto_${gastoType}`,
+            'gasto_type': gastoType,
+            'percentage_value': percentage,
+            'provincia': provincia,
+            'is_custom_percentage': true
+        });
+    }
+
     // Rastrear simulación de tipo de cambio
     trackCurrencyScenario(exchangeRate, scenarioType = 'manual') {
         if (!this.isEnabled) return;
@@ -103,6 +117,21 @@ class CalculadoraAnalytics {
         });
     }
 
+    // Rastrear múltiples escenarios de tipo de cambio (función requerida por script.js)
+    trackCurrencyScenarios(scenarios) {
+        if (!this.isEnabled) return;
+
+        gtag('event', 'currency_scenarios_viewed', {
+            'event_category': 'Simulador',
+            'event_label': 'Escenarios_Multiples',
+            'piso_rate': scenarios.piso,
+            'oficial_rate': scenarios.oficial,
+            'techo_rate': scenarios.techo,
+            'diferencia_piso_oficial': scenarios.diferencia_piso_oficial,
+            'diferencia_techo_oficial': scenarios.diferencia_techo_oficial
+        });
+    }
+
     // Rastrear visualización de consejos
     trackTipsViewed(tipType, tipContent = '') {
         if (!this.isEnabled) return;
@@ -111,7 +140,37 @@ class CalculadoraAnalytics {
             'event_category': 'Contenido',
             'event_label': 'Tips_Visualizados',
             'tip_type': tipType,
-            'tip_category': this.categorizeTip(tipContent)
+            'tip_category': this.categorizeTip(tipContent),
+            'content_length': tipContent.length,
+            'timestamp': new Date().toISOString()
+        });
+    }
+
+    // Rastrear cuando el usuario interactúa con consejos dinámicos
+    trackDynamicTipsGenerated(tipCount, cuotaAmount, userContext = {}) {
+        if (!this.isEnabled) return;
+
+        gtag('event', 'dynamic_tips_generated', {
+            'event_category': 'Contenido_Dinamico',
+            'event_label': 'Tips_Generados',
+            'tips_count': tipCount,
+            'cuota_amount_ars': cuotaAmount,
+            'user_provincia': userContext.provincia || 'unknown',
+            'property_value_usd': userContext.valorPropiedad || 0,
+            'loan_amount_ars': userContext.montoPrestamo || 0
+        });
+    }
+
+    // Rastrear visualización/ocultación de secciones importantes
+    trackSectionVisibility(sectionId, isVisible, context = {}) {
+        if (!this.isEnabled) return;
+
+        gtag('event', 'section_visibility_changed', {
+            'event_category': 'Interfaz',
+            'event_label': isVisible ? 'Seccion_Mostrada' : 'Seccion_Oculta',
+            'section_id': sectionId,
+            'is_visible': isVisible,
+            'context_data': JSON.stringify(context)
         });
     }
 
