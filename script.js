@@ -889,19 +889,22 @@ function configurarSliders() {
     }
 }
 
-// Configurar slider de tipo de cambio
+// Configurar input de tipo de cambio
 function configurarSliderTC() {
-    const tcSlider = document.getElementById('tcSlider');
-    const tcValor = document.getElementById('tcValor');
+    const tcInput = document.getElementById('tcInput');
+    const tcSuggestions = document.querySelectorAll('.tc-suggestion');
     
-    if (tcSlider && tcValor) {
-        // Inicializar slider con el valor oficial
-        tcSlider.value = CONFIG.tiposCambio.oficial;
-        tcValor.textContent = CONFIG.tiposCambio.oficial;
+    if (tcInput) {
+        // Inicializar input con el valor oficial
+        tcInput.value = CONFIG.tiposCambio.oficial;
         
-        tcSlider.addEventListener('input', function() {
-            const nuevoTC = parseInt(this.value);
-            tcValor.textContent = nuevoTC;
+        // Evento para cambios manuales
+        tcInput.addEventListener('input', function() {
+            const nuevoTC = parseInt(this.value) || CONFIG.tiposCambio.oficial;
+            
+            // Validar rango básico
+            if (nuevoTC < 800) this.value = 800;
+            if (nuevoTC > 2000) this.value = 2000;
             
             // Analytics: Rastrear cambio en simulador de tipo de cambio
             if (window.calculadoraAnalytics) {
@@ -909,12 +912,67 @@ function configurarSliderTC() {
             }
             
             // Solo actualizar el simulador, no el oficial
-            CONFIG.tiposCambio.simulador = nuevoTC;
+            CONFIG.tiposCambio.simulador = parseInt(this.value);
             
             // Mostrar el impacto de este tipo de cambio
             mostrarImpactoSimulador();
+            
+            // Actualizar estado visual de sugerencias
+            actualizarEstadoSugerencias();
+            
+            // Validar y mostrar consejos sobre bandas cambiarias
+            validarTipoCambioConBandas(nuevoTC);
+        });
+        
+        // Evento para cambios finales (blur)
+        tcInput.addEventListener('blur', function() {
+            const valor = parseInt(this.value) || CONFIG.tiposCambio.oficial;
+            if (valor !== parseInt(this.value)) {
+                this.value = valor;
+                CONFIG.tiposCambio.simulador = valor;
+                mostrarImpactoSimulador();
+            }
         });
     }
+    
+    // Configurar botones de sugerencias
+    tcSuggestions.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tipo = this.dataset.tc;
+            let nuevoValor;
+            
+            switch(tipo) {
+                case 'oficial':
+                    nuevoValor = CONFIG.tiposCambio.oficial;
+                    break;
+                case 'piso':
+                    nuevoValor = CONFIG.tiposCambio.mejorCaso;
+                    break;
+                case 'techo':
+                    nuevoValor = CONFIG.tiposCambio.peorCaso;
+                    break;
+                default:
+                    nuevoValor = CONFIG.tiposCambio.oficial;
+            }
+            
+            tcInput.value = nuevoValor;
+            CONFIG.tiposCambio.simulador = nuevoValor;
+            
+            // Analytics: Rastrear uso de sugerencia
+            if (window.calculadoraAnalytics) {
+                window.calculadoraAnalytics.trackCurrencyScenario(nuevoValor, `suggestion_${tipo}`);
+            }
+            
+            mostrarImpactoSimulador();
+            actualizarEstadoSugerencias();
+            
+            // Validar valor con bandas
+            validarTipoCambioConBandas(nuevoValor);
+        });
+    });
+    
+    // Actualizar valores de las bandas en la interfaz
+    actualizarBandasEnInterfaz();
 }
 
 // Configurar campos de gastos (ahora inputs numéricos)
@@ -1166,6 +1224,125 @@ function validarDatosParaConsejos() {
     }
     
     return consejos;
+}
+
+// Función para actualizar estado visual de sugerencias
+function actualizarEstadoSugerencias() {
+    const tcInput = document.getElementById('tcInput');
+    const tcSuggestions = document.querySelectorAll('.tc-suggestion');
+    
+    if (!tcInput) return;
+    
+    const valorActual = parseInt(tcInput.value);
+    
+    tcSuggestions.forEach(btn => {
+        const tipo = btn.dataset.tc;
+        let valorComparar;
+        
+        switch(tipo) {
+            case 'oficial':
+                valorComparar = CONFIG.tiposCambio.oficial;
+                break;
+            case 'piso':
+                valorComparar = CONFIG.tiposCambio.mejorCaso;
+                break;
+            case 'techo':
+                valorComparar = CONFIG.tiposCambio.peorCaso;
+                break;
+        }
+        
+        // Marcar activo si coincide con el valor actual
+        if (Math.abs(valorActual - valorComparar) <= 5) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+// Función para actualizar las bandas en la interfaz
+function actualizarBandasEnInterfaz() {
+    const elementos = {
+        oficial: document.getElementById('tcOficial'),
+        piso: document.getElementById('tcPiso'),
+        techo: document.getElementById('tcTecho'),
+        bandasCalculadas: document.getElementById('bandasCalculadas')
+    };
+    
+    if (elementos.oficial) {
+        elementos.oficial.textContent = formatearPesos(CONFIG.tiposCambio.oficial);
+    }
+    
+    if (elementos.piso) {
+        elementos.piso.textContent = formatearPesos(CONFIG.tiposCambio.mejorCaso);
+    }
+    
+    if (elementos.techo) {
+        elementos.techo.textContent = formatearPesos(CONFIG.tiposCambio.peorCaso);
+    }
+    
+    // Calcular información dinámica para mostrar al usuario
+    if (elementos.bandasCalculadas) {
+        const bandasInfo = calcularBandasDinamicas();
+        const fechaActual = new Date().toLocaleDateString('es-AR');
+        
+        if (bandasInfo.mesesTranscurridos > 0) {
+            elementos.bandasCalculadas.textContent = `Calculadas para ${fechaActual} (${bandasInfo.mesesTranscurridos.toFixed(1)} meses desde abr/25)`;
+        } else {
+            elementos.bandasCalculadas.textContent = `Calculadas automáticamente para ${fechaActual}`;
+        }
+    }
+}
+
+// Función para validar el tipo de cambio contra las bandas cambiarias
+function validarTipoCambioConBandas(valorTC) {
+    const piso = CONFIG.tiposCambio.mejorCaso;
+    const techo = CONFIG.tiposCambio.peorCaso;
+    const oficial = CONFIG.tiposCambio.oficial;
+    
+    // Limpiar consejos previos sobre bandas
+    const tipsContainer = document.getElementById('tipsDinamicos');
+    if (tipsContainer) {
+        const bandaTips = tipsContainer.querySelectorAll('[data-tipo="banda-tc"]');
+        bandaTips.forEach(tip => tip.remove());
+    }
+    
+    let mensaje = '';
+    let tipo = 'info';
+    
+    if (valorTC > techo) {
+        mensaje = `⚠️ Tipo de cambio por encima del techo de banda (${formatearPesos(techo)}). Esto podría indicar una devaluación fuerte.`;
+        tipo = 'warning';
+    } else if (valorTC < piso) {
+        mensaje = `📉 Tipo de cambio por debajo del piso de banda (${formatearPesos(piso)}). Escenario poco probable según las bandas actuales.`;
+        tipo = 'info';
+    } else if (Math.abs(valorTC - oficial) / oficial > 0.05) {
+        // Si está dentro de la banda pero lejos del oficial (más de 5%)
+        const diferencia = ((valorTC - oficial) / oficial * 100).toFixed(1);
+        const signo = valorTC > oficial ? '+' : '';
+        mensaje = `💱 Simulando ${signo}${diferencia}% respecto al oficial. Dentro de la banda pero considerar el riesgo cambiario.`;
+        tipo = 'info';
+    }
+    
+    if (mensaje && tipsContainer) {
+        const tipBanda = document.createElement('div');
+        tipBanda.className = `tip-card ${tipo}`;
+        tipBanda.setAttribute('data-tipo', 'banda-tc');
+        tipBanda.innerHTML = `
+            <span class="tip-icon">${tipo === 'warning' ? '⚠️' : '💡'}</span>
+            <div class="tip-content">${mensaje}</div>
+        `;
+        
+        // Insertar al principio para que sea visible
+        tipsContainer.insertBefore(tipBanda, tipsContainer.firstChild);
+        
+        // Auto-remover después de 8 segundos
+        setTimeout(() => {
+            if (tipBanda.parentNode) {
+                tipBanda.remove();
+            }
+        }, 8000);
+    }
 }
 
 
