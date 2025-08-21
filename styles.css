@@ -363,33 +363,192 @@ section h2 {
     margin-top: 2px;
 }
 
-/* Slider de tipo de cambio */
-.tc-slider-container {
+/* Input de tipo de cambio */
+.tc-input-container {
     background: rgba(15, 23, 42, 0.8);
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
     border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-.tc-slider-container label {
+.tc-input-container label {
     display: block;
     font-weight: 600;
     color: #f1f5f9;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     font-size: 1rem;
 }
 
-.tc-slider {
-    background: linear-gradient(to right, #38a169, #e53e3e);
+.tc-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
-.tc-labels {
+.tc-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.9);
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 150px;
+    max-width: 220px;
+}
+
+.tc-input-wrapper:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.currency-prefix {
+    padding: 12px 8px 12px 15px;
+    background: #3b82f6;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.tc-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px 15px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.tc-input::-webkit-outer-spin-button,
+.tc-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.tc-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.tc-suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tc-suggestion {
+    padding: 8px 12px;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tc-suggestion:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.6);
+    transform: translateY(-1px);
+}
+
+.tc-suggestion.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.tc-banda-info {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
-    color: #cbd5e1;
+    align-items: center;
+    gap: 15px;
+    margin: 12px 0;
+    padding: 12px;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.banda-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+}
+
+.banda-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.banda-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #60a5fa;
+}
+
+.tc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-align: center;
+    font-style: italic;
     margin-top: 8px;
+}
+
+.bandas-calculadas {
+    color: #60a5fa;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+/* Responsive para el input de tipo de cambio */
+@media (max-width: 768px) {
+    .tc-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .tc-input-wrapper {
+        max-width: none;
+    }
+    
+    .tc-suggestions {
+        justify-content: center;
+    }
+    
+    .tc-banda-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .banda-item {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        padding: 6px 0;
+    }
 }
 
 /* Resultados */
@@ -1187,6 +1346,7 @@ footer {
 
 .percentage-field[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .percentage-symbol {

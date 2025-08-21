@@ -284,12 +284,36 @@
                 <h2>💱 Simulador al Día de la Firma</h2>
                 <p class="section-description">El tipo de cambio se fija el día que firmás la escritura. Simulá cuánto dinero necesitarás y cuántos dólares podrás comprar:</p>
                 
-                <div class="tc-slider-container">
-                    <label for="tcSlider">Tipo de cambio: $<span id="tcValor">1225</span></label>
-                    <input type="range" id="tcSlider" min="1000" max="1600" value="1225" step="25" class="slider tc-slider">
-                    <div class="tc-labels">
-                        <span>$1000</span>
-                        <span>$1600</span>
+                <div class="tc-input-container">
+                    <label for="tcInput">Tipo de cambio al día de la firma</label>
+                    <div class="tc-input-group">
+                        <div class="tc-input-wrapper">
+                            <span class="currency-prefix">$</span>
+                            <input type="number" id="tcInput" min="800" max="2000" value="1225" step="1" class="tc-input">
+                        </div>
+                        <div class="tc-suggestions">
+                            <button type="button" class="tc-suggestion" data-tc="oficial">Oficial</button>
+                            <button type="button" class="tc-suggestion" data-tc="piso">Piso</button>
+                            <button type="button" class="tc-suggestion" data-tc="techo">Techo</button>
+                        </div>
+                    </div>
+                    <div class="tc-banda-info">
+                        <div class="banda-item">
+                            <span class="banda-label">🏦 Oficial:</span>
+                            <span class="banda-value" id="tcOficial">$1,225</span>
+                        </div>
+                        <div class="banda-item">
+                            <span class="banda-label">📉 Piso:</span>
+                            <span class="banda-value" id="tcPiso">$1,000</span>
+                        </div>
+                        <div class="banda-item">
+                            <span class="banda-label">📈 Techo:</span>
+                            <span class="banda-value" id="tcTecho">$1,450</span>
+                        </div>
+                    </div>
+                    <div class="tc-info">
+                        <small>💡 Bandas cambiarias del BCRA (se ajustan mensualmente ~1%)</small>
+                        <small id="bandasCalculadas" class="bandas-calculadas">Calculadas automáticamente para la fecha actual</small>
                     </div>
                 </div>
                 
