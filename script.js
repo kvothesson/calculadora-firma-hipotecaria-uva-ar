@@ -758,6 +758,10 @@ function mostrarResultados(resultados) {
         elementos.gastosExtra.innerHTML = `<strong>${formatearPesos(gastos.total)}</strong>`;
         document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(totalUSD)}`;
     }
+    
+    // Generar y mostrar el ejemplo práctico
+    const datos = obtenerDatosEntrada();
+    generarEjemploPractico(datos, resultados);
 }
 
 
