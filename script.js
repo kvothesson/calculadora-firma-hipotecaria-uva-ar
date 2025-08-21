@@ -1289,7 +1289,13 @@ function calcularGastosExtraEnPeorEscenario(valorPropiedadUSD) {
     const firmasMax = valorPesosPeorCaso * gastos.firmas.max / 100;
     const sellosMax = valorPesosPeorCaso * gastos.sellos.max / 100;
     
-    return escrituraMax + inmobiliariaMax + firmasMax + sellosMax;
+    return {
+        escritura: escrituraMax,
+        inmobiliaria: inmobiliariaMax,
+        firmas: firmasMax,
+        sellos: sellosMax,
+        total: escrituraMax + inmobiliariaMax + firmasMax + sellosMax
+    };
 }
 
 
@@ -1488,10 +1494,18 @@ function generarEjemploPractico(datos, resultados) {
     // Calcular valores del ejemplo
     const valorCasaPesos = datos.valorPropiedad * dolarTecho;
     const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
-    const gastosMaximos = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
-    const margenSeguridad = (diferenciaACubrir + gastosMaximos) * 0.20;
+    
+    // Calcular gastos detallados
+    const gastosDetallados = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+    const gastosEscritura = gastosDetallados.escritura;
+    const gastosInmobiliaria = gastosDetallados.inmobiliaria;
+    const gastosFirmas = gastosDetallados.firmas;
+    const gastosSellos = gastosDetallados.sellos;
+    const gastosTotal = gastosDetallados.total;
+    
+    const margenSeguridad = (diferenciaACubrir + gastosTotal) * 0.20;
     const reservaEmergencia = resultados.primeraCuota * 6;
-    const totalNecesario = diferenciaACubrir + gastosMaximos + margenSeguridad + reservaEmergencia;
+    const totalNecesario = diferenciaACubrir + gastosTotal + margenSeguridad + reservaEmergencia;
     
     // Actualizar valores en el HTML
     document.getElementById('ejemploValorCasa').textContent = `USD ${formatearNumero(datos.valorPropiedad)}`;
@@ -1500,7 +1514,14 @@ function generarEjemploPractico(datos, resultados) {
     document.getElementById('ejemploValorCasaPesos').textContent = formatearPesos(valorCasaPesos);
     document.getElementById('ejemploPrestamoBanco').textContent = formatearPesos(datos.montoPrestamo);
     document.getElementById('ejemploDiferencia').textContent = formatearPesos(diferenciaACubrir);
-    document.getElementById('ejemploGastosMaximos').textContent = formatearPesos(gastosMaximos);
+    
+    // Actualizar gastos detallados
+    document.getElementById('ejemploGastoEscritura').textContent = formatearPesos(gastosEscritura);
+    document.getElementById('ejemploGastoInmobiliaria').textContent = formatearPesos(gastosInmobiliaria);
+    document.getElementById('ejemploGastoFirmas').textContent = formatearPesos(gastosFirmas);
+    document.getElementById('ejemploGastoSellos').textContent = formatearPesos(gastosSellos);
+    document.getElementById('ejemploGastosTotal').textContent = formatearPesos(gastosTotal);
+    
     document.getElementById('ejemploMargen').textContent = formatearPesos(margenSeguridad);
     document.getElementById('ejemploReserva').textContent = formatearPesos(reservaEmergencia);
     document.getElementById('ejemploTotal').textContent = formatearPesos(totalNecesario);

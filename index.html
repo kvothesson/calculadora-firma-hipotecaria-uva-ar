@@ -261,43 +261,6 @@
                     </div>
                     
                     <div class="result-card secondary">
-                        <h3>💰 Total Gastos de Escritura e Inmobiliaria</h3>
-                        <div class="gastos-summary">
-                            <div class="gastos-breakdown">
-                                <div class="gasto-summary-item">
-                                    <span>📄 Escritura:</span>
-                                    <span id="gastoEscritura">$0</span>
-                                </div>
-                                <div class="gasto-summary-item">
-                                    <span>🏪 Inmobiliaria:</span>
-                                    <span id="gastoInmobiliaria">$0</span>
-                                </div>
-                                <div class="gasto-summary-item">
-                                    <span>✍️ Firmas:</span>
-                                    <span id="gastoFirmas">$0</span>
-                                </div>
-                                <div class="gasto-summary-item">
-                                    <span>🏷️ Sellos:</span>
-                                    <span id="gastoSellos">$0</span>
-                                </div>
-                            </div>
-                            <div class="gastos-total">
-                                <span><strong>Total Gastos:</strong></span>
-                                <div class="gasto-valores dual-currency">
-                                    <div class="currency-item-inline">
-                                        <span class="currency-label-small">ARS</span>
-                                        <span id="gastosExtra" class="currency-value-inline"><strong>$0</strong></span>
-                                    </div>
-                                    <div class="currency-item-inline">
-                                        <span class="currency-label-small">USD</span>
-                                        <span id="gastosExtraUSD" class="currency-value-inline">$0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="result-card secondary">
                         <h3>Costo Total de la Operación 
                             <span class="tooltip" title="Valor de la propiedad + gastos de escritura, inmobiliaria, firmas y sellos">ℹ️</span>
                         </h3>
@@ -362,10 +325,32 @@
                                     <span class="example-label">💰 Lo que tenés que poner vos</span>
                                     <span class="example-value" id="ejemploDiferencia">$0</span>
                                 </div>
-                                <div class="example-item">
-                                    <span class="example-label">📄 Gastos extras (máximos)</span>
-                                    <span class="example-value" id="ejemploGastosMaximos">$0</span>
+                                
+                                <!-- Desglose detallado de gastos -->
+                                <div class="example-gastos-breakdown">
+                                    <h5>📋 Desglose de Gastos:</h5>
+                                    <div class="gasto-ejemplo-item">
+                                        <span class="gasto-ejemplo-label">📄 Escritura:</span>
+                                        <span class="gasto-ejemplo-value" id="ejemploGastoEscritura">$0</span>
+                                    </div>
+                                    <div class="gasto-ejemplo-item">
+                                        <span class="gasto-ejemplo-label">🏪 Inmobiliaria:</span>
+                                        <span class="gasto-ejemplo-value" id="ejemploGastoInmobiliaria">$0</span>
+                                    </div>
+                                    <div class="gasto-ejemplo-item">
+                                        <span class="gasto-ejemplo-label">✍️ Firmas:</span>
+                                        <span class="gasto-ejemplo-value" id="ejemploGastoFirmas">$0</span>
+                                    </div>
+                                    <div class="gasto-ejemplo-item">
+                                        <span class="gasto-ejemplo-label">🏷️ Sellos:</span>
+                                        <span class="gasto-ejemplo-value" id="ejemploGastoSellos">$0</span>
+                                    </div>
+                                    <div class="gasto-ejemplo-total">
+                                        <span class="gasto-ejemplo-label"><strong>Total Gastos:</strong></span>
+                                        <span class="gasto-ejemplo-value"><strong id="ejemploGastosTotal">$0</strong></span>
+                                    </div>
                                 </div>
+                                
                                 <div class="example-item">
                                     <span class="example-label">🛡️ Margen de seguridad (20%)</span>
                                     <span class="example-value" id="ejemploMargen">$0</span>
