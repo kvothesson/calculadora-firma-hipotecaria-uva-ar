@@ -869,7 +869,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const bandasInfo = calcularBandasCambiarias();
     
     // Helper para setear valores por escenario
-    function setEscenario(prefix, tc, totalOperacion) {
+    function setEscenario(prefix, tc, totalOperacion, baseline) {
         const prestamoARS = datos.montoPrestamo;
         const prestamoUSD = prestamoARS / tc;
         const diferenciaARS = totalOperacion - prestamoARS;
@@ -891,6 +891,30 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
         // Diferencia a cubrir
         setText(`diferencia${prefix}ARS`, diferenciaARS);
         setText(`diferencia${prefix}USD`, diferenciaUSD);
+
+        // Si tenemos baseline (oficial), mostrar delta vs oficial
+        if (baseline) {
+            const deltaARS = diferenciaARS - baseline.diferenciaARS;
+            const deltaUSD = diferenciaUSD - baseline.diferenciaUSD;
+            setText(`delta${prefix}ARS`, deltaARS);
+            setText(`delta${prefix}USD`, deltaUSD);
+
+            // Colorear según signo
+            const colValores = document.getElementById(`delta${prefix}ARS`)?.closest('.col-valores');
+            if (colValores) {
+                const cls = deltaARS >= 0 ? 'positivo' : 'negativo';
+                colValores.classList.remove('positivo','negativo');
+                colValores.classList.add(cls);
+            }
+
+            const resumenEl = document.getElementById(`resumen${prefix}`);
+            if (resumenEl) {
+                const signo = deltaARS > 0 ? '+' : '';
+                resumenEl.textContent = `${signo}${formatearNumero(Math.round(deltaARS))} ARS vs. Oficial (${signo}${formatearNumero(Math.round(deltaUSD))} USD)`;
+                resumenEl.classList.remove('positivo','negativo');
+                resumenEl.classList.add(deltaARS >= 0 ? 'negativo' : 'positivo');
+            }
+        }
     }
     
     // Escenario Piso (mejor caso)
@@ -900,7 +924,6 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const valorCasaPiso = datos.valorPropiedad * tcPiso;
     const gastosPiso = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcPiso);
     const totalPiso = valorCasaPiso + gastosPiso.total;
-    setEscenario('Piso', tcPiso, totalPiso);
     
     // Escenario Oficial (caso base)
     const tcOficial = CONFIG.tiposCambio.oficial;
@@ -910,6 +933,15 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const gastosOficial = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcOficial);
     const totalOficial = valorCasaOficial + gastosOficial.total;
     setEscenario('Oficial', tcOficial, totalOficial);
+
+    // Calcular baseline para deltas
+    const baseline = {
+        diferenciaARS: totalOficial - datos.montoPrestamo,
+        diferenciaUSD: (totalOficial - datos.montoPrestamo) / tcOficial
+    };
+
+    // Ahora setear Piso con deltas vs oficial
+    setEscenario('Piso', tcPiso, totalPiso, baseline);
     
     // Escenario Techo (peor caso)
     const tcTecho = bandasInfo.techo;
@@ -918,7 +950,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const valorCasaTecho = datos.valorPropiedad * tcTecho;
     const gastosTecho = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcTecho);
     const totalTecho = valorCasaTecho + gastosTecho.total;
-    setEscenario('Techo', tcTecho, totalTecho);
+    setEscenario('Techo', tcTecho, totalTecho, baseline);
     
     // Analytics: Rastrear visualización de escenarios
     if (window.calculadoraAnalytics) {
