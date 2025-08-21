@@ -67,10 +67,8 @@ const elementos = {
     // Resultados
     primeraCuota: document.getElementById('primeraCuota'),
     totalPagar: document.getElementById('totalPagar'),
-    gastosExtra: document.getElementById('gastosExtra'),
-    cuotaPromedio: document.getElementById('cuotaPromedio'),
     
-    // Simulador
+    // Simulador (solo si existen)
     diferenciaSimulador: document.getElementById('diferenciaSimulador'),
     diferenciaSimuladorUSD: document.getElementById('diferenciaSimuladorUSD'),
     tcSimuladorTexto: document.getElementById('tcSimuladorTexto')
@@ -86,13 +84,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar event listeners
         agregarEventListeners();
         
-
-        
         // Inicializar sliders de gastos
         actualizarSlidersGastos(elementos.provincia.value);
         
-        // Calcular inicialmente
-        calcularTodo();
+        // Calcular inicialmente después de un pequeño delay para asegurar que los valores estén establecidos
+        setTimeout(() => {
+            calcularTodo();
+        }, 100);
         
         // Mostrar impacto inicial del simulador
         mostrarImpactoSimulador();
@@ -232,11 +230,26 @@ function guardarCotizacionEnCache(valor, fuente) {
 }
 
 function establecerValoresPorDefecto() {
+    // Establecer valores por defecto
     elementos.valorPropiedad.value = 155000; // USD 155,000
-    // Monto prestado fijo en pesos
     elementos.montoPrestamo.value = 70000000; // $70,000,000 ARS
     elementos.tasaInteres.value = 8.5;
     elementos.plazo.value = 20;
+    
+    // Actualizar también los elementos de visualización de los sliders
+    const plazoValor = document.getElementById('plazoValor');
+    const tasaValor = document.getElementById('tasaValor');
+    
+    if (plazoValor) plazoValor.textContent = '20';
+    if (tasaValor) tasaValor.textContent = '8.5';
+    
+    // Asegurar que los valores estén establecidos en el DOM
+    console.log('Valores por defecto establecidos:', {
+        valorPropiedad: elementos.valorPropiedad.value,
+        montoPrestamo: elementos.montoPrestamo.value,
+        tasaInteres: elementos.tasaInteres.value,
+        plazo: elementos.plazo.value
+    });
 }
 
 function agregarEventListeners() {
@@ -567,13 +580,8 @@ function limpiarResultados() {
     elementos.totalPagar.textContent = '$0';
     document.getElementById('totalPagarUSD').textContent = '$0';
     
-    // Limpiar desglose de gastos
-    document.getElementById('gastoEscritura').textContent = '$0';
-    document.getElementById('gastoInmobiliaria').textContent = '$0';
-    document.getElementById('gastoFirmas').textContent = '$0';
-    document.getElementById('gastoSellos').textContent = '$0';
-    elementos.gastosExtra.innerHTML = '<strong>$0</strong>';
-    document.getElementById('gastosExtraUSD').textContent = '$0';
+    // Los gastos detallados ya no se muestran en la sección principal
+    // Solo se muestran en el ejemplo práctico
     
     if (elementos.diferenciaSimulador) {
         elementos.diferenciaSimulador.textContent = '$0';
@@ -597,13 +605,36 @@ function limpiarResultados() {
 }
 
 function obtenerDatosEntrada() {
-    return {
+    const datos = {
         valorPropiedad: parseFloat(elementos.valorPropiedad.value) || 0,
         provincia: elementos.provincia.value,
         montoPrestamo: parseFloat(elementos.montoPrestamo.value) || 0,
         plazo: parseInt(elementos.plazo.value) || 20,
         tasaInteres: parseFloat(elementos.tasaInteres.value) || 0
     };
+    
+    // Debug: mostrar qué datos se están obteniendo
+    console.log('Datos obtenidos del DOM:', datos);
+    
+    // Si algún valor crítico es 0, intentar usar valores por defecto
+    if (datos.valorPropiedad === 0) {
+        datos.valorPropiedad = 155000;
+        console.log('Usando valor por defecto para valorPropiedad:', datos.valorPropiedad);
+    }
+    if (datos.montoPrestamo === 0) {
+        datos.montoPrestamo = 70000000;
+        console.log('Usando valor por defecto para montoPrestamo:', datos.montoPrestamo);
+    }
+    if (datos.tasaInteres === 0) {
+        datos.tasaInteres = 8.5;
+        console.log('Usando valor por defecto para tasaInteres:', datos.tasaInteres);
+    }
+    if (datos.plazo === 0) {
+        datos.plazo = 20;
+        console.log('Usando valor por defecto para plazo:', datos.plazo);
+    }
+    
+    return datos;
 }
 
 function validarDatos(datos) {
@@ -612,6 +643,20 @@ function validarDatos(datos) {
     const isValidLoan = datos.montoPrestamo > 0;
     const isValidRate = datos.tasaInteres > 0;
     const isValidTerm = datos.plazo > 0;
+    
+    // Debug: mostrar qué valores se están validando
+    if (!isValidValue || !isValidLoan || !isValidRate || !isValidTerm) {
+        console.log('Validación falló:', {
+            valorPropiedad: datos.valorPropiedad,
+            montoPrestamo: datos.montoPrestamo,
+            tasaInteres: datos.tasaInteres,
+            plazo: datos.plazo,
+            isValidValue,
+            isValidLoan,
+            isValidRate,
+            isValidTerm
+        });
+    }
     
     // Permitir cálculo si todos los valores básicos están presentes
     const canCalculate = isValidValue && isValidLoan && isValidRate && isValidTerm;
@@ -742,22 +787,8 @@ function mostrarResultados(resultados) {
     const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.oficial;
     document.getElementById('totalPagarUSD').textContent = formatearUSD(totalPagarUSD);
     
-    // Mostrar desglose de gastos con valores intermedios
-    if (resultados.gastosExtra && typeof resultados.gastosExtra === 'object') {
-        const gastos = resultados.gastosExtra;
-        
-        // Mostrar gastos intermedios
-        document.getElementById('gastoEscritura').textContent = formatearPesos(gastos.escritura);
-        document.getElementById('gastoInmobiliaria').textContent = formatearPesos(gastos.inmobiliaria);
-        document.getElementById('gastoFirmas').textContent = formatearPesos(gastos.firmas);
-        document.getElementById('gastoSellos').textContent = formatearPesos(gastos.sellos);
-        
-        // Total gastos en ambas monedas
-        const totalUSD = gastos.total / CONFIG.tiposCambio.oficial;
-        
-        elementos.gastosExtra.innerHTML = `<strong>${formatearPesos(gastos.total)}</strong>`;
-        document.getElementById('gastosExtraUSD').textContent = `$${formatearNumero(totalUSD)}`;
-    }
+    // Los gastos detallados ahora se muestran en el ejemplo práctico
+    // No necesitamos mostrar el desglose aquí porque ya no existe en el HTML
     
     // Generar y mostrar el ejemplo práctico
     const datos = obtenerDatosEntrada();
@@ -1484,16 +1515,24 @@ function calcularPisoBandaCambiaria() {
 // Función para generar ejemplo práctico dinámico
 function generarEjemploPractico(datos, resultados) {
     const ejemploContainer = document.getElementById('ejemploPractico');
-    if (!ejemploContainer) return;
+    if (!ejemploContainer) {
+        console.log('ERROR: No se encontró el contenedor del ejemplo práctico');
+        return;
+    }
+    
+    console.log('Generando ejemplo práctico con datos:', datos);
+    console.log('Y resultados:', resultados);
     
     // Solo mostrar si tenemos datos válidos
     if (!validarDatos(datos)) {
+        console.log('Ejemplo práctico: datos no válidos, ocultando sección');
         ejemploContainer.style.display = 'none';
         return;
     }
     
     // Usar el dólar del techo de la banda (peor escenario)
     const dolarTecho = calcularBandasCambiarias().techo;
+    console.log('Usando dólar techo para ejemplo:', dolarTecho);
     
     // Calcular valores del ejemplo
     const valorCasaPesos = datos.valorPropiedad * dolarTecho;
@@ -1510,6 +1549,15 @@ function generarEjemploPractico(datos, resultados) {
     const margenSeguridad = (diferenciaACubrir + gastosTotal) * 0.20;
     const reservaEmergencia = resultados.primeraCuota * 6;
     const totalNecesario = diferenciaACubrir + gastosTotal + margenSeguridad + reservaEmergencia;
+    
+    console.log('Cálculos del ejemplo:', {
+        valorCasaPesos,
+        diferenciaACubrir,
+        gastosTotal,
+        margenSeguridad,
+        reservaEmergencia,
+        totalNecesario
+    });
     
     // Actualizar valores en el HTML
     document.getElementById('ejemploValorCasa').textContent = `USD ${formatearNumero(datos.valorPropiedad)}`;
@@ -1532,6 +1580,7 @@ function generarEjemploPractico(datos, resultados) {
     
     // Mostrar el ejemplo
     ejemploContainer.style.display = 'block';
+    console.log('Ejemplo práctico mostrado correctamente');
     
     // Analytics: Rastrear generación de ejemplo práctico
     if (window.calculadoraAnalytics) {
