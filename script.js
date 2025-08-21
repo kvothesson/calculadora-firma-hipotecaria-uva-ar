@@ -558,50 +558,87 @@ function mostrarGuiaCompletar(datos) {
     if (camposFaltantes.length >= 2) {
         const mensaje = `Completá ${camposFaltantes.join(', ')} para ver los resultados`;
         
-        // Mostrar en lugar de los resultados principales
-        const elemento = document.getElementById('primeraCuota');
+        // Mostrar en lugar de los resultados principales del CORE
+        const elementosCore = [
+            'primeraCuota', 'primeraCuotaUSD',
+            'totalPagar', 'totalPagarUSD',
+            'diferenciaACubrir', 'diferenciaACubrirUSD',
+            'montoPrestamoBanco', 'montoPrestamoBancoUSD'
+        ];
+        
+        elementosCore.forEach(id => {
+            const elemento = document.getElementById(id);
         if (elemento) {
             elemento.textContent = '—';
             elemento.title = mensaje;
         }
+        });
+        
+        // Limpiar gastos y escenarios
+        const elementosGastos = [
+            'gastoEscrituraARS', 'gastoEscrituraUSD',
+            'gastoInmobiliariaARS', 'gastoInmobiliariaUSD',
+            'gastoFirmasARS', 'gastoFirmasUSD',
+            'gastoSellosARS', 'gastoSellosUSD',
+            'gastosTotalARS', 'gastosTotalUSD'
+        ];
+        
+        elementosGastos.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.textContent = '—';
+                elemento.title = mensaje;
+            }
+        });
+        
+        const elementosEscenarios = [
+            'tcPisoEscenario', 'totalPisoARS', 'totalPisoUSD',
+            'tcOficialEscenario', 'totalOficialARS', 'totalOficialUSD',
+            'tcTechoEscenario', 'totalTechoARS', 'totalTechoUSD'
+        ];
+        
+        elementosEscenarios.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.textContent = '—';
+                elemento.title = mensaje;
+            }
+        });
     }
 }
 
 function limpiarResultados() {
-    elementos.primeraCuota.textContent = '$0';
-    document.getElementById('primeraCuotaUSD').textContent = '$0';
+    // Primera cuota
+    setLineaMoneda('primeraCuota', 'ARS', 0);
+    setLineaMoneda('primeraCuotaUSD', 'USD', 0);
     
-    // Ocultar ejemplo práctico
+    // Totales
+    setLineaMoneda('totalPagar', 'ARS', 0, true);
+    setLineaMoneda('totalPagarUSD', 'USD', 0, true);
+    
+    // Valor de la casa
+    setLineaMoneda('valorCasaARS', 'ARS', 0);
+    setLineaMoneda('valorCasaUSD', 'USD', 0);
+    
+    // Gastos detallados
+    ['gastoEscritura','gastoInmobiliaria','gastoFirmas','gastoSellos'].forEach(base => {
+        setLineaMoneda(base + 'ARS', 'ARS', 0);
+        setLineaMoneda(base + 'USD', 'USD', 0);
+    });
+    setLineaMoneda('gastosTotalARS', 'ARS', 0, true);
+    setLineaMoneda('gastosTotalUSD', 'USD', 0, true);
+    
+    // Escenarios de tipo de cambio (dejar como "$0" por estructura de etiquetas "ARS: <span>")
+    const idsEsc = [
+        'tcPisoEscenario','totalPisoARS','totalPisoUSD','prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD',
+        'tcOficialEscenario','totalOficialARS','totalOficialUSD','prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD',
+        'tcTechoEscenario','totalTechoARS','totalTechoUSD','prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD'
+    ];
+    idsEsc.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '$0'; });
+    
+    // Ocultar resumen ejecutivo
     const ejemploContainer = document.getElementById('ejemploPractico');
-    if (ejemploContainer) {
-        ejemploContainer.style.display = 'none';
-    }
-    
-    elementos.totalPagar.textContent = '$0';
-    document.getElementById('totalPagarUSD').textContent = '$0';
-    
-    // Los gastos detallados ya no se muestran en la sección principal
-    // Solo se muestran en el ejemplo práctico
-    
-    if (elementos.diferenciaSimulador) {
-        elementos.diferenciaSimulador.textContent = '$0';
-    }
-    if (elementos.diferenciaSimuladorUSD) {
-        elementos.diferenciaSimuladorUSD.textContent = '$0';
-    }
-    if (elementos.tcSimuladorTexto) {
-        elementos.tcSimuladorTexto.textContent = '1225';
-    }
-    
-    // Limpiar elementos del banco
-    const elementoPrestamoSimuladorPesos = document.getElementById('prestamoSimuladorPesos');
-    const elementoPrestamoSimuladorUSD = document.getElementById('prestamoSimuladorUSD');
-    if (elementoPrestamoSimuladorPesos) {
-        elementoPrestamoSimuladorPesos.textContent = '$0';
-    }
-    if (elementoPrestamoSimuladorUSD) {
-        elementoPrestamoSimuladorUSD.textContent = '$0';
-    }
+    if (ejemploContainer) ejemploContainer.style.display = 'none';
 }
 
 function obtenerDatosEntrada() {
@@ -778,121 +815,136 @@ function calcularCuotaPromedioConUVA(cuotaInicial, totalMeses) {
 
 function mostrarResultados(resultados) {
     // Primera cuota en ambas monedas
-    elementos.primeraCuota.textContent = formatearARS(resultados.primeraCuota);
+    setLineaMoneda('primeraCuota', 'ARS', resultados.primeraCuota);
     const primeraCuotaUSD = resultados.primeraCuota / CONFIG.tiposCambio.oficial;
-    document.getElementById('primeraCuotaUSD').textContent = formatearUSD(primeraCuotaUSD);
+    setLineaMoneda('primeraCuotaUSD', 'USD', primeraCuotaUSD);
     
-    // Total a pagar en ambas monedas
-    elementos.totalPagar.textContent = formatearARS(resultados.totalPagar);
-    const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.oficial;
-    document.getElementById('totalPagarUSD').textContent = formatearUSD(totalPagarUSD);
-    
-    // Los gastos detallados ahora se muestran en el ejemplo práctico
-    // No necesitamos mostrar el desglose aquí porque ya no existe en el HTML
-    
-    // Generar y mostrar el ejemplo práctico
+    // Valor de la casa en ambas monedas
     const datos = obtenerDatosEntrada();
+    const valorCasaARS = datos.valorPropiedad * CONFIG.tiposCambio.oficial;
+    const valorCasaUSD = datos.valorPropiedad; // ya está en USD
+    setLineaMoneda('valorCasaARS', 'ARS', valorCasaARS);
+    setLineaMoneda('valorCasaUSD', 'USD', valorCasaUSD);
+    
+    // Total a pagar en ambas monedas (casa + gastos)
+    setLineaMoneda('totalPagar', 'ARS', resultados.totalPagar, true);
+    const totalPagarUSD = resultados.totalPagar / CONFIG.tiposCambio.oficial;
+    setLineaMoneda('totalPagarUSD', 'USD', totalPagarUSD, true);
+    
+    // Desglose detallado de gastos en ambas monedas
+    mostrarGastosDetallados(resultados.gastosExtra);
+    
+    // Calcular y mostrar escenarios de tipo de cambio
+    mostrarEscenariosTipoCambio(datos, resultados);
+    
+    // Generar y mostrar el resumen ejecutivo
     generarEjemploPractico(datos, resultados);
 }
 
+// Nueva función para mostrar gastos detallados en el CORE
+function mostrarGastosDetallados(gastosExtra) {
+    // Escritura
+    setLineaMoneda('gastoEscrituraARS', 'ARS', gastosExtra.escritura);
+    setLineaMoneda('gastoEscrituraUSD', 'USD', gastosExtra.escritura / CONFIG.tiposCambio.oficial);
+    
+    // Inmobiliaria
+    setLineaMoneda('gastoInmobiliariaARS', 'ARS', gastosExtra.inmobiliaria);
+    setLineaMoneda('gastoInmobiliariaUSD', 'USD', gastosExtra.inmobiliaria / CONFIG.tiposCambio.oficial);
+    
+    // Firmas
+    setLineaMoneda('gastoFirmasARS', 'ARS', gastosExtra.firmas);
+    setLineaMoneda('gastoFirmasUSD', 'USD', gastosExtra.firmas / CONFIG.tiposCambio.oficial);
+    
+    // Sellos
+    setLineaMoneda('gastoSellosARS', 'ARS', gastosExtra.sellos);
+    setLineaMoneda('gastoSellosUSD', 'USD', gastosExtra.sellos / CONFIG.tiposCambio.oficial);
+    
+    // Total gastos
+    setLineaMoneda('gastosTotalARS', 'ARS', gastosExtra.total, true);
+    setLineaMoneda('gastosTotalUSD', 'USD', gastosExtra.total / CONFIG.tiposCambio.oficial, true);
+}
 
-
-// Nueva función para mostrar el impacto del simulador
-function mostrarImpactoSimulador() {
-    const datos = obtenerDatosEntrada();
-    if (!validarDatos(datos)) {
-        console.log('mostrarImpactoSimulador: datos no válidos', datos);
-        return;
+// Nueva función para mostrar escenarios de tipo de cambio
+function mostrarEscenariosTipoCambio(datos, resultados) {
+    const bandasInfo = calcularBandasCambiarias();
+    
+    // Helper para setear valores por escenario
+    function setEscenario(prefix, tc, totalOperacion) {
+        const prestamoARS = datos.montoPrestamo;
+        const prestamoUSD = prestamoARS / tc;
+        const diferenciaARS = totalOperacion - prestamoARS;
+        const diferenciaUSD = diferenciaARS / tc;
+        
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = typeof value === 'number' ? (id.includes('USD') ? formatearUSD(value) : formatearARS(value)) : value;
+        };
+        
+        // Totales
+        setText(`total${prefix}ARS`, totalOperacion);
+        setText(`total${prefix}USD`, totalOperacion / tc);
+        
+        // Préstamo del banco
+        setText(`prestamo${prefix}ARS`, prestamoARS);
+        setText(`prestamo${prefix}USD`, prestamoUSD);
+        
+        // Diferencia a cubrir
+        setText(`diferencia${prefix}ARS`, diferenciaARS);
+        setText(`diferencia${prefix}USD`, diferenciaUSD);
     }
     
-    console.log('mostrarImpactoSimulador ejecutándose con TC:', CONFIG.tiposCambio.simulador);
+    // Escenario Piso (mejor caso)
+    const tcPiso = bandasInfo.piso;
+    const elPiso = document.getElementById('tcPisoEscenario');
+    if (elPiso) elPiso.textContent = formatearARS(tcPiso);
+    const valorCasaPiso = datos.valorPropiedad * tcPiso;
+    const gastosPiso = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcPiso);
+    const totalPiso = valorCasaPiso + gastosPiso.total;
+    setEscenario('Piso', tcPiso, totalPiso);
     
-    // Calcular valor de la propiedad con el tipo de cambio del simulador
-    const valorPropiedadConSimulador = datos.valorPropiedad * CONFIG.tiposCambio.simulador;
+    // Escenario Oficial (caso base)
+    const tcOficial = CONFIG.tiposCambio.oficial;
+    const elOf = document.getElementById('tcOficialEscenario');
+    if (elOf) elOf.textContent = formatearARS(tcOficial);
+    const valorCasaOficial = datos.valorPropiedad * tcOficial;
+    const gastosOficial = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcOficial);
+    const totalOficial = valorCasaOficial + gastosOficial.total;
+    setEscenario('Oficial', tcOficial, totalOficial);
     
-    // Calcular gastos extra con el tipo de cambio del simulador
-    const gastosExtraSimulador = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, CONFIG.tiposCambio.simulador);
+    // Escenario Techo (peor caso)
+    const tcTecho = bandasInfo.techo;
+    const elTecho = document.getElementById('tcTechoEscenario');
+    if (elTecho) elTecho.textContent = formatearARS(tcTecho);
+    const valorCasaTecho = datos.valorPropiedad * tcTecho;
+    const gastosTecho = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcTecho);
+    const totalTecho = valorCasaTecho + gastosTecho.total;
+    setEscenario('Techo', tcTecho, totalTecho);
     
-    // El monto en pesos que da el banco es siempre fijo (el monto que pediste prestado)
-    // Solo varía el equivalente en USD según el tipo de cambio del simulador
-    const montoPrestamoPesos = datos.montoPrestamo; // Pesos fijo (monto que pediste)
-    const montoPrestamoUSD = datos.montoPrestamo / CONFIG.tiposCambio.simulador; // USD varía con el TC
-    
-    // Lo que tienes que poner = valor propiedad + gastos - préstamo
-    const diferenciaACubrir = valorPropiedadConSimulador + gastosExtraSimulador.total - montoPrestamoPesos;
-    
-    // Mostrar lo que da el banco
-    const elementoPrestamoSimuladorPesos = document.getElementById('prestamoSimuladorPesos');
-    const elementoPrestamoSimuladorUSD = document.getElementById('prestamoSimuladorUSD');
-    
-    if (elementoPrestamoSimuladorPesos) {
-        elementoPrestamoSimuladorPesos.textContent = formatearPesos(montoPrestamoPesos);
-    }
-    
-    if (elementoPrestamoSimuladorUSD) {
-        elementoPrestamoSimuladorUSD.textContent = `$${formatearNumero(montoPrestamoUSD)}`;
-    }
-    
-    // Mostrar lo que tienes que poner
-    if (elementos.diferenciaSimulador) {
-        elementos.diferenciaSimulador.textContent = formatearPesos(diferenciaACubrir);
-        console.log('Actualizado diferenciaSimulador:', formatearPesos(diferenciaACubrir));
-    } else {
-        console.log('ERROR: elemento diferenciaSimulador no encontrado');
-    }
-    
-    if (elementos.diferenciaSimuladorUSD) {
-        const diferenciaUSD = diferenciaACubrir / CONFIG.tiposCambio.simulador;
-        elementos.diferenciaSimuladorUSD.textContent = `$${formatearNumero(diferenciaUSD)}`;
-        console.log('Actualizado diferenciaSimuladorUSD:', `$${formatearNumero(diferenciaUSD)}`);
-    } else {
-        console.log('ERROR: elemento diferenciaSimuladorUSD no encontrado');
-    }
-    
-    // Mostrar desglose de componentes
-    const diferenciaPropiedad = valorPropiedadConSimulador - montoPrestamoPesos;
-    const elementoDiferenciaPropiedad = document.getElementById('diferenciaPropiedad');
-    const elementoDiferenciaPropiedadUSD = document.getElementById('diferenciaPropiedadUSD');
-    const elementoGastosSimulador = document.getElementById('gastosSimulador');
-    const elementoGastosSimuladorUSD = document.getElementById('gastosSimuladorUSD');
-    
-    if (elementoDiferenciaPropiedad) {
-        elementoDiferenciaPropiedad.textContent = formatearPesos(diferenciaPropiedad);
-    }
-    
-    if (elementoDiferenciaPropiedadUSD) {
-        const diferenciaPropiedadUSD = diferenciaPropiedad / CONFIG.tiposCambio.simulador;
-        elementoDiferenciaPropiedadUSD.textContent = `$${formatearNumero(diferenciaPropiedadUSD)}`;
-    }
-    
-    if (elementoGastosSimulador) {
-        elementoGastosSimulador.textContent = formatearPesos(gastosExtraSimulador.total);
-    }
-    
-    if (elementoGastosSimuladorUSD) {
-        const gastosSimuladorUSD = gastosExtraSimulador.total / CONFIG.tiposCambio.simulador;
-        elementoGastosSimuladorUSD.textContent = `$${formatearNumero(gastosSimuladorUSD)}`;
-    }
-    
-    if (elementos.tcSimuladorTexto) {
-        elementos.tcSimuladorTexto.textContent = CONFIG.tiposCambio.simulador;
-    }
-    
-    // Calcular diferencia de tipo de cambio respecto al oficial
-    const diferenciaTc = CONFIG.tiposCambio.simulador - CONFIG.tiposCambio.oficial;
-    const porcentajeDiferencia = (diferenciaTc / CONFIG.tiposCambio.oficial * 100).toFixed(1);
-    
-    // Actualizar título del slider para mostrar la diferencia
-    const tcLabel = document.querySelector('.tc-slider-container label');
-    if (tcLabel) {
-        let textoTc = `Tipo de cambio: $${CONFIG.tiposCambio.simulador}`;
-        if (diferenciaTc !== 0) {
-            const signo = diferenciaTc > 0 ? '+' : '';
-            textoTc += ` (${signo}${porcentajeDiferencia}% vs oficial)`;
-        }
-        tcLabel.innerHTML = textoTc;
+    // Analytics: Rastrear visualización de escenarios
+    if (window.calculadoraAnalytics) {
+        window.calculadoraAnalytics.trackCurrencyScenarios({
+            piso: tcPiso,
+            oficial: tcOficial,
+            techo: tcTecho,
+            diferencia_piso_oficial: ((tcOficial - tcPiso) / tcPiso * 100).toFixed(1),
+            diferencia_techo_oficial: ((tcTecho - tcOficial) / tcOficial * 100).toFixed(1)
+        });
     }
 }
+
+// Extender limpieza para escenarios
+(function extendLimpiarResultados(){
+    const original = limpiarResultados;
+    limpiarResultados = function() {
+        original();
+        const ids = [
+            'prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD',
+            'prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD',
+            'prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD'
+        ];
+        ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '$0'; });
+    }
+})();
 
 function formatearPesos(valor) {
     return new Intl.NumberFormat('es-AR', {
@@ -1026,8 +1078,8 @@ function configurarSliderTC() {
                 // Solo actualizar el simulador, no el oficial
                 CONFIG.tiposCambio.simulador = nuevoTC;
                 
-                // Mostrar el impacto de este tipo de cambio
-                mostrarImpactoSimulador();
+                // Recalcular todo el CORE con el nuevo tipo de cambio
+                recalcularCoreConNuevoTC(nuevoTC);
                 
                 // Actualizar estado visual de sugerencias
                 actualizarEstadoSugerencias();
@@ -1053,7 +1105,7 @@ function configurarSliderTC() {
             // Actualizar si cambió el valor
             if (valor !== CONFIG.tiposCambio.simulador) {
                 CONFIG.tiposCambio.simulador = valor;
-                mostrarImpactoSimulador();
+                recalcularCoreConNuevoTC(valor);
                 actualizarEstadoSugerencias();
             }
         });
@@ -1088,8 +1140,10 @@ function configurarSliderTC() {
                 window.calculadoraAnalytics.trackCurrencyScenario(nuevoValor, `suggestion_${tipo}`);
             }
             
-            // Mostrar el impacto de este tipo de cambio
-            mostrarImpactoSimulador();
+            // Recalcular todo el CORE con el nuevo tipo de cambio
+            recalcularCoreConNuevoTC(nuevoValor);
+            
+            // Actualizar estado visual de sugerencias
             actualizarEstadoSugerencias();
             
             // Validar valor con bandas
@@ -1105,6 +1159,56 @@ function configurarSliderTC() {
     console.log(`- Piso (mejor caso): $${calcularPisoBandaCambiaria().piso}`);
     console.log(`- Techo (peor caso): $${calcularBandasCambiarias().techo}`);
     console.log(`- Ancho de banda: $${calcularBandasCambiarias().techo - calcularPisoBandaCambiaria().piso}`);
+}
+
+// Nueva función para recalcular el CORE con un nuevo tipo de cambio
+function recalcularCoreConNuevoTC(nuevoTC) {
+    const datos = obtenerDatosEntrada();
+    if (!validarDatos(datos)) {
+        console.log('recalcularCoreConNuevoTC: datos no válidos', datos);
+        return;
+    }
+    
+    console.log('Recalculando CORE con nuevo TC:', nuevoTC);
+    
+    // Recalcular gastos con el nuevo tipo de cambio
+    const gastosExtra = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, nuevoTC);
+    
+    // Recalcular valores totales
+    const valorCasaPesos = datos.valorPropiedad * nuevoTC;
+    const totalOperacion = valorCasaPesos + gastosExtra.total;
+    
+    // Actualizar gastos detallados en el CORE
+    mostrarGastosDetallados(gastosExtra);
+    
+    // Actualizar escenarios de tipo de cambio
+    mostrarEscenariosTipoCambio(datos, {
+        totalPagar: totalOperacion,
+        gastosExtra: gastosExtra
+    });
+    
+    // Actualizar diferencia a cubrir
+    const diferenciaACubrir = totalOperacion - datos.montoPrestamo;
+    document.getElementById('diferenciaACubrir').textContent = formatearARS(diferenciaACubrir);
+    const diferenciaACubrirUSD = diferenciaACubrir / nuevoTC;
+    document.getElementById('diferenciaACubrirUSD').textContent = formatearUSD(diferenciaACubrirUSD);
+    
+    // Actualizar equivalencia del monto prestado en USD
+    const montoPrestamoBancoUSD = datos.montoPrestamo / nuevoTC;
+    document.getElementById('montoPrestamoBancoUSD').textContent = formatearUSD(montoPrestamoBancoUSD);
+    
+    // Actualizar primera cuota en USD
+    const primeraCuota = calcularCredito(datos).primeraCuota;
+    const primeraCuotaUSD = primeraCuota / nuevoTC;
+    const primeraCuotaUSDEl = document.getElementById('primeraCuotaUSD');
+    if (primeraCuotaUSDEl) primeraCuotaUSDEl.textContent = formatearUSD(primeraCuotaUSD);
+    
+    // Actualizar total a pagar en USD
+    const totalPagarUSD = totalOperacion / nuevoTC;
+    const totalPagarUSDEl = document.getElementById('totalPagarUSD');
+    if (totalPagarUSDEl) totalPagarUSDEl.textContent = formatearUSD(totalPagarUSD);
+    
+    console.log('CORE recalculado con TC:', nuevoTC);
 }
 
 // Configurar campos de gastos (ahora inputs numéricos)
@@ -1512,7 +1616,7 @@ function calcularPisoBandaCambiaria() {
     };
 }
 
-// Función para generar ejemplo práctico dinámico
+// Función para generar ejemplo práctico simplificado (resumen ejecutivo)
 function generarEjemploPractico(datos, resultados) {
     const ejemploContainer = document.getElementById('ejemploPractico');
     if (!ejemploContainer) {
@@ -1520,71 +1624,63 @@ function generarEjemploPractico(datos, resultados) {
         return;
     }
     
-    console.log('Generando ejemplo práctico con datos:', datos);
+    console.log('Generando resumen ejecutivo con datos:', datos);
     console.log('Y resultados:', resultados);
     
     // Solo mostrar si tenemos datos válidos
     if (!validarDatos(datos)) {
-        console.log('Ejemplo práctico: datos no válidos, ocultando sección');
+        console.log('Resumen ejecutivo: datos no válidos, ocultando sección');
         ejemploContainer.style.display = 'none';
         return;
     }
     
-    // Usar el dólar del techo de la banda (peor escenario)
+    // Usar el dólar del techo de la banda (peor escenario) para el cálculo
     const dolarTecho = calcularBandasCambiarias().techo;
-    console.log('Usando dólar techo para ejemplo:', dolarTecho);
+    console.log('Usando dólar techo para resumen ejecutivo:', dolarTecho);
     
-    // Calcular valores del ejemplo
+    // Calcular valores del peor escenario
     const valorCasaPesos = datos.valorPropiedad * dolarTecho;
     const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
     
-    // Calcular gastos detallados
+    // Calcular gastos detallados en el peor escenario
     const gastosDetallados = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
-    const gastosEscritura = gastosDetallados.escritura;
-    const gastosInmobiliaria = gastosDetallados.inmobiliaria;
-    const gastosFirmas = gastosDetallados.firmas;
-    const gastosSellos = gastosDetallados.sellos;
     const gastosTotal = gastosDetallados.total;
     
-    const margenSeguridad = (diferenciaACubrir + gastosTotal) * 0.20;
-    const reservaEmergencia = resultados.primeraCuota * 6;
-    const totalNecesario = diferenciaACubrir + gastosTotal + margenSeguridad + reservaEmergencia;
+    // Calcular margen de seguridad (20% sobre lo necesario)
+    const totalNecesario = diferenciaACubrir + gastosTotal;
+    const margenSeguridad = totalNecesario * 0.20;
     
-    console.log('Cálculos del ejemplo:', {
+    // Reserva de emergencia (6 cuotas)
+    const reservaEmergencia = resultados.primeraCuota * 6;
+    
+    // Total recomendado para ahorrar
+    const totalRecomendado = totalNecesario + margenSeguridad + reservaEmergencia;
+    
+    console.log('Cálculos del resumen ejecutivo:', {
         valorCasaPesos,
         diferenciaACubrir,
         gastosTotal,
         margenSeguridad,
         reservaEmergencia,
-        totalNecesario
+        totalRecomendado
     });
     
     // Actualizar valores en el HTML
     document.getElementById('ejemploValorCasa').textContent = `USD ${formatearNumero(datos.valorPropiedad)}`;
     document.getElementById('ejemploPrestamo').textContent = formatearPesos(datos.montoPrestamo);
-    document.getElementById('ejemploDolarTecho').textContent = formatearPesos(dolarTecho);
-    document.getElementById('ejemploValorCasaPesos').textContent = formatearPesos(valorCasaPesos);
-    document.getElementById('ejemploPrestamoBanco').textContent = formatearPesos(datos.montoPrestamo);
-    document.getElementById('ejemploDiferencia').textContent = formatearPesos(diferenciaACubrir);
     
-    // Actualizar gastos detallados
-    document.getElementById('ejemploGastoEscritura').textContent = formatearPesos(gastosEscritura);
-    document.getElementById('ejemploGastoInmobiliaria').textContent = formatearPesos(gastosInmobiliaria);
-    document.getElementById('ejemploGastoFirmas').textContent = formatearPesos(gastosFirmas);
-    document.getElementById('ejemploGastoSellos').textContent = formatearPesos(gastosSellos);
-    document.getElementById('ejemploGastosTotal').textContent = formatearPesos(gastosTotal);
-    
+    // Solo mostrar margen de seguridad y reserva de emergencia
     document.getElementById('ejemploMargen').textContent = formatearPesos(margenSeguridad);
     document.getElementById('ejemploReserva').textContent = formatearPesos(reservaEmergencia);
-    document.getElementById('ejemploTotal').textContent = formatearPesos(totalNecesario);
+    document.getElementById('ejemploTotal').textContent = formatearPesos(totalRecomendado);
     
-    // Mostrar el ejemplo
+    // Mostrar el resumen ejecutivo
     ejemploContainer.style.display = 'block';
-    console.log('Ejemplo práctico mostrado correctamente');
+    console.log('Resumen ejecutivo mostrado correctamente');
     
-    // Analytics: Rastrear generación de ejemplo práctico
+    // Analytics: Rastrear generación de resumen ejecutivo
     if (window.calculadoraAnalytics) {
-        window.calculadoraAnalytics.trackTipsViewed('ejemplo_practico', `Ejemplo generado para casa USD ${datos.valorPropiedad}`);
+        window.calculadoraAnalytics.trackTipsViewed('resumen_ejecutivo', `Resumen generado para casa USD ${datos.valorPropiedad}`);
     }
 }
 
@@ -1637,6 +1733,34 @@ function validarTipoCambioConBandas(valorTC) {
                 tipBanda.remove();
             }
         }, 8000);
+    }
+}
+
+// Helpers de formato con prefijo de moneda sin símbolo $
+function formatearNumeroPlano(valor) {
+    return new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(valor || 0);
+}
+
+function lineaARS(valor, bold = false) {
+    const texto = `ARS ${formatearNumeroPlano(valor)}`;
+    return bold ? `<strong>${texto}</strong>` : texto;
+}
+
+function lineaUSD(valor, bold = false) {
+    const texto = `USD ${formatearNumeroPlano(valor)}`;
+    return bold ? `<strong>${texto}</strong>` : texto;
+}
+
+function setLineaMoneda(id, currency, valor, bold = false) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (currency === 'ARS') {
+        el.innerHTML = lineaARS(valor, bold);
+    } else {
+        el.innerHTML = lineaUSD(valor, bold);
     }
 }
 

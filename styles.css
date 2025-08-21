@@ -2092,3 +2092,354 @@ footer {
         padding: 20px 16px;
     }
 }
+
+/* Estilos para el CORE principal con tabla */
+.core-section {
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.core-section h2 {
+    color: #60a5fa;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.section-description {
+    text-align: center;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+    font-size: 1.1rem;
+}
+
+/* Tabla principal del CORE */
+.core-table-container {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    overflow-x: auto;
+}
+
+.core-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.core-table th {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    font-size: 1rem;
+}
+
+.core-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    vertical-align: middle;
+}
+
+/* Columnas de la tabla */
+.currency-column {
+    text-align: center;
+    min-width: 120px;
+}
+
+.description-column {
+    min-width: 200px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* Filas principales */
+.core-row-primary {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.core-row-primary .concept-cell {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.core-row-primary .currency-cell {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Filas secundarias */
+.core-row-secondary {
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.core-row-secondary .concept-cell {
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+/* Celdas de concepto */
+.concept-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 250px;
+}
+
+.concept-icon {
+    font-size: 1.2rem;
+    min-width: 24px;
+}
+
+.concept-text {
+    flex: 1;
+}
+
+.tooltip {
+    color: #60a5fa;
+    cursor: help;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Celdas de moneda */
+.currency-cell {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+.currency-cell.ars {
+    color: #fbbf24;
+    font-size: 1rem;
+}
+
+.currency-cell.usd {
+    color: #34d399;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Separador visual */
+.separator-row {
+    height: 20px;
+    background: transparent;
+}
+
+.separator-row td {
+    border: none;
+    padding: 0;
+}
+
+/* Encabezado de sección de gastos */
+.section-header {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.section-header h3 {
+    color: #60a5fa;
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+/* Filas de gastos */
+.gasto-row {
+    background: rgba(15, 23, 42, 0.3);
+}
+
+.gasto-row .concept-cell {
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+.gasto-row .currency-cell {
+    font-size: 0.95rem;
+}
+
+/* Fila total de gastos */
+.gasto-total-row {
+    background: rgba(59, 130, 246, 0.15);
+    border-top: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.gasto-total-row .concept-cell {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.gasto-total-row .currency-cell {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Responsive para la tabla */
+@media (max-width: 768px) {
+    .core-section {
+        padding: 16px;
+    }
+    
+    .core-table-container {
+        padding: 12px;
+        margin: 16px 0;
+    }
+    
+    .core-table {
+        font-size: 0.85rem;
+    }
+    
+    .core-table th,
+    .core-table td {
+        padding: 12px 8px;
+    }
+    
+    .concept-cell {
+        min-width: 200px;
+        gap: 8px;
+    }
+    
+    .currency-column {
+        min-width: 100px;
+    }
+    
+    .description-column {
+        min-width: 150px;
+        font-size: 0.8rem;
+    }
+    
+    .currency-cell.ars {
+        font-size: 0.9rem;
+    }
+    
+    .currency-cell.usd {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .core-table {
+        font-size: 0.8rem;
+    }
+    
+    .concept-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        min-width: 180px;
+    }
+    
+    .concept-icon {
+        font-size: 1rem;
+    }
+    
+    .concept-text {
+        font-size: 0.9rem;
+    }
+    
+    .tooltip {
+        font-size: 0.8rem;
+    }
+}
+
+/* Escenarios de tipo de cambio */
+.escenarios-tc {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.escenarios-tc h3 {
+    color: #60a5fa;
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.escenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.escenario-card {
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    transition: all 0.3s ease;
+}
+
+.escenario-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+.escenario-card h4 {
+    color: #60a5fa;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.escenario-content p {
+    color: #cbd5e1;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.escenario-values {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.escenario-ars {
+    color: #fbbf24;
+    font-weight: 500;
+}
+
+.escenario-usd {
+    color: #34d399;
+    font-weight: 500;
+}
+
+/* Responsive para escenarios */
+@media (max-width: 768px) {
+    .escenarios-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Celdas con dos líneas de moneda en una columna */
+.currency-line {
+    display: block;
+}
+.currency-line.ars {
+    color: #fbbf24;
+    font-weight: 600;
+}
+.currency-line.usd {
+    color: #34d399;
+    opacity: 0.95;
+    font-size: 0.9em;
+}
+
+/* Ocultar descripción en mobile */
+@media (max-width: 768px) {
+    .core-table .description-column,
+    .core-table td.description-cell {
+        display: none;
+    }
+}
