@@ -167,25 +167,7 @@
                 </div>
 
                 <!-- Tipo de cambio al día de la firma (mejorado) -->
-                <div class="form-group">
-                    <label for="tcInput">💱 Tipo de cambio al día de la firma</label>
-                    <div class="tc-input-container">
-                        <div class="tc-input-group">
-                            <div class="tc-input-wrapper">
-                                <span class="currency-prefix">$</span>
-                                <input type="number" id="tcInput" min="800" max="2000" value="1225" step="1" class="tc-input">
-                            </div>
-                            <div class="tc-suggestions">
-                                <button type="button" class="tc-suggestion" data-tc="piso">📉 Piso</button>
-                                <button type="button" class="tc-suggestion" data-tc="oficial">🏦 Oficial</button>
-                                <button type="button" class="tc-suggestion" data-tc="techo">📈 Techo</button>
-                            </div>
-                        </div>
-                        <div class="tc-banda-info-compact">
-                            <small>💡 Bandas: <span id="tcPiso">$1,000</span> | <span id="tcOficial">$1,225</span> | <span id="tcTecho">$1,450</span></small>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- Sección de gastos integrada en el formulario principal -->
                 <div class="gastos-form-section">
@@ -238,96 +220,191 @@
                 </div>
             </section>
 
-            <!-- Sección de resultados -->
-            <section class="results-section">
-                <h2>📊 Simulador de Cuotas Hipotecarias en ARS y USD</h2>
+            <!-- Sección de resultados - CORE PRINCIPAL -->
+            <section class="results-section core-section">
+                <h2>💰 CORE: Tu Crédito Hipotecario UVA en ARS y USD</h2>
+                <p class="section-description">Calculá cuánto vas a pagar y cuánto necesitás ahorrar según el tipo de cambio al día de la firma</p>
                 
-                <div class="results-grid">
-                    <div class="result-card priority">
-                        <h3>Primera Cuota 
-                            <span class="tooltip" title="Tu primera cuota mensual, antes de ajustes UVA">ℹ️</span>
-                        </h3>
-                        <div class="dual-currency-display">
-                            <div class="currency-item">
-                                <span class="currency-label">ARS</span>
-                                <span class="currency-value" id="primeraCuota">$0</span>
+                <!-- Tabla principal del CORE -->
+                <div class="core-table-container">
+                    <table class="core-table">
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th class="currency-column">Valores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Primera Cuota -->
+                            <tr class="core-row-primary">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">💰</span>
+                                    <span class="concept-text">Primera Cuota</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="primeraCuota">$0</div>
+                                    <div class="currency-line usd" id="primeraCuotaUSD">$0</div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Separador visual -->
+                            <tr class="separator-row">
+                                <td colspan="2"></td>
+                            </tr>
+                            
+                            <!-- Encabezado sección Valor de la Casa y Gastos -->
+                            <tr class="section-header">
+                                <td colspan="2">
+                                    <h3>🏠 Valor de la Casa y Gastos</h3>
+                                </td>
+                            </tr>
+                            
+                            <!-- Valor de la Casa -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">🏠</span>
+                                    <span class="concept-text">Valor de la Casa</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="valorCasaARS">$0</div>
+                                    <div class="currency-line usd" id="valorCasaUSD">$0</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Escritura -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">📄</span>
+                                    <span class="concept-text">Escritura</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="gastoEscrituraARS">$0</div>
+                                    <div class="currency-line usd" id="gastoEscrituraUSD">$0</div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Inmobiliaria -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">🏪</span>
+                                    <span class="concept-text">Inmobiliaria</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="gastoInmobiliariaARS">$0</div>
+                                    <div class="currency-line usd" id="gastoInmobiliariaUSD">$0</div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Firmas -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">✍️</span>
+                                    <span class="concept-text">Firmas</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="gastoFirmasARS">$0</div>
+                                    <div class="currency-line usd" id="gastoFirmasUSD">$0</div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Sellos -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">🏷️</span>
+                                    <span class="concept-text">Sellos</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="gastoSellosARS">$0</div>
+                                    <div class="currency-line usd" id="gastoSellosUSD">$0</div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Total Gastos -->
+                            <tr class="gasto-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">📋</span>
+                                    <span class="concept-text">Total Gastos</span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="gastosTotalARS"><strong>$0</strong></div>
+                                    <div class="currency-line usd" id="gastosTotalUSD"><strong>$0</strong></div>
+                                </td>
+                                
+                            </tr>
+                            
+                            <!-- Total de la operación -->
+                            <tr class="gasto-total-row">
+                                <td class="concept-cell">
+                                    <span class="concept-icon">📊</span>
+                                    <span class="concept-text"><strong>Total de la operación</strong></span>
+                                </td>
+                                <td class="currency-cell">
+                                    <div class="currency-line ars" id="totalPagar"><strong>$0</strong></div>
+                                    <div class="currency-line usd" id="totalPagarUSD"><strong>$0</strong></div>
+                                </td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Escenarios de tipo de cambio -->
+                <div class="escenarios-tc">
+                    <h3>💱 Escenarios según Tipo de Cambio al día de la firma</h3>
+                    <div class="escenarios-grid">
+                        <div class="escenario-card">
+                            <h4>📉 Mejor Caso (Piso)</h4>
+                            <div class="escenario-content">
+                                <p>Si el dólar está en <span id="tcPisoEscenario">$0</span></p>
+                                <div class="escenario-values">
+                                    <div>🏠 Total operación — ARS: <span id="totalPisoARS">$0</span> | USD: <span id="totalPisoUSD">$0</span></div>
+                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoPisoARS">$0</span> | USD: <span id="prestamoPisoUSD">$0</span></div>
+                                    <div>💸 Ponés vos — ARS: <span id="diferenciaPisoARS">$0</span> | USD: <span id="diferenciaPisoUSD">$0</span></div>
                             </div>
-                            <div class="currency-item">
-                                <span class="currency-label">USD</span>
-                                <span class="currency-value" id="primeraCuotaUSD">$0</span>
                             </div>
                         </div>
-                        <small>Al inicio del crédito</small>
+                        <div class="escenario-card">
+                            <h4>🏦 Caso Base (Oficial)</h4>
+                            <div class="escenario-content">
+                                <p>Si el dólar está en <span id="tcOficialEscenario">$0</span></p>
+                                <div class="escenario-values">
+                                    <div>🏠 Total operación — ARS: <span id="totalOficialARS">$0</span> | USD: <span id="totalOficialUSD">$0</span></div>
+                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoOficialARS">$0</span> | USD: <span id="prestamoOficialUSD">$0</span></div>
+                                    <div>💸 Ponés vos — ARS: <span id="diferenciaOficialARS">$0</span> | USD: <span id="diferenciaOficialUSD">$0</span></div>
                     </div>
-                    
-                    <div class="result-card secondary">
-                        <h3>Costo Total de la Operación 
-                            <span class="tooltip" title="Valor de la propiedad + gastos de escritura, inmobiliaria, firmas y sellos">ℹ️</span>
-                        </h3>
-                        <div class="dual-currency-display">
-                            <div class="currency-item">
-                                <span class="currency-label">ARS</span>
-                                <span class="currency-value" id="totalPagar">$0</span>
-                            </div>
-                            <div class="currency-item">
-                                <span class="currency-label">USD</span>
-                                <span class="currency-value" id="totalPagarUSD">$0</span>
                             </div>
                         </div>
-                        <small>Casa + Gastos de Escritura</small>
+                        <div class="escenario-card">
+                            <h4>📈 Peor Caso (Techo)</h4>
+                            <div class="escenario-content">
+                                <p>Si el dólar está en <span id="tcTechoEscenario">$0</span></p>
+                                <div class="escenario-values">
+                                    <div>🏠 Total operación — ARS: <span id="totalTechoARS">$0</span> | USD: <span id="totalTechoUSD">$0</span></div>
+                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoTechoARS">$0</span> | USD: <span id="prestamoTechoUSD">$0</span></div>
+                                    <div>💸 Ponés vos — ARS: <span id="diferenciaTechoARS">$0</span> | USD: <span id="diferenciaTechoUSD">$0</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Ejemplo práctico dinámico - CORE de la aplicación -->
+            <!-- Ejemplo práctico simplificado - ahora secundario -->
             <section class="practical-example-section" id="ejemploPractico" style="display: none;">
-                <h2>📝 Ejemplo Práctico con Tus Valores</h2>
-                <p class="section-description">Este es el desglose completo de cuánto dinero necesitás ahorrar para comprar tu casa con el crédito UVA:</p>
+                <h2>📝 Resumen Ejecutivo</h2>
+                <p class="section-description">Resumen de cuánto dinero necesitás ahorrar para estar cubierto en cualquier escenario:</p>
                 
                 <div class="example-content">
                     <div class="example-summary">
-                        <p><strong>Situación:</strong> Querés comprar una casa de <span id="ejemploValorCasa">USD 0</span> con un crédito de <span id="ejemploPrestamo">$0</span></p>
+                        <p><strong>Situación:</strong> Casa de <span id="ejemploValorCasa">USD 0</span> con crédito de <span id="ejemploPrestamo">$0</span></p>
                     </div>
                     
                     <div class="example-breakdown">
-                        <div class="example-item">
-                            <span class="example-label">🏠 Valor de la casa (dólar a <span id="ejemploDolarTecho">$0</span>)</span>
-                            <span class="example-value" id="ejemploValorCasaPesos">$0</span>
-                        </div>
-                        <div class="example-item">
-                            <span class="example-label">🏦 Lo que te presta el banco</span>
-                            <span class="example-value" id="ejemploPrestamoBanco">$0</span>
-                        </div>
-                        <div class="example-item highlight">
-                            <span class="example-label">💰 Lo que tenés que poner vos</span>
-                            <span class="example-value" id="ejemploDiferencia">$0</span>
-                        </div>
-                        
-                        <!-- Desglose detallado de gastos -->
-                        <div class="example-gastos-breakdown">
-                            <h5>📋 Desglose de Gastos:</h5>
-                            <div class="gasto-ejemplo-item">
-                                <span class="gasto-ejemplo-label">📄 Escritura:</span>
-                                <span class="gasto-ejemplo-value" id="ejemploGastoEscritura">$0</span>
-                            </div>
-                            <div class="gasto-ejemplo-item">
-                                <span class="gasto-ejemplo-label">🏪 Inmobiliaria:</span>
-                                <span class="gasto-ejemplo-value" id="ejemploGastoInmobiliaria">$0</span>
-                            </div>
-                            <div class="gasto-ejemplo-item">
-                                <span class="gasto-ejemplo-label">✍️ Firmas:</span>
-                                <span class="gasto-ejemplo-value" id="ejemploGastoFirmas">$0</span>
-                            </div>
-                            <div class="gasto-ejemplo-item">
-                                <span class="gasto-ejemplo-label">🏷️ Sellos:</span>
-                                <span class="gasto-ejemplo-value" id="ejemploGastoSellos">$0</span>
-                            </div>
-                            <div class="gasto-ejemplo-total">
-                                <span class="gasto-ejemplo-label"><strong>Total Gastos:</strong></span>
-                                <span class="gasto-ejemplo-value"><strong id="ejemploGastosTotal">$0</strong></span>
-                            </div>
-                        </div>
-                        
                         <div class="example-item">
                             <span class="example-label">🛡️ Margen de seguridad (20%)</span>
                             <span class="example-value" id="ejemploMargen">$0</span>
@@ -337,14 +414,13 @@
                             <span class="example-value" id="ejemploReserva">$0</span>
                         </div>
                         <div class="example-total">
-                            <span class="example-label"><strong>🎯 Total que necesitás ahorrar</strong></span>
+                            <span class="example-label"><strong>🎯 Total recomendado para ahorrar</strong></span>
                             <span class="example-value"><strong id="ejemploTotal">$0</strong></span>
                         </div>
                     </div>
                     
                     <div class="example-note">
-                        <p>💡 Con esta plata podés comprar la casa sin sustos, usando el dólar más alto posible (techo de banda)</p>
-                        <p>🚨 <strong>Importante:</strong> Este cálculo usa el peor escenario posible para que estés preparado para cualquier situación</p>
+                        <p>💡 Este cálculo incluye un colchón del 20% y reserva para 6 cuotas, cubriendo el peor escenario posible</p>
                     </div>
                 </div>
             </section>
