@@ -2437,8 +2437,28 @@ footer {
 
 .escenario-table tr.delta-row td { border-top: 1px dashed rgba(148,163,184,0.3); }
 .escenario-table tr.delta-row .concept-cell { color:#cbd5e1; }
-.escenario-table tr.delta-row .col-valores.positivo .ars, .escenario-summary.positivo { color:#34d399; }
-.escenario-table tr.delta-row .col-valores.negativo .ars, .escenario-summary.negativo { color:#f87171; }
+/* Colores intuitivos para diferencia vs oficial */
+.escenario-table tr.delta-row .col-valores.mejor .currency-line.ars, 
+.escenario-table tr.delta-row .col-valores.mejor .currency-line.usd, 
+.escenario-summary.mejor { color:#22c55e !important; } /* Verde: necesitás menos (mejor) */
+
+.escenario-table tr.delta-row .col-valores.peor .currency-line.ars, 
+.escenario-table tr.delta-row .col-valores.peor .currency-line.usd, 
+.escenario-summary.peor { color:#ef4444 !important; } /* Rojo: necesitás más (peor) */
+
+.escenario-table tr.delta-row .col-valores.igual .currency-line.ars, 
+.escenario-table tr.delta-row .col-valores.igual .currency-line.usd, 
+.escenario-summary.igual { color:#f59e0b !important; } /* Dorado: igual al oficial */
+
+/* Colores para tarjetas completas según qué tan bueno es el escenario */
+.escenario-card.mejor .col-valores .currency-line.ars { color:#22c55e !important; } /* Verde: mejor escenario */
+.escenario-card.mejor .col-valores .currency-line.usd { color:#16a34a !important; }
+
+.escenario-card.base .col-valores .currency-line.ars { color:#f59e0b !important; } /* Dorado: escenario base */
+.escenario-card.base .col-valores .currency-line.usd { color:#d97706 !important; }
+
+.escenario-card.peor .col-valores .currency-line.ars { color:#ef4444 !important; } /* Rojo: peor escenario */
+.escenario-card.peor .col-valores .currency-line.usd { color:#dc2626 !important; }
 
 .escenario-summary { margin-top:8px; color:#94a3b8; font-size:0.9rem; text-align:right; }
 
