@@ -20,8 +20,8 @@ const CONFIG = {
     tiposCambio: {
         oficial: 1301,     // Dólar oficial (se actualiza automáticamente)
         simulador: 1301,   // Dólar del simulador (controlado por el slider)
-        peorCaso: 1400,    // Dólar alto (techo de banda) - FIJO
-        mejorCaso: 1200    // Dólar bajo (piso de banda) - FIJO
+        techo: 1400,       // Dólar alto (techo de banda) - BASE (abril 2025)
+        piso: 1000         // Dólar bajo (piso de banda) - BASE (abril 2025)
     },
     
     // Factor UVA mensual (aproximado)
@@ -177,10 +177,12 @@ async function obtenerCotizacionOficial() {
 function aplicarCotizacion(valor, fuente) {
     CONFIG.tiposCambio.oficial = valor;
     CONFIG.tiposCambio.simulador = valor;
-    CONFIG.tiposCambio.peorCaso = Math.round(valor * 1.15); // 15% más
-    CONFIG.tiposCambio.mejorCaso = Math.round(valor * 0.95); // 5% menos
-    
-    console.log(`Cotización obtenida de ${fuente}: $${valor}`);
+            // Mantener los valores fijos de las bandas cambiarias
+        // CONFIG.tiposCambio.techo = 1400 (techo fijo)
+        // CONFIG.tiposCambio.piso = 1000 (piso fijo)
+        
+        console.log(`Cotización obtenida de ${fuente}: $${valor}`);
+        console.log(`Bandas fijas: Piso $${CONFIG.tiposCambio.piso}, Techo $${CONFIG.tiposCambio.techo}`);
 }
 
 // Sistema de cache en localStorage
@@ -555,6 +557,12 @@ function mostrarGuiaCompletar(datos) {
 function limpiarResultados() {
     elementos.primeraCuota.textContent = '$0';
     document.getElementById('primeraCuotaUSD').textContent = '$0';
+    
+    // Ocultar ejemplo práctico
+    const ejemploContainer = document.getElementById('ejemploPractico');
+    if (ejemploContainer) {
+        ejemploContainer.style.display = 'none';
+    }
     
     elementos.totalPagar.textContent = '$0';
     document.getElementById('totalPagarUSD').textContent = '$0';
@@ -1026,12 +1034,12 @@ function configurarSliderTC() {
                 case 'oficial':
                     nuevoValor = CONFIG.tiposCambio.oficial;
                     break;
-                case 'piso':
-                    nuevoValor = CONFIG.tiposCambio.mejorCaso;
-                    break;
-                case 'techo':
-                    nuevoValor = CONFIG.tiposCambio.peorCaso;
-                    break;
+                            case 'piso':
+                nuevoValor = calcularPisoBandaCambiaria().piso;
+                break;
+            case 'techo':
+                nuevoValor = CONFIG.tiposCambio.techo;
+                break;
                 default:
                     nuevoValor = CONFIG.tiposCambio.oficial;
             }
@@ -1054,6 +1062,12 @@ function configurarSliderTC() {
     
     // Actualizar valores de las bandas en la interfaz
     actualizarBandasEnInterfaz();
+    
+    // Log para verificar que las bandas se mantengan fijas
+    console.log('Bandas cambiarias configuradas:');
+    console.log(`- Piso (mejor caso): $${CONFIG.tiposCambio.mejorCaso}`);
+    console.log(`- Techo (peor caso): $${CONFIG.tiposCambio.peorCaso}`);
+    console.log(`- Ancho de banda: $${CONFIG.tiposCambio.peorCaso - CONFIG.tiposCambio.mejorCaso}`);
 }
 
 // Configurar campos de gastos (ahora inputs numéricos)
@@ -1127,8 +1141,9 @@ function mostrarTipsDinamicos(resultados) {
     tipCuota.innerHTML = `
         <span class="tip-icon">💡</span>
         <div class="tip-content">
-            <strong>Ingreso recomendado:</strong> Para esta cuota de ${formatearPesos(cuota)}, 
-            tu ingreso mensual debería ser al menos ${formatearPesos(ingresoRecomendado)} (25% de tus ingresos)
+            <strong>¿Podés pagar esta cuota?</strong> Para una cuota de ${formatearPesos(cuota)}, 
+            necesitás ganar al menos ${formatearPesos(ingresoRecomendado)} por mes en tu familia. 
+            <br><small>💡 Esto es porque tu cuota no debería ser más del 25% de lo que ganás</small>
         </div>
     `;
     tipsContainer.appendChild(tipCuota);
@@ -1139,7 +1154,8 @@ function mostrarTipsDinamicos(resultados) {
     }
     
     // 2. Ancho de banda cambiaria
-    const anchoBanda = CONFIG.tiposCambio.peorCaso - CONFIG.tiposCambio.mejorCaso;
+    const bandasInfo = calcularBandasCambiarias();
+    const anchoBanda = bandasInfo.techo - bandasInfo.piso;
     const porcentajeAncho = ((anchoBanda / CONFIG.tiposCambio.oficial) * 100).toFixed(1);
     
     const tipBanda = document.createElement('div');
@@ -1147,8 +1163,10 @@ function mostrarTipsDinamicos(resultados) {
     tipBanda.innerHTML = `
         <span class="tip-icon">📊</span>
         <div class="tip-content">
-            <strong>Ancho de banda cambiaria:</strong> Entre ${formatearPesos(CONFIG.tiposCambio.mejorCaso)} y ${formatearPesos(CONFIG.tiposCambio.peorCaso)} 
-            (diferencia: ${formatearPesos(anchoBanda)} - ${porcentajeAncho}% de variación)
+            <strong>El dólar puede variar cuando firmés:</strong> El gobierno fija una banda donde el dólar puede moverse 
+            entre ${formatearPesos(bandasInfo.piso)} y ${formatearPesos(bandasInfo.techo)}. 
+            <br><small>📈 Esto significa que podría subir hasta ${formatearPesos(anchoBanda)} más (${porcentajeAncho}% de diferencia)</small>
+            <br><small>📅 Ambas bandas se ajustan mensualmente (base: ${bandasInfo.fechaBase})</small>
         </div>
     `;
     tipsContainer.appendChild(tipBanda);
@@ -1156,25 +1174,27 @@ function mostrarTipsDinamicos(resultados) {
     // 3. Colchón de seguridad en el peor escenario
     const datos = obtenerDatosEntrada();
     if (validarDatos(datos)) {
-        const valorPropiedadPeorCaso = datos.valorPropiedad * CONFIG.tiposCambio.peorCaso;
-        const diferenciaACubrirPeorCaso = valorPropiedadPeorCaso - datos.montoPrestamo;
-        const gastosPeorCaso = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
-        const totalNecesarioPeorCaso = diferenciaACubrirPeorCaso + gastosPeorCaso;
+        const bandasInfo = calcularBandasCambiarias();
+        const valorPropiedadTecho = datos.valorPropiedad * bandasInfo.techo;
+        const diferenciaACubrirTecho = valorPropiedadTecho - datos.montoPrestamo;
+        const gastosTecho = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+        const totalNecesarioTecho = diferenciaACubrirTecho + gastosTecho;
         
-        const tipColchonPeorCaso = document.createElement('div');
-        tipColchonPeorCaso.className = 'tip-card danger';
-        tipColchonPeorCaso.innerHTML = `
+        const tipColchonTecho = document.createElement('div');
+        tipColchonTecho.className = 'tip-card danger';
+        tipColchonTecho.innerHTML = `
             <span class="tip-icon">🚨</span>
             <div class="tip-content">
-                <strong>Colchón en el peor escenario:</strong> Con el dólar a ${formatearPesos(CONFIG.tiposCambio.peorCaso)}, 
-                necesitarías ${formatearPesos(totalNecesarioPeorCaso)} (incluye gastos máximos)
+                <strong>En el peor de los casos:</strong> Si el dólar sube a ${formatearPesos(bandasInfo.techo)} cuando firmés, 
+                vas a necesitar ${formatearPesos(totalNecesarioTecho)} en total.
+                <br><small>⚠️ Esto incluye la casa, todos los gastos extras y el máximo que podrían costar</small>
             </div>
         `;
-        tipsContainer.appendChild(tipColchonPeorCaso);
+        tipsContainer.appendChild(tipColchonTecho);
         
         // 4. Margen de seguridad recomendado (20% extra sobre lo necesario)
-        const margenSeguridad = totalNecesarioPeorCaso * 0.20;
-        const totalConMargen = totalNecesarioPeorCaso + margenSeguridad;
+        const margenSeguridad = totalNecesarioTecho * 0.20;
+        const totalConMargen = totalNecesarioTecho + margenSeguridad;
         const margenSeguridadUSD = margenSeguridad / CONFIG.tiposCambio.oficial;
         const totalConMargenUSD = totalConMargen / CONFIG.tiposCambio.oficial;
         
@@ -1183,9 +1203,9 @@ function mostrarTipsDinamicos(resultados) {
         tipMargenSeguridad.innerHTML = `
             <span class="tip-icon">🛡️</span>
             <div class="tip-content">
-                <strong>Margen de seguridad recomendado:</strong> Agregá 20% extra = ${formatearPesos(margenSeguridad)} 
-                (${formatearUSD(margenSeguridadUSD)}). 
-                Total con margen: ${formatearPesos(totalConMargen)} (${formatearUSD(totalConMargenUSD)})
+                <strong>Agregá un colchón extra:</strong> Siempre tenés que sumar 20% más por las dudas. 
+                Son ${formatearPesos(margenSeguridad)} extra (USD ${formatearUSD(margenSeguridadUSD)}). 
+                <br><small>🎯 Total recomendado para estar tranquilo: ${formatearPesos(totalConMargen)}</small>
             </div>
         `;
         tipsContainer.appendChild(tipMargenSeguridad);
@@ -1203,10 +1223,12 @@ function mostrarTipsDinamicos(resultados) {
         tipAhorroTotal.innerHTML = `
             <span class="tip-icon">💎</span>
             <div class="tip-content">
-                <strong>💰 Ahorro total sugerido:</strong> Deberías tener ${formatearPesos(ahorroTotalSugerido)} 
-                (${formatearUSD(ahorroTotalSugeridoUSD)}) que incluye:
-                <br>• Dinero para la compra con margen: ${formatearPesos(totalConMargen)} (${formatearUSD(totalConMargenUSD)})
-                <br>• Reserva de emergencia (6 meses): ${formatearPesos(colchonAhorroExtra)} (${formatearUSD(colchonAhorroExtraUSD)})
+                <strong>💰 Cuánto necesitás ahorrar en total:</strong> Te recomendamos tener ${formatearPesos(ahorroTotalSugerido)} 
+                (USD ${formatearUSD(ahorroTotalSugeridoUSD)}) dividido así:
+                <br><br>
+                <span class="breakdown-line">🏠 Para comprar la casa (con margen): ${formatearPesos(totalConMargen)}</span>
+                <br><span class="breakdown-line">🚨 Reserva de emergencia (6 cuotas): ${formatearPesos(colchonAhorroExtra)}</span>
+                <br><br><small>✅ Con esta plata vas a estar cubierto para cualquier situación</small>
             </div>
         `;
         tipsContainer.appendChild(tipAhorroTotal);
@@ -1216,11 +1238,14 @@ function mostrarTipsDinamicos(resultados) {
             window.calculadoraAnalytics.trackTipsViewed('tips_completos', `Tips generados para cuota: ${formatearPesos(cuota)}`);
         }
     }
+    
+    // Generar ejemplo práctico dinámico
+    generarEjemploPractico(datos, resultados);
 }
 
 // Nueva función para calcular gastos extra en el peor escenario
 function calcularGastosExtraEnPeorEscenario(valorPropiedadUSD) {
-    const valorPesosPeorCaso = valorPropiedadUSD * CONFIG.tiposCambio.peorCaso;
+    const valorPesosPeorCaso = valorPropiedadUSD * calcularBandasCambiarias().techo;
     const provincia = elementos.provincia.value;
     const gastos = CONFIG.gastosExtra[provincia];
     
@@ -1328,10 +1353,10 @@ function actualizarEstadoSugerencias() {
                 valorComparar = CONFIG.tiposCambio.oficial;
                 break;
             case 'piso':
-                valorComparar = CONFIG.tiposCambio.mejorCaso;
+                valorComparar = calcularPisoBandaCambiaria().piso;
                 break;
             case 'techo':
-                valorComparar = CONFIG.tiposCambio.peorCaso;
+                valorComparar = calcularBandasCambiarias().techo;
                 break;
         }
         
@@ -1353,35 +1378,123 @@ function actualizarBandasEnInterfaz() {
         bandasCalculadas: document.getElementById('bandasCalculadas')
     };
     
+    // Calcular ambas bandas dinámicamente
+    const bandasInfo = calcularBandasCambiarias();
+    
     if (elementos.oficial) {
         elementos.oficial.textContent = formatearPesos(CONFIG.tiposCambio.oficial);
     }
     
     if (elementos.piso) {
-        elementos.piso.textContent = formatearPesos(CONFIG.tiposCambio.mejorCaso);
+        elementos.piso.textContent = formatearPesos(bandasInfo.piso);
     }
     
     if (elementos.techo) {
-        elementos.techo.textContent = formatearPesos(CONFIG.tiposCambio.peorCaso);
+        elementos.techo.textContent = formatearPesos(bandasInfo.techo);
     }
     
     // Calcular información dinámica para mostrar al usuario
     if (elementos.bandasCalculadas) {
-        const bandasInfo = calcularBandasDinamicas();
-        const fechaActual = new Date().toLocaleDateString('es-AR');
-        
         if (bandasInfo.mesesTranscurridos > 0) {
-            elementos.bandasCalculadas.textContent = `Calculadas para ${fechaActual} (${bandasInfo.mesesTranscurridos.toFixed(1)} meses desde abr/25)`;
+            elementos.bandasCalculadas.textContent = `Bandas calculadas para ${bandasInfo.fechaActual} (${bandasInfo.mesesTranscurridos} meses desde ${bandasInfo.fechaBase})`;
         } else {
-            elementos.bandasCalculadas.textContent = `Calculadas automáticamente para ${fechaActual}`;
+            elementos.bandasCalculadas.textContent = `Bandas base de ${bandasInfo.fechaBase} (sin ajustes mensuales)`;
         }
+    }
+    
+    // Log para verificar que las bandas se mantengan fijas
+    console.log('Bandas cambiarias configuradas:');
+    console.log(`- Piso: $${bandasInfo.piso} (base: $${CONFIG.tiposCambio.piso})`);
+    console.log(`- Techo: $${bandasInfo.techo} (base: $${CONFIG.tiposCambio.techo})`);
+    console.log(`- Ancho de banda: $${bandasInfo.techo - bandasInfo.piso}`);
+    console.log(`- Meses transcurridos: ${bandasInfo.mesesTranscurridos}`);
+}
+
+// Función para calcular las bandas cambiarias (piso baja 1%, techo sube 1% por mes desde abril 2025)
+function calcularBandasCambiarias() {
+    const fechaBase = new Date('2025-04-01'); // Abril 2025
+    const fechaActual = new Date();
+    
+    // Calcular meses transcurridos desde abril 2025
+    const mesesTranscurridos = (fechaActual.getFullYear() - fechaBase.getFullYear()) * 12 + 
+                               (fechaActual.getMonth() - fechaBase.getMonth());
+    
+    // El piso baja 1% por mes
+    const factorReduccionPiso = Math.pow(0.99, Math.max(0, mesesTranscurridos));
+    const pisoCalculado = Math.round(CONFIG.tiposCambio.piso * factorReduccionPiso);
+    
+    // El techo sube 1% por mes
+    const factorIncrementoTecho = Math.pow(1.01, Math.max(0, mesesTranscurridos));
+    const techoCalculado = Math.round(CONFIG.tiposCambio.techo * factorIncrementoTecho);
+    
+    return {
+        piso: pisoCalculado,
+        techo: techoCalculado,
+        mesesTranscurridos: Math.max(0, mesesTranscurridos),
+        fechaBase: fechaBase.toLocaleDateString('es-AR'),
+        fechaActual: fechaActual.toLocaleDateString('es-AR')
+    };
+}
+
+// Función legacy para mantener compatibilidad
+function calcularPisoBandaCambiaria() {
+    const bandas = calcularBandasCambiarias();
+    return {
+        piso: bandas.piso,
+        mesesTranscurridos: bandas.mesesTranscurridos,
+        fechaBase: bandas.fechaBase,
+        fechaActual: bandas.fechaActual
+    };
+}
+
+// Función para generar ejemplo práctico dinámico
+function generarEjemploPractico(datos, resultados) {
+    const ejemploContainer = document.getElementById('ejemploPractico');
+    if (!ejemploContainer) return;
+    
+    // Solo mostrar si tenemos datos válidos
+    if (!validarDatos(datos)) {
+        ejemploContainer.style.display = 'none';
+        return;
+    }
+    
+    // Usar el dólar del techo de la banda (peor escenario)
+    const dolarTecho = calcularBandasCambiarias().techo;
+    
+    // Calcular valores del ejemplo
+    const valorCasaPesos = datos.valorPropiedad * dolarTecho;
+    const diferenciaACubrir = valorCasaPesos - datos.montoPrestamo;
+    const gastosMaximos = calcularGastosExtraEnPeorEscenario(datos.valorPropiedad);
+    const margenSeguridad = (diferenciaACubrir + gastosMaximos) * 0.20;
+    const reservaEmergencia = resultados.primeraCuota * 6;
+    const totalNecesario = diferenciaACubrir + gastosMaximos + margenSeguridad + reservaEmergencia;
+    
+    // Actualizar valores en el HTML
+    document.getElementById('ejemploValorCasa').textContent = `USD ${formatearNumero(datos.valorPropiedad)}`;
+    document.getElementById('ejemploPrestamo').textContent = formatearPesos(datos.montoPrestamo);
+    document.getElementById('ejemploDolarTecho').textContent = formatearPesos(dolarTecho);
+    document.getElementById('ejemploValorCasaPesos').textContent = formatearPesos(valorCasaPesos);
+    document.getElementById('ejemploPrestamoBanco').textContent = formatearPesos(datos.montoPrestamo);
+    document.getElementById('ejemploDiferencia').textContent = formatearPesos(diferenciaACubrir);
+    document.getElementById('ejemploGastosMaximos').textContent = formatearPesos(gastosMaximos);
+    document.getElementById('ejemploMargen').textContent = formatearPesos(margenSeguridad);
+    document.getElementById('ejemploReserva').textContent = formatearPesos(reservaEmergencia);
+    document.getElementById('ejemploTotal').textContent = formatearPesos(totalNecesario);
+    
+    // Mostrar el ejemplo
+    ejemploContainer.style.display = 'block';
+    
+    // Analytics: Rastrear generación de ejemplo práctico
+    if (window.calculadoraAnalytics) {
+        window.calculadoraAnalytics.trackTipsViewed('ejemplo_practico', `Ejemplo generado para casa USD ${datos.valorPropiedad}`);
     }
 }
 
 // Función para validar el tipo de cambio contra las bandas cambiarias
 function validarTipoCambioConBandas(valorTC) {
-    const piso = CONFIG.tiposCambio.mejorCaso;
-    const techo = CONFIG.tiposCambio.peorCaso;
+    const bandasInfo = calcularBandasCambiarias();
+    const piso = bandasInfo.piso;
+    const techo = bandasInfo.techo;
     const oficial = CONFIG.tiposCambio.oficial;
     
     // Limpiar consejos previos sobre bandas
