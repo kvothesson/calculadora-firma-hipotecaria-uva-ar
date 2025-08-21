@@ -701,14 +701,16 @@ section h2 {
     text-align: center;
     min-width: 140px;
     padding: 8px;
+    gap: 4px;
 }
 
 .currency-label {
-    font-size: 0.9rem;
-    color: #94a3b8;
-    font-weight: 500;
-    margin-bottom: 8px;
+    font-size: 1.1rem;
+    color: #10b981;
+    font-weight: 700;
+    margin-bottom: 2px;
     text-align: center;
+    letter-spacing: 0.5px;
 }
 
 .currency-value {
@@ -771,6 +773,16 @@ section h2 {
     align-items: flex-end;
     text-align: right;
     min-width: 100px;
+    gap: 2px;
+}
+
+.currency-label-small {
+    font-size: 0.8rem;
+    color: #10b981;
+    font-weight: 600;
+    margin-bottom: 2px;
+    text-align: right;
+    letter-spacing: 0.3px;
 }
 
 .currency-value-inline {
@@ -863,6 +875,14 @@ section h2 {
     font-size: 0.75rem;
     font-weight: 500;
     color: #94a3b8;
+}
+
+.amount-usd::before {
+    content: "USD ";
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #10b981;
+    margin-right: 2px;
 }
 
 /* Responsive para desglose compacto */
