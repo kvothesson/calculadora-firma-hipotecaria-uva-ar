@@ -817,78 +817,66 @@ section h2 {
     }
 }
 
-/* Estilos para el desglose del simulador */
-.breakdown-container {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 8px;
+/* Desglose compacto y consistente */
+.scenario-breakdown {
+    margin-top: 16px;
     padding: 12px;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 8px;
 }
 
-.breakdown-title {
-    display: block;
-    font-weight: 600;
-    color: #60a5fa;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-}
-
-.breakdown-items {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.breakdown-item {
+.breakdown-item-compact {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
-    color: #e2e8f0;
-}
-
-.breakdown-item span:first-child {
-    color: #94a3b8;
-}
-
-.breakdown-item span:last-child {
-    font-weight: 600;
-    color: #60a5fa;
-}
-
-/* Estilos para breakdown con dual currency */
-.breakdown-item-dual {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: #e2e8f0;
-    margin-bottom: 8px;
-}
-
-.breakdown-label {
-    color: #94a3b8;
-    flex: 1;
-}
-
-.breakdown-values {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-    gap: 2px;
-}
-
-.breakdown-values span {
-    font-weight: 600;
-    color: #60a5fa;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
     font-size: 0.9rem;
 }
 
-.breakdown-values small {
+.breakdown-item-compact:last-child {
+    border-bottom: none;
+}
+
+.breakdown-label-compact {
+    color: #94a3b8;
+    font-weight: 500;
+    flex: 1;
+}
+
+.breakdown-amount-compact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 100px;
+}
+
+.amount-pesos {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.amount-usd {
+    font-size: 0.75rem;
     font-weight: 500;
     color: #94a3b8;
-    font-size: 0.75rem;
+}
+
+/* Responsive para desglose compacto */
+@media (max-width: 640px) {
+    .breakdown-item-compact {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    
+    .breakdown-amount-compact {
+        align-items: flex-start;
+        width: 100%;
+    }
 }
 
 /* Consejos */
