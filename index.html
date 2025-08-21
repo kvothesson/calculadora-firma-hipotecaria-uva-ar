@@ -356,38 +356,153 @@
                 <!-- Escenarios de tipo de cambio -->
                 <div class="escenarios-tc">
                     <h3>💱 Escenarios según Tipo de Cambio al día de la firma</h3>
+                    <p class="section-helper">El día de la firma se usa el dólar oficial del momento. Si sube, recibís menos USD y ponés más; si baja, recibís más. Calculá con el techo para estar cubierto.</p>
                     <div class="escenarios-grid">
-                        <div class="escenario-card">
+                        <div class="escenario-card mejor">
                             <h4>📉 Mejor Caso (Piso)</h4>
                             <div class="escenario-content">
-                                <p>Si el dólar está en <span id="tcPisoEscenario">$0</span></p>
-                                <div class="escenario-values">
-                                    <div>🏠 Total operación — ARS: <span id="totalPisoARS">$0</span> | USD: <span id="totalPisoUSD">$0</span></div>
-                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoPisoARS">$0</span> | USD: <span id="prestamoPisoUSD">$0</span></div>
-                                    <div>💸 Ponés vos — ARS: <span id="diferenciaPisoARS">$0</span> | USD: <span id="diferenciaPisoUSD">$0</span></div>
-                            </div>
+                                <div class="tc-badge"><span class="badge-title">Dólar</span> <span id="tcPisoEscenario">$0</span></div>
+                                <table class="escenario-table">
+                                    <colgroup>
+                                        <col class="col-concept" />
+                                        <col class="col-valores" />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th class="col-monedas">Valores</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="concept-cell">🏠 Total operación</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="totalPisoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="totalPisoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">🏦 Te presta el banco</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="prestamoPisoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="prestamoPisoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">💸 Ponés vos</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="diferenciaPisoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="diferenciaPisoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr class="delta-row">
+                                            <td class="concept-cell">↔ Diferencia vs. Oficial</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="deltaPisoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="deltaPisoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="escenario-summary" id="resumenPiso"></div>
                             </div>
                         </div>
-                        <div class="escenario-card">
+                        <div class="escenario-card base">
                             <h4>🏦 Caso Base (Oficial)</h4>
                             <div class="escenario-content">
-                                <p>Si el dólar está en <span id="tcOficialEscenario">$0</span></p>
-                                <div class="escenario-values">
-                                    <div>🏠 Total operación — ARS: <span id="totalOficialARS">$0</span> | USD: <span id="totalOficialUSD">$0</span></div>
-                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoOficialARS">$0</span> | USD: <span id="prestamoOficialUSD">$0</span></div>
-                                    <div>💸 Ponés vos — ARS: <span id="diferenciaOficialARS">$0</span> | USD: <span id="diferenciaOficialUSD">$0</span></div>
-                    </div>
+                                <div class="tc-badge"><span class="badge-title">Dólar</span> <span id="tcOficialEscenario">$0</span></div>
+                                <table class="escenario-table">
+                                    <colgroup>
+                                        <col class="col-concept" />
+                                        <col class="col-valores" />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th class="col-monedas">Valores</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="concept-cell">🏠 Total operación</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="totalOficialARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="totalOficialUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">🏦 Te presta el banco</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="prestamoOficialARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="prestamoOficialUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">💸 Ponés vos</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="diferenciaOficialARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="diferenciaOficialUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr class="delta-row">
+                                            <td class="concept-cell">↔ Diferencia vs. Oficial</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="deltaOficialARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="deltaOficialUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="escenario-summary" id="resumenOficial"></div>
                             </div>
                         </div>
-                        <div class="escenario-card">
+                        <div class="escenario-card peor">
                             <h4>📈 Peor Caso (Techo)</h4>
                             <div class="escenario-content">
-                                <p>Si el dólar está en <span id="tcTechoEscenario">$0</span></p>
-                                <div class="escenario-values">
-                                    <div>🏠 Total operación — ARS: <span id="totalTechoARS">$0</span> | USD: <span id="totalTechoUSD">$0</span></div>
-                                    <div>🏦 Te presta el banco — ARS: <span id="prestamoTechoARS">$0</span> | USD: <span id="prestamoTechoUSD">$0</span></div>
-                                    <div>💸 Ponés vos — ARS: <span id="diferenciaTechoARS">$0</span> | USD: <span id="diferenciaTechoUSD">$0</span></div>
-                                </div>
+                                <div class="tc-badge"><span class="badge-title">Dólar</span> <span id="tcTechoEscenario">$0</span></div>
+                                <table class="escenario-table">
+                                    <colgroup>
+                                        <col class="col-concept" />
+                                        <col class="col-valores" />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th class="col-monedas">Valores</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="concept-cell">🏠 Total operación</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="totalTechoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="totalTechoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">🏦 Te presta el banco</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="prestamoTechoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="prestamoTechoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="concept-cell">💸 Ponés vos</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="diferenciaTechoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="diferenciaTechoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr class="delta-row">
+                                            <td class="concept-cell">↔ Diferencia vs. Oficial</td>
+                                            <td class="col-valores">
+                                                <div class="currency-line ars">ARS: <span id="deltaTechoARS">$0</span></div>
+                                                <div class="currency-line usd">USD: <span id="deltaTechoUSD">$0</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="escenario-summary" id="resumenTecho"></div>
                             </div>
                         </div>
                     </div>
