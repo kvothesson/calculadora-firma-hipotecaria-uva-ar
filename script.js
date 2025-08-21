@@ -1034,16 +1034,17 @@ function configurarSliderTC() {
                 case 'oficial':
                     nuevoValor = CONFIG.tiposCambio.oficial;
                     break;
-                            case 'piso':
-                nuevoValor = calcularPisoBandaCambiaria().piso;
-                break;
-            case 'techo':
-                nuevoValor = CONFIG.tiposCambio.techo;
-                break;
+                case 'piso':
+                    nuevoValor = calcularPisoBandaCambiaria().piso;
+                    break;
+                case 'techo':
+                    nuevoValor = calcularBandasCambiarias().techo;
+                    break;
                 default:
                     nuevoValor = CONFIG.tiposCambio.oficial;
             }
             
+            // Actualizar el input y el simulador
             tcInput.value = nuevoValor;
             CONFIG.tiposCambio.simulador = nuevoValor;
             
@@ -1052,6 +1053,7 @@ function configurarSliderTC() {
                 window.calculadoraAnalytics.trackCurrencyScenario(nuevoValor, `suggestion_${tipo}`);
             }
             
+            // Mostrar el impacto de este tipo de cambio
             mostrarImpactoSimulador();
             actualizarEstadoSugerencias();
             
@@ -1065,9 +1067,9 @@ function configurarSliderTC() {
     
     // Log para verificar que las bandas se mantengan fijas
     console.log('Bandas cambiarias configuradas:');
-    console.log(`- Piso (mejor caso): $${CONFIG.tiposCambio.mejorCaso}`);
-    console.log(`- Techo (peor caso): $${CONFIG.tiposCambio.peorCaso}`);
-    console.log(`- Ancho de banda: $${CONFIG.tiposCambio.peorCaso - CONFIG.tiposCambio.mejorCaso}`);
+    console.log(`- Piso (mejor caso): $${calcularPisoBandaCambiaria().piso}`);
+    console.log(`- Techo (peor caso): $${calcularBandasCambiarias().techo}`);
+    console.log(`- Ancho de banda: $${calcularBandasCambiarias().techo - calcularPisoBandaCambiaria().piso}`);
 }
 
 // Configurar campos de gastos (ahora inputs numéricos)
@@ -1406,8 +1408,7 @@ function actualizarBandasEnInterfaz() {
     const elementos = {
         oficial: document.getElementById('tcOficial'),
         piso: document.getElementById('tcPiso'),
-        techo: document.getElementById('tcTecho'),
-        bandasCalculadas: document.getElementById('bandasCalculadas')
+        techo: document.getElementById('tcTecho')
     };
     
     // Calcular ambas bandas dinámicamente
@@ -1423,15 +1424,6 @@ function actualizarBandasEnInterfaz() {
     
     if (elementos.techo) {
         elementos.techo.textContent = formatearPesos(bandasInfo.techo);
-    }
-    
-    // Calcular información dinámica para mostrar al usuario
-    if (elementos.bandasCalculadas) {
-        if (bandasInfo.mesesTranscurridos > 0) {
-            elementos.bandasCalculadas.textContent = `Bandas calculadas para ${bandasInfo.fechaActual} (${bandasInfo.mesesTranscurridos} meses desde ${bandasInfo.fechaBase})`;
-        } else {
-            elementos.bandasCalculadas.textContent = `Bandas base de ${bandasInfo.fechaBase} (sin ajustes mensuales)`;
-        }
     }
     
     // Log para verificar que las bandas se mantengan fijas

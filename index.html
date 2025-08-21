@@ -166,6 +166,27 @@
                     </div>
                 </div>
 
+                <!-- Tipo de cambio al día de la firma (mejorado) -->
+                <div class="form-group">
+                    <label for="tcInput">💱 Tipo de cambio al día de la firma</label>
+                    <div class="tc-input-container">
+                        <div class="tc-input-group">
+                            <div class="tc-input-wrapper">
+                                <span class="currency-prefix">$</span>
+                                <input type="number" id="tcInput" min="800" max="2000" value="1225" step="1" class="tc-input">
+                            </div>
+                            <div class="tc-suggestions">
+                                <button type="button" class="tc-suggestion" data-tc="piso">📉 Piso</button>
+                                <button type="button" class="tc-suggestion" data-tc="oficial">🏦 Oficial</button>
+                                <button type="button" class="tc-suggestion" data-tc="techo">📈 Techo</button>
+                            </div>
+                        </div>
+                        <div class="tc-banda-info-compact">
+                            <small>💡 Bandas: <span id="tcPiso">$1,000</span> | <span id="tcOficial">$1,225</span> | <span id="tcTecho">$1,450</span></small>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sección de gastos integrada en el formulario principal -->
                 <div class="gastos-form-section">
                     <h3>🏠 Gastos de Escritura e Inmobiliaria</h3>
@@ -291,104 +312,6 @@
                             </div>
                         </div>
                         <small>Casa + Gastos de Escritura</small>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sección de escenarios -->
-            <section class="scenarios-section">
-                <h2>💱 Simulador al Día de la Firma</h2>
-                <p class="section-description">El tipo de cambio se fija el día que firmás la escritura. Simulá cuánto dinero necesitarás y cuántos dólares podrás comprar:</p>
-                
-                <div class="tc-input-container">
-                    <label for="tcInput">Tipo de cambio al día de la firma</label>
-                    <div class="tc-input-group">
-                        <div class="tc-input-wrapper">
-                            <span class="currency-prefix">$</span>
-                            <input type="number" id="tcInput" min="800" max="2000" value="1225" step="1" class="tc-input">
-                        </div>
-                        <div class="tc-suggestions">
-                            <button type="button" class="tc-suggestion" data-tc="oficial">Oficial</button>
-                            <button type="button" class="tc-suggestion" data-tc="piso">Piso</button>
-                            <button type="button" class="tc-suggestion" data-tc="techo">Techo</button>
-                        </div>
-                    </div>
-                    <div class="tc-banda-info">
-                        <div class="banda-item">
-                            <span class="banda-label">🏦 Oficial:</span>
-                            <span class="banda-value" id="tcOficial">$1,225</span>
-                        </div>
-                        <div class="banda-item">
-                            <span class="banda-label">📉 Piso:</span>
-                            <span class="banda-value" id="tcPiso">$1,000</span>
-                        </div>
-                        <div class="banda-item">
-                            <span class="banda-label">📈 Techo:</span>
-                            <span class="banda-value" id="tcTecho">$1,450</span>
-                        </div>
-                    </div>
-                    <div class="tc-info">
-                        <small>💡 Bandas cambiarias del BCRA (se ajustan mensualmente ~1%)</small>
-                        <small id="bandasCalculadas" class="bandas-calculadas">Calculadas automáticamente para la fecha actual</small>
-                    </div>
-                </div>
-                
-                <div class="scenario-result">
-                    <div class="scenario-grid">
-                        <div class="scenario-card bank">
-                            <h3>🏦 Lo que te da el Banco</h3>
-                            <div class="scenario-details">
-                                <div class="dual-currency-display">
-                                    <div class="currency-item">
-                                        <span class="currency-label">ARS</span>
-                                        <span class="currency-value" id="prestamoSimuladorPesos">$0</span>
-                                    </div>
-                                    <div class="currency-item">
-                                        <span class="currency-label">USD</span>
-                                        <span class="currency-value" id="prestamoSimuladorUSD">$0</span>
-                                    </div>
-                                </div>
-                                <small class="scenario-note">Préstamo convertido al tipo de cambio del día de la firma</small>
-                            </div>
-                        </div>
-                        
-                        <div class="scenario-card personal">
-                            <h3>💰 Lo que tienes que Poner</h3>
-                            <div class="scenario-details">
-                                <div class="dual-currency-display">
-                                    <div class="currency-item">
-                                        <span class="currency-label">ARS</span>
-                                        <span class="currency-value" id="diferenciaSimulador">$0</span>
-                                    </div>
-                                    <div class="currency-item">
-                                        <span class="currency-label">USD</span>
-                                        <span class="currency-value" id="diferenciaSimuladorUSD">$0</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Desglose compacto y consistente -->
-                                <div class="scenario-breakdown">
-                                    <div class="breakdown-item-compact">
-                                        <span class="breakdown-label-compact">Diferencia propiedad:</span>
-                                        <div class="breakdown-amount-compact">
-                                            <span class="amount-pesos" id="diferenciaPropiedad">$0</span>
-                                            <span class="amount-usd" id="diferenciaPropiedadUSD">$0</span>
-                                        </div>
-                                    </div>
-                                    <div class="breakdown-item-compact">
-                                        <span class="breakdown-label-compact">Gastos escritura:</span>
-                                        <div class="breakdown-amount-compact">
-                                            <span class="amount-pesos" id="gastosSimulador">$0</span>
-                                            <span class="amount-usd" id="gastosSimuladorUSD">$0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <small class="scenario-note">
-                                    Con el dólar a $<span id="tcSimuladorTexto">1225</span> el día de la firma
-                                </small>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
