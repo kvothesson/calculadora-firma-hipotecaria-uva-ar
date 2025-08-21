@@ -165,8 +165,56 @@
                         <span>11%</span>
                     </div>
                 </div>
-                
 
+                <!-- Sección de gastos integrada en el formulario principal -->
+                <div class="gastos-form-section">
+                    <h3>🏠 Gastos de Escritura e Inmobiliaria</h3>
+                    <div class="gastos-form-grid">
+                        <div class="gasto-form-item">
+                            <label for="escrituraSlider">📄 Escritura</label>
+                            <div class="gasto-input-group">
+                                <div class="percentage-input">
+                                    <input type="number" id="escrituraSlider" min="0" max="10" value="2.25" step="0.25" class="percentage-field">
+                                    <span class="percentage-symbol">%</span>
+                                </div>
+                                <small class="gasto-reference">(ref: 2.0-2.5%)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="gasto-form-item">
+                            <label for="inmobiliariaSlider">🏪 Inmobiliaria</label>
+                            <div class="gasto-input-group">
+                                <div class="percentage-input">
+                                    <input type="number" id="inmobiliariaSlider" min="0" max="10" value="3.0" step="0.25" class="percentage-field">
+                                    <span class="percentage-symbol">%</span>
+                                </div>
+                                <small class="gasto-reference">(ref: 2.5-3.5%)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="gasto-form-item">
+                            <label for="firmasSlider">✍️ Firmas</label>
+                            <div class="gasto-input-group">
+                                <div class="percentage-input">
+                                    <input type="number" id="firmasSlider" min="0" max="10" value="0.75" step="0.25" class="percentage-field">
+                                    <span class="percentage-symbol">%</span>
+                                </div>
+                                <small class="gasto-reference">(ref: 0.5-1.0%)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="gasto-form-item">
+                            <label for="sellosSlider">🏷️ Sellos</label>
+                            <div class="gasto-input-group">
+                                <div class="percentage-input">
+                                    <input type="number" id="sellosSlider" min="0" max="10" value="1.25" step="0.25" class="percentage-field">
+                                    <span class="percentage-symbol">%</span>
+                                </div>
+                                <small class="gasto-reference">(ref: 1.0-1.5%)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Sección de resultados -->
@@ -192,59 +240,27 @@
                     </div>
                     
                     <div class="result-card secondary">
-                        <h3>Gastos de Escritura e Inmobiliaria en la Compra 
-                            <span class="tooltip" title="Desglose detallado de todos los gastos al comprar">ℹ️</span>
-                        </h3>
-                        <div class="gastos-detalle">
-                            <div class="gasto-item">
-                                <div class="gasto-header">
-                                    <span>Escritura: <small class="porcentaje">(ref: 2.0-2.5%)</small></span>
+                        <h3>💰 Total Gastos de Escritura e Inmobiliaria</h3>
+                        <div class="gastos-summary">
+                            <div class="gastos-breakdown">
+                                <div class="gasto-summary-item">
+                                    <span>📄 Escritura:</span>
                                     <span id="gastoEscritura">$0</span>
                                 </div>
-                                <div class="gasto-control">
-                                    <div class="percentage-input">
-                                        <input type="number" id="escrituraSlider" min="0" max="10" value="2.25" step="0.25" class="percentage-field">
-                                        <span class="percentage-symbol">%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gasto-item">
-                                <div class="gasto-header">
-                                    <span>Inmobiliaria: <small class="porcentaje">(ref: 2.5-3.5%)</small></span>
+                                <div class="gasto-summary-item">
+                                    <span>🏪 Inmobiliaria:</span>
                                     <span id="gastoInmobiliaria">$0</span>
                                 </div>
-                                <div class="gasto-control">
-                                    <div class="percentage-input">
-                                        <input type="number" id="inmobiliariaSlider" min="0" max="10" value="3.0" step="0.25" class="percentage-field">
-                                        <span class="percentage-symbol">%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gasto-item">
-                                <div class="gasto-header">
-                                    <span>Firmas: <small class="porcentaje">(ref: 0.5-1.0%)</small></span>
+                                <div class="gasto-summary-item">
+                                    <span>✍️ Firmas:</span>
                                     <span id="gastoFirmas">$0</span>
                                 </div>
-                                <div class="gasto-control">
-                                    <div class="percentage-input">
-                                        <input type="number" id="firmasSlider" min="0" max="10" value="0.75" step="0.25" class="percentage-field">
-                                        <span class="percentage-symbol">%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="gasto-item">
-                                <div class="gasto-header">
-                                    <span>Sellos: <small class="porcentaje">(ref: 1.0-1.5%)</small></span>
+                                <div class="gasto-summary-item">
+                                    <span>🏷️ Sellos:</span>
                                     <span id="gastoSellos">$0</span>
                                 </div>
-                                <div class="gasto-control">
-                                    <div class="percentage-input">
-                                        <input type="number" id="sellosSlider" min="0" max="10" value="1.25" step="0.25" class="percentage-field">
-                                        <span class="percentage-symbol">%</span>
-                                    </div>
-                                </div>
                             </div>
-                            <div class="gasto-item total">
+                            <div class="gastos-total">
                                 <span><strong>Total Gastos:</strong></span>
                                 <div class="gasto-valores dual-currency">
                                     <div class="currency-item-inline">
