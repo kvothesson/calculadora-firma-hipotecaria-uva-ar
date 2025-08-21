@@ -735,7 +735,12 @@ function mostrarResultados(resultados) {
 // Nueva función para mostrar el impacto del simulador
 function mostrarImpactoSimulador() {
     const datos = obtenerDatosEntrada();
-    if (!validarDatos(datos)) return;
+    if (!validarDatos(datos)) {
+        console.log('mostrarImpactoSimulador: datos no válidos', datos);
+        return;
+    }
+    
+    console.log('mostrarImpactoSimulador ejecutándose con TC:', CONFIG.tiposCambio.simulador);
     
     // Calcular valor de la propiedad con el tipo de cambio del simulador
     const valorPropiedadConSimulador = datos.valorPropiedad * CONFIG.tiposCambio.simulador;
@@ -763,11 +768,17 @@ function mostrarImpactoSimulador() {
     // Mostrar lo que tienes que poner
     if (elementos.diferenciaSimulador) {
         elementos.diferenciaSimulador.textContent = formatearPesos(diferenciaACubrir);
+        console.log('Actualizado diferenciaSimulador:', formatearPesos(diferenciaACubrir));
+    } else {
+        console.log('ERROR: elemento diferenciaSimulador no encontrado');
     }
     
     if (elementos.diferenciaSimuladorUSD) {
         const diferenciaUSD = diferenciaACubrir / CONFIG.tiposCambio.simulador;
         elementos.diferenciaSimuladorUSD.textContent = `$${formatearNumero(diferenciaUSD)} USD`;
+        console.log('Actualizado diferenciaSimuladorUSD:', `$${formatearNumero(diferenciaUSD)} USD`);
+    } else {
+        console.log('ERROR: elemento diferenciaSimuladorUSD no encontrado');
     }
     
     if (elementos.tcSimuladorTexto) {
@@ -900,37 +911,49 @@ function configurarSliderTC() {
         
         // Evento para cambios manuales
         tcInput.addEventListener('input', function() {
-            const nuevoTC = parseInt(this.value) || CONFIG.tiposCambio.oficial;
+            // Permitir que el usuario escriba cualquier valor mientras tipea
+            const valorTexto = this.value;
+            const nuevoTC = parseInt(valorTexto);
             
-            // Validar rango básico
-            if (nuevoTC < 800) this.value = 800;
-            if (nuevoTC > 2000) this.value = 2000;
-            
-            // Analytics: Rastrear cambio en simulador de tipo de cambio
-            if (window.calculadoraAnalytics) {
-                window.calculadoraAnalytics.trackCurrencyScenario(nuevoTC, 'manual');
+            // Solo procesar si es un número válido
+            if (!isNaN(nuevoTC) && nuevoTC > 0) {
+                // Analytics: Rastrear cambio en simulador de tipo de cambio
+                if (window.calculadoraAnalytics) {
+                    window.calculadoraAnalytics.trackCurrencyScenario(nuevoTC, 'manual');
+                }
+                
+                // Solo actualizar el simulador, no el oficial
+                CONFIG.tiposCambio.simulador = nuevoTC;
+                
+                // Mostrar el impacto de este tipo de cambio
+                mostrarImpactoSimulador();
+                
+                // Actualizar estado visual de sugerencias
+                actualizarEstadoSugerencias();
+                
+                // Validar y mostrar consejos sobre bandas cambiarias
+                validarTipoCambioConBandas(nuevoTC);
             }
-            
-            // Solo actualizar el simulador, no el oficial
-            CONFIG.tiposCambio.simulador = parseInt(this.value);
-            
-            // Mostrar el impacto de este tipo de cambio
-            mostrarImpactoSimulador();
-            
-            // Actualizar estado visual de sugerencias
-            actualizarEstadoSugerencias();
-            
-            // Validar y mostrar consejos sobre bandas cambiarias
-            validarTipoCambioConBandas(nuevoTC);
         });
         
-        // Evento para cambios finales (blur)
+        // Evento para cambios finales (blur) - validación de rango
         tcInput.addEventListener('blur', function() {
-            const valor = parseInt(this.value) || CONFIG.tiposCambio.oficial;
-            if (valor !== parseInt(this.value)) {
+            let valor = parseInt(this.value) || CONFIG.tiposCambio.oficial;
+            
+            // Validar rango solo cuando termine de escribir
+            if (valor < 800) {
+                valor = 800;
                 this.value = valor;
+            } else if (valor > 2000) {
+                valor = 2000;
+                this.value = valor;
+            }
+            
+            // Actualizar si cambió el valor
+            if (valor !== CONFIG.tiposCambio.simulador) {
                 CONFIG.tiposCambio.simulador = valor;
                 mostrarImpactoSimulador();
+                actualizarEstadoSugerencias();
             }
         });
     }
@@ -1235,6 +1258,9 @@ function actualizarEstadoSugerencias() {
     
     const valorActual = parseInt(tcInput.value);
     
+    // Solo actualizar si tenemos un valor válido
+    if (isNaN(valorActual)) return;
+    
     tcSuggestions.forEach(btn => {
         const tipo = btn.dataset.tc;
         let valorComparar;
@@ -1251,7 +1277,7 @@ function actualizarEstadoSugerencias() {
                 break;
         }
         
-        // Marcar activo si coincide con el valor actual
+        // Marcar activo si coincide con el valor actual (tolerancia de ±5)
         if (Math.abs(valorActual - valorComparar) <= 5) {
             btn.classList.add('active');
         } else {
