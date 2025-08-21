@@ -18,8 +18,8 @@ const CONFIG = {
     
     // Tipos de cambio para escenarios (se actualizarán con la cotización oficial)
     tiposCambio: {
-        oficial: 1225,     // Dólar oficial (se actualiza automáticamente)
-        simulador: 1225,   // Dólar del simulador (controlado por el slider)
+        oficial: 1301,     // Dólar oficial (se actualiza automáticamente)
+        simulador: 1301,   // Dólar del simulador (controlado por el slider)
         peorCaso: 1400,    // Dólar alto (techo de banda) - FIJO
         mejorCaso: 1200    // Dólar bajo (piso de banda) - FIJO
     },
@@ -109,36 +109,51 @@ async function obtenerCotizacionOficial() {
             return;
         }
 
-        // Intentar API del BCRA (oficial)
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const bcraUrl = `https://api.bcra.gob.ar/estadisticascambiarias/v1.0/Cotizaciones/USD?fechaDesde=${today}&fechaHasta=${today}`;
+        // Intentar API del BCRA (oficial) - buscar en los últimos 7 días
+        const today = new Date();
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const fechaHasta = today.toISOString().split('T')[0];
+        const fechaDesde = weekAgo.toISOString().split('T')[0];
+        const bcraUrl = `https://api.bcra.gob.ar/estadisticascambiarias/v1.0/Cotizaciones/USD?fechaDesde=${fechaDesde}&fechaHasta=${fechaHasta}`;
         
         try {
             const bcraResponse = await fetch(bcraUrl);
             const bcraData = await bcraResponse.json();
             
-            if (bcraData && bcraData.results && bcraData.results[0] && bcraData.results[0].detalle && bcraData.results[0].detalle[0]) {
-                const cotizacionBCRA = bcraData.results[0].detalle[0].tipoCotizacion;
-                if (cotizacionBCRA && cotizacionBCRA > 0) {
-                    aplicarCotizacion(cotizacionBCRA, 'BCRA');
-                    guardarCotizacionEnCache(cotizacionBCRA, 'BCRA');
-                    actualizarCotizacionEnInterfaz('BCRA', today);
-                    return;
+            if (bcraData && bcraData.results && bcraData.results.length > 0) {
+                // Tomar el último valor disponible (más reciente)
+                const ultimoResultado = bcraData.results[0];
+                if (ultimoResultado.detalle && ultimoResultado.detalle[0]) {
+                    const cotizacionBCRA = ultimoResultado.detalle[0].tipoCotizacion;
+                    const fechaCotizacion = ultimoResultado.fecha;
+                    
+                    if (cotizacionBCRA && cotizacionBCRA > 0) {
+                        aplicarCotizacion(cotizacionBCRA, 'BCRA');
+                        guardarCotizacionEnCache(cotizacionBCRA, 'BCRA');
+                        actualizarCotizacionEnInterfaz('BCRA', fechaCotizacion);
+                        console.log(`Cotización BCRA obtenida: $${cotizacionBCRA} (fecha: ${fechaCotizacion})`);
+                        return;
+                    }
                 }
             }
         } catch (bcraError) {
             console.log('API del BCRA no disponible, intentando con API alternativa:', bcraError.message);
         }
 
-        // Fallback: API alternativa
-        const response = await fetch('https://api-dolar-argentina.herokuapp.com/api/dolares/oficial');
-        const data = await response.json();
-        
-        if (data && data.venta) {
-            aplicarCotizacion(parseFloat(data.venta), 'API alternativa');
-            guardarCotizacionEnCache(parseFloat(data.venta), 'API alternativa');
-            actualizarCotizacionEnInterfaz('API alternativa', today);
-            return;
+        // Fallback: API alternativa (DolarApi.com)
+        try {
+            const response = await fetch('https://dolarapi.com/v1/dolares/oficial');
+            const data = await response.json();
+            
+            if (data && data.venta) {
+                aplicarCotizacion(parseFloat(data.venta), 'API alternativa');
+                guardarCotizacionEnCache(parseFloat(data.venta), 'API alternativa');
+                actualizarCotizacionEnInterfaz('API alternativa', fechaHasta);
+                console.log(`Cotización alternativa obtenida: $${data.venta}`);
+                return;
+            }
+        } catch (altError) {
+            console.log('API alternativa también falló:', altError.message);
         }
 
         // Si todo falla, usar valores por defecto
@@ -152,8 +167,8 @@ async function obtenerCotizacionOficial() {
             window.calculadoraAnalytics.trackError('api_cotizacion', error.message, 'obtenerCotizacionOficial');
         }
         
-        // Si falla, usar valores por defecto
-        aplicarCotizacion(1225, 'Valor por defecto');
+        // Si falla, usar valores por defecto actualizados
+        aplicarCotizacion(1301, 'Valor por defecto');
         actualizarCotizacionEnInterfaz('Valor por defecto', new Date().toISOString().split('T')[0]);
     }
 }
