@@ -1,374 +1,223 @@
-// Google Analytics 4 - Configuración separada de la presentación
-// Este archivo contiene toda la lógica de analytics sin afectar la UI
+// Google Analytics 4 - Configuración avanzada para calculadora UVA
+// Tracking de eventos y conversiones para medir el uso real de la herramienta
 
-class CalculadoraAnalytics {
-    constructor() {
-        this.isEnabled = true;
-        this.events = {
-            CALCULATION_PERFORMED: 'calculation_performed',
-            SLIDER_CHANGED: 'slider_changed',
-            CURRENCY_SCENARIO: 'currency_scenario_viewed',
-            TIPS_VIEWED: 'tips_viewed',
-            PROVINCE_CHANGED: 'province_changed',
-            ERROR_OCCURRED: 'error_occurred',
-            SESSION_DURATION: 'session_duration'
-        };
-        
-        this.init();
-    }
+// Configuración de eventos personalizados
+const ANALYTICS_EVENTS = {
+    // Eventos de uso de la calculadora
+    CALCULATOR_LOADED: 'calculator_loaded',
+    CALCULATION_STARTED: 'calculation_started',
+    CALCULATION_COMPLETED: 'calculation_completed',
+    CALCULATION_ERROR: 'calculation_error',
+    
+    // Eventos de interacción con gastos
+    GASTOS_UPDATED: 'gastos_updated',
+    PROVINCIA_CHANGED: 'provincia_changed',
+    
+    // Eventos de escenarios
+    ESCENARIO_VIEWED: 'escenario_viewed',
+    ESCENARIO_COMPARED: 'escenario_compared',
+    
+    // Eventos de contenido educativo
+    UVA_EDUCATION_VIEWED: 'uva_education_viewed',
+    FAQ_OPENED: 'faq_opened',
+    
+    // Eventos de conversión (cada simulación = 1 conversión)
+    SIMULATION_CONVERSION: 'simulation_conversion'
+};
 
-    init() {
-        // Verificar que gtag esté disponible
-        if (typeof gtag === 'undefined') {
-            console.warn('Google Analytics no está disponible');
-            this.isEnabled = false;
-            return;
-        }
-
-        // Configurar opciones de privacidad
-        this.configurePrivacy();
-        
-        // Configurar eventos personalizados
-        this.setupCustomEvents();
-        
-        // Rastrear duración de sesión
-        this.trackSessionDuration();
-        
-        console.log('Analytics inicializado correctamente');
-    }
-
-    configurePrivacy() {
-        if (!this.isEnabled) return;
-
-        // Configurar opciones de privacidad de GA4
-        gtag('config', 'G-FHHDM0RFWY', {
-            // Anonimizar IP automáticamente (GA4 lo hace por defecto)
-            'anonymize_ip': true,
-            
-            // Respetar Do Not Track
-            'allow_google_signals': !navigator.doNotTrack,
-            
-            // Configuración de cookies
-            'cookie_flags': 'SameSite=None;Secure',
-            'cookie_expires': 63072000, // 2 años
-            
-            // Configuración de datos
-            'allow_ad_personalization_signals': false,
-            'restricted_data_processing': navigator.doNotTrack === '1'
-        });
-    }
-
-    // Rastrear cálculo realizado
-    trackCalculation(data) {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.CALCULATION_PERFORMED, {
-            'event_category': 'Calculadora',
-            'event_label': 'Calculo_Completo',
-            'property_value_usd': data.valorPropiedad || 0,
-            'loan_amount_ars': data.montoPrestamo || 0,
-            'loan_term_years': data.plazo || 0,
-            'interest_rate': data.tasaInteres || 0,
-            'province': data.provincia || 'unknown',
-            'first_payment_ars': data.primeraCuota || 0,
-            'total_expenses_ars': data.gastosExtra || 0,
-            'custom_parameter_1': 'hipoteca_uva'
-        });
-    }
-
-    // Rastrear cambios en sliders
-    trackSliderChange(sliderType, value, previousValue = null) {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.SLIDER_CHANGED, {
-            'event_category': 'Interaccion',
-            'event_label': `Slider_${sliderType}`,
-            'slider_type': sliderType,
-            'new_value': value,
-            'previous_value': previousValue,
-            'value_change': previousValue ? (value - previousValue) : 0
-        });
-    }
-
-    // Rastrear cambios en inputs de gastos personalizables
-    trackGastoInputChange(gastoType, percentage, provincia) {
-        if (!this.isEnabled) return;
-
-        gtag('event', 'gasto_input_changed', {
-            'event_category': 'Gastos_Personalizables',
-            'event_label': `Gasto_${gastoType}`,
-            'gasto_type': gastoType,
-            'percentage_value': percentage,
-            'provincia': provincia,
-            'is_custom_percentage': true
-        });
-    }
-
-    // Rastrear simulación de tipo de cambio
-    trackCurrencyScenario(exchangeRate, scenarioType = 'manual') {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.CURRENCY_SCENARIO, {
-            'event_category': 'Simulador',
-            'event_label': 'Escenario_Cambio',
-            'exchange_rate': exchangeRate,
-            'scenario_type': scenarioType,
-            'rate_difference_pct': this.calculateRateDifference(exchangeRate)
-        });
-    }
-
-    // Rastrear múltiples escenarios de tipo de cambio (función requerida por script.js)
-    trackCurrencyScenarios(scenarios) {
-        if (!this.isEnabled) return;
-
-        gtag('event', 'currency_scenarios_viewed', {
-            'event_category': 'Simulador',
-            'event_label': 'Escenarios_Multiples',
-            'piso_rate': scenarios.piso,
-            'oficial_rate': scenarios.oficial,
-            'techo_rate': scenarios.techo,
-            'diferencia_piso_oficial': scenarios.diferencia_piso_oficial,
-            'diferencia_techo_oficial': scenarios.diferencia_techo_oficial
-        });
-    }
-
-    // Rastrear visualización de consejos
-    trackTipsViewed(tipType, tipContent = '') {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.TIPS_VIEWED, {
-            'event_category': 'Contenido',
-            'event_label': 'Tips_Visualizados',
-            'tip_type': tipType,
-            'tip_category': this.categorizeTip(tipContent),
-            'content_length': tipContent.length,
-            'timestamp': new Date().toISOString()
-        });
-    }
-
-    // Rastrear cuando el usuario interactúa con consejos dinámicos
-    trackDynamicTipsGenerated(tipCount, cuotaAmount, userContext = {}) {
-        if (!this.isEnabled) return;
-
-        gtag('event', 'dynamic_tips_generated', {
-            'event_category': 'Contenido_Dinamico',
-            'event_label': 'Tips_Generados',
-            'tips_count': tipCount,
-            'cuota_amount_ars': cuotaAmount,
-            'user_provincia': userContext.provincia || 'unknown',
-            'property_value_usd': userContext.valorPropiedad || 0,
-            'loan_amount_ars': userContext.montoPrestamo || 0
-        });
-    }
-
-    // Rastrear visualización/ocultación de secciones importantes
-    trackSectionVisibility(sectionId, isVisible, context = {}) {
-        if (!this.isEnabled) return;
-
-        gtag('event', 'section_visibility_changed', {
-            'event_category': 'Interfaz',
-            'event_label': isVisible ? 'Seccion_Mostrada' : 'Seccion_Oculta',
-            'section_id': sectionId,
-            'is_visible': isVisible,
-            'context_data': JSON.stringify(context)
-        });
-    }
-
-    // Rastrear cambio de provincia
-    trackProvinceChange(province, fromProvince = null) {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.PROVINCE_CHANGED, {
-            'event_category': 'Geografia',
-            'event_label': 'Cambio_Provincia',
-            'new_province': province,
-            'previous_province': fromProvince
-        });
-    }
-
-    // Rastrear errores
-    trackError(errorType, errorMessage, errorContext = '') {
-        if (!this.isEnabled) return;
-
-        gtag('event', this.events.ERROR_OCCURRED, {
-            'event_category': 'Error',
-            'event_label': errorType,
-            'error_message': errorMessage,
-            'error_context': errorContext,
-            'user_agent': navigator.userAgent,
-            'timestamp': new Date().toISOString()
-        });
-    }
-
-    // Rastrear métricas de rendimiento
-    trackPerformance(metric, value, context = '') {
-        if (!this.isEnabled) return;
-
-        gtag('event', 'performance_metric', {
-            'event_category': 'Rendimiento',
-            'event_label': metric,
-            'metric_value': value,
-            'metric_context': context
-        });
-    }
-
-    // Rastrear duración de sesión
-    trackSessionDuration() {
-        if (!this.isEnabled) return;
-
-        this.sessionStart = Date.now();
-        
-        // Enviar duración cada 30 segundos para sesiones activas
-        this.sessionInterval = setInterval(() => {
-            const duration = Math.floor((Date.now() - this.sessionStart) / 1000);
-            
-            gtag('event', this.events.SESSION_DURATION, {
-                'event_category': 'Engagement',
-                'event_label': 'Sesion_Activa',
-                'session_duration_seconds': duration,
-                'engagement_time_msec': duration * 1000
-            });
-        }, 30000);
-
-        // Limpiar intervalo al salir
-        window.addEventListener('beforeunload', () => {
-            if (this.sessionInterval) {
-                clearInterval(this.sessionInterval);
-                
-                const finalDuration = Math.floor((Date.now() - this.sessionStart) / 1000);
-                gtag('event', 'session_end', {
-                    'event_category': 'Engagement',
-                    'final_duration_seconds': finalDuration
-                });
-            }
-        });
-    }
-
-    // Configurar eventos automáticos
-    setupCustomEvents() {
-        if (!this.isEnabled) return;
-
-        // Rastrear scroll profundo
-        let maxScroll = 0;
-        window.addEventListener('scroll', () => {
-            const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-            
-            if (scrollPercent > maxScroll && scrollPercent % 25 === 0) {
-                maxScroll = scrollPercent;
-                gtag('event', 'scroll_depth', {
-                    'event_category': 'Engagement',
-                    'scroll_depth_percent': scrollPercent
-                });
-            }
-        });
-
-        // Rastrear clics en tooltips
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tooltip')) {
-                gtag('event', 'tooltip_click', {
-                    'event_category': 'Interaccion',
-                    'tooltip_content': e.target.getAttribute('title') || 'unknown'
-                });
-            }
-        });
-
-        // Rastrear tiempo en inputs específicos
-        this.trackInputFocus();
-    }
-
-    // Rastrear tiempo de enfoque en inputs importantes
-    trackInputFocus() {
-        const importantInputs = ['valorPropiedad', 'montoPrestamo', 'plazo', 'tasaInteres'];
-        
-        importantInputs.forEach(inputId => {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-
-            let focusTime = null;
-
-            input.addEventListener('focus', () => {
-                focusTime = Date.now();
-            });
-
-            input.addEventListener('blur', () => {
-                if (focusTime) {
-                    const timeSpent = Date.now() - focusTime;
-                    
-                    gtag('event', 'input_time_spent', {
-                        'event_category': 'Interaccion',
-                        'input_field': inputId,
-                        'time_spent_ms': timeSpent
-                    });
-                    
-                    focusTime = null;
-                }
-            });
-        });
-    }
-
-    // Funciones auxiliares
-    calculateRateDifference(currentRate) {
-        // Asumir que CONFIG.tiposCambio.oficial está disponible globalmente
-        if (typeof CONFIG !== 'undefined' && CONFIG.tiposCambio && CONFIG.tiposCambio.oficial) {
-            return ((currentRate - CONFIG.tiposCambio.oficial) / CONFIG.tiposCambio.oficial * 100).toFixed(2);
-        }
-        return 0;
-    }
-
-    categorizeTip(tipContent) {
-        if (tipContent.includes('ingreso') || tipContent.includes('25%')) return 'financial_advice';
-        if (tipContent.includes('cambio') || tipContent.includes('dólar')) return 'currency_advice';
-        if (tipContent.includes('margen') || tipContent.includes('seguridad')) return 'risk_management';
-        if (tipContent.includes('ahorro') || tipContent.includes('reserva')) return 'savings_advice';
-        return 'general';
-    }
-
-    // Método para deshabilitar analytics (respeto a privacidad)
-    disable() {
-        this.isEnabled = false;
-        if (this.sessionInterval) {
-            clearInterval(this.sessionInterval);
-        }
-        console.log('Analytics deshabilitado');
-    }
-
-    // Método para habilitar analytics
-    enable() {
-        this.isEnabled = true;
-        this.init();
-        console.log('Analytics habilitado');
-    }
-
-    // Enviar evento personalizado genérico
-    sendCustomEvent(eventName, parameters = {}) {
-        if (!this.isEnabled) return;
-
+// Función para enviar eventos a GA4
+function trackEvent(eventName, parameters = {}) {
+    if (typeof gtag !== 'undefined') {
         gtag('event', eventName, {
-            'event_category': 'Custom',
-            'timestamp': new Date().toISOString(),
+            event_category: 'Calculadora_UVA',
+            event_label: 'Argentina',
             ...parameters
         });
+        
+        console.log(`Evento GA4 enviado: ${eventName}`, parameters);
     }
 }
 
-// Inicializar analytics cuando el DOM esté listo
-let analytics = null;
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Solo inicializar si gtag está disponible
+// Función para trackear conversiones (cada simulación ejecutada)
+function trackSimulationConversion(simulationData) {
+    const conversionData = {
+        event_category: 'Conversión',
+        event_label: 'Simulación_Completada',
+        value: 1, // Cada simulación = 1 conversión
+        custom_parameters: {
+            valor_propiedad: simulationData.valorPropiedad || 0,
+            monto_prestamo: simulationData.montoPrestamo || 0,
+            plazo: simulationData.plazo || 0,
+            tasa_interes: simulationData.tasaInteres || 0,
+            provincia: simulationData.provincia || 'N/A'
+        }
+    };
+    
+    trackEvent(ANALYTICS_EVENTS.SIMULATION_CONVERSION, conversionData);
+    
+    // También trackear como evento de conversión estándar
     if (typeof gtag !== 'undefined') {
-        analytics = new CalculadoraAnalytics();
-        
-        // Hacer disponible globalmente para uso en otros scripts
-        window.calculadoraAnalytics = analytics;
-        
-        console.log('Sistema de analytics cargado');
-    } else {
-        console.warn('Google Analytics no detectado, analytics deshabilitado');
+        gtag('event', 'conversion', {
+            send_to: 'G-FHHDM0RFWY/calculadora_uva_conversion',
+            value: 1,
+            currency: 'ARS'
+        });
     }
+}
+
+// Función para trackear el inicio de una simulación
+function trackCalculationStarted(formData) {
+    trackEvent(ANALYTICS_EVENTS.CALCULATION_STARTED, {
+        event_category: 'Interacción',
+        event_label: 'Inicio_Simulación',
+        custom_parameters: {
+            valor_propiedad_usd: formData.valorPropiedad || 0,
+            provincia: formData.provincia || 'N/A'
+        }
+    });
+}
+
+// Función para trackear la finalización de una simulación
+function trackCalculationCompleted(results, formData) {
+    trackEvent(ANALYTICS_EVENTS.CALCULATION_COMPLETED, {
+        event_category: 'Resultado',
+        event_label: 'Simulación_Exitosa',
+        custom_parameters: {
+            primera_cuota: results.primeraCuota || 0,
+            total_gastos: results.totalGastos || 0,
+            total_operacion: results.totalOperacion || 0,
+            valor_propiedad_usd: formData.valorPropiedad || 0,
+            monto_prestamo: formData.montoPrestamo || 0
+        }
+    });
+    
+    // Trackear como conversión
+    trackSimulationConversion({
+        valorPropiedad: formData.valorPropiedad,
+        montoPrestamo: formData.montoPrestamo,
+        plazo: formData.plazo,
+        tasaInteres: formData.tasaInteres,
+        provincia: formData.provincia
+    });
+}
+
+// Función para trackear errores de cálculo
+function trackCalculationError(error, formData) {
+    trackEvent(ANALYTICS_EVENTS.CALCULATION_ERROR, {
+        event_category: 'Error',
+        event_label: 'Error_Cálculo',
+        custom_parameters: {
+            error_message: error.message || 'Error desconocido',
+            valor_propiedad: formData.valorPropiedad || 0,
+            provincia: formData.provincia || 'N/A'
+        }
+    });
+}
+
+// Función para trackear cambios en gastos
+function trackGastosUpdated(gastosData) {
+    trackEvent(ANALYTICS_EVENTS.GASTOS_UPDATED, {
+        event_category: 'Configuración',
+        event_label: 'Gastos_Modificados',
+        custom_parameters: {
+            escritura: gastosData.escritura || 0,
+            inmobiliaria: gastosData.inmobiliaria || 0,
+            firmas: gastosData.firmas || 0,
+            sellos: gastosData.sellos || 0
+        }
+    });
+}
+
+// Función para trackear cambios de provincia
+function trackProvinciaChanged(provincia) {
+    trackEvent(ANALYTICS_EVENTS.PROVINCIA_CHANGED, {
+        event_category: 'Configuración',
+        event_label: 'Provincia_Cambiada',
+        custom_parameters: {
+            provincia: provincia || 'N/A'
+        }
+    });
+}
+
+// Función para trackear visualización de escenarios
+function trackEscenarioViewed(escenarioType) {
+    trackEvent(ANALYTICS_EVENTS.ESCENARIO_VIEWED, {
+        event_category: 'Análisis',
+        event_label: `Escenario_${escenarioType}`,
+        custom_parameters: {
+            tipo_escenario: escenarioType || 'N/A'
+        }
+    });
+}
+
+// Función para trackear apertura de FAQ
+function trackFAQOpened(questionIndex) {
+    trackEvent(ANALYTICS_EVENTS.FAQ_OPENED, {
+        event_category: 'Contenido',
+        event_label: 'FAQ_Abierta',
+        custom_parameters: {
+            pregunta_index: questionIndex || 0
+        }
+    });
+}
+
+// Función para trackear visualización de contenido educativo
+function trackUVAEducationViewed() {
+    trackEvent(ANALYTICS_EVENTS.UVA_EDUCATION_VIEWED, {
+        event_category: 'Contenido',
+        event_label: 'Educación_UVA_Vista',
+        custom_parameters: {
+            seccion: 'explicacion_uva'
+        }
+    });
+}
+
+// Inicialización de analytics cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Trackear que la calculadora se cargó
+    trackEvent(ANALYTICS_EVENTS.CALCULATOR_LOADED, {
+        event_category: 'Página',
+        event_label: 'Calculadora_Cargada',
+        custom_parameters: {
+            timestamp: new Date().toISOString(),
+            user_agent: navigator.userAgent
+        }
+    });
+    
+    // Trackear visualización de contenido educativo cuando sea visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.target.classList.contains('uva-education-section')) {
+                trackUVAEducationViewed();
+                observer.unobserve(entry.target); // Solo trackear una vez
+            }
+        });
+    });
+    
+    const uvaSection = document.querySelector('.uva-education-section');
+    if (uvaSection) {
+        observer.observe(uvaSection);
+    }
+    
+    // Trackear apertura de FAQ
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.faq-question')) {
+            const faqItem = e.target.closest('.faq-item');
+            const faqIndex = Array.from(document.querySelectorAll('.faq-item')).indexOf(faqItem);
+            trackFAQOpened(faqIndex);
+        }
+    });
 });
 
-// Exportar para uso en módulos (si se usa)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CalculadoraAnalytics;
-}
+// Exportar funciones para uso en script.js
+window.AnalyticsTracker = {
+    trackCalculationStarted,
+    trackCalculationCompleted,
+    trackCalculationError,
+    trackGastosUpdated,
+    trackProvinciaChanged,
+    trackEscenarioViewed,
+    trackSimulationConversion
+};
+
+console.log('Analytics avanzado cargado para Calculadora UVA');

@@ -61,6 +61,31 @@ header p {
     font-size: 0.9rem;
 }
 
+.actualizado-hoy {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.badge-actualizado {
+    display: inline-block;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
 /* Indicador sutil de estado de validación */
 .validation-status {
     display: flex;
@@ -1083,6 +1108,211 @@ section h2 {
     .example-total .example-value {
         font-size: 1.3rem;
     }
+}
+
+/* Sección educativa sobre UVA */
+.uva-education-section {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.uva-education-content {
+    display: grid;
+    gap: 24px;
+}
+
+.uva-explanation h3,
+.uva-calculation h3,
+.uva-example h3 {
+    color: #60a5fa;
+    margin-bottom: 16px;
+    font-size: 1.3rem;
+}
+
+.uva-explanation p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.uva-benefits h4 {
+    color: #22c55e;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+.uva-benefits ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.uva-benefits li {
+    padding: 8px 0;
+    border-left: 3px solid #22c55e;
+    padding-left: 16px;
+    margin-bottom: 8px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 0 8px 8px 0;
+}
+
+.calculation-steps {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.step-content strong {
+    color: #60a5fa;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.uva-formula {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.formula-box {
+    text-align: center;
+    padding: 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.formula-box strong {
+    color: #60a5fa;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.formula-box p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.example-box {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.example-box p {
+    margin-bottom: 16px;
+}
+
+.example-box ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.example-box li {
+    padding: 8px 0;
+    border-left: 3px solid #60a5fa;
+    padding-left: 16px;
+    margin-bottom: 8px;
+    background: rgba(96, 165, 250, 0.1);
+    border-radius: 0 8px 8px 0;
+}
+
+/* Sección de FAQ */
+.faq-section {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.faq-content {
+    display: grid;
+    gap: 16px;
+}
+
+.faq-item {
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: rgba(59, 130, 246, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.faq-question:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.faq-question h3 {
+    color: #60a5fa;
+    font-size: 1.1rem;
+    margin: 0;
+    flex: 1;
+}
+
+.faq-toggle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #60a5fa;
+    transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    padding: 0 20px 20px;
+    background: rgba(15, 23, 42, 0.6);
+    display: none;
+}
+
+.faq-answer p {
+    margin: 0;
+    line-height: 1.6;
+    color: #e2e8f0;
 }
 
 /* Footer */
@@ -2252,6 +2482,68 @@ footer {
 @media (max-width: 768px) {
     .escenarios-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive para sección educativa UVA */
+@media (max-width: 768px) {
+    .uva-education-section {
+        padding: 16px;
+        margin: 16px 0;
+    }
+    
+    .uva-education-content {
+        gap: 16px;
+    }
+    
+    .calculation-steps {
+        gap: 12px;
+    }
+    
+    .step {
+        padding: 12px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+    
+    .uva-formula,
+    .example-box {
+        padding: 16px;
+    }
+}
+
+/* Responsive para FAQ */
+@media (max-width: 768px) {
+    .faq-section {
+        padding: 16px;
+        margin: 16px 0;
+    }
+    
+    .faq-question {
+        padding: 16px;
+    }
+    
+    .faq-question h3 {
+        font-size: 1rem;
+    }
+    
+    .faq-answer {
+        padding: 0 16px 16px;
+    }
+}
+
+/* Responsive para badge actualizado */
+@media (max-width: 768px) {
+    .badge-actualizado {
+        font-size: 0.7rem;
+        padding: 4px 10px;
     }
 }
 

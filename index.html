@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>Calculadora Hipotecaria UVA Argentina | Simulador de Créditos</title>
-    <meta name="description" content="Calculá tu crédito hipotecario UVA en Argentina. Simulá cuotas, gastos de escritura e inmobiliaria, y compará escenarios con tipo de cambio.">
-    <meta name="keywords" content="calculadora crédito hipotecario UVA, simulador hipotecario Argentina, gastos escritura inmobiliaria Argentina, cuánto me presta el banco hipoteca UVA, primera cuota crédito hipotecario UVA">
+    <title>Calculadora UVA actualizada HOY | Simulador hipotecario Argentina</title>
+    <meta name="description" content="Convierte UVA a pesos y calcula tu crédito hipotecario en segundos. Datos actualizados diariamente. Gratis y sin registro.">
+    <meta name="keywords" content="calculadora uva hoy, calculadora uva, simulador uva, cómo se calcula el uva, conversión uva a pesos, crédito hipotecario uva simulador, valor unidad uva, calculadora crédito hipotecario UVA, simulador hipotecario Argentina, gastos escritura inmobiliaria Argentina">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Calculadora Hipotecaria UVA">
     <meta name="google-site-verification" content="cItOFMZTcyyC4sdhwygGQeFjSo9yMcTZ6Bk_owNlxPc">
@@ -95,14 +95,17 @@
 <body>
     <div class="container">
         <header>
-            <h1>🏠 Calculadora Hipotecaria UVA</h1>
-            <p>Calculá tu crédito hipotecario y todos los gastos asociados</p>
+            <h1>🏠 Calculadora UVA actualizada HOY</h1>
+            <p>Convierte UVA a pesos y calcula tu crédito hipotecario en segundos</p>
             
 
             
             <div class="cotizacion-actual">
                 <span>💱 Dólar Oficial: <strong id="cotizacionActual">$0</strong></span>
                 <small id="fechaCotizacion">Actualizado automáticamente</small>
+                <div class="actualizado-hoy">
+                    <span class="badge-actualizado">🔄 Actualizado HOY</span>
+                </div>
                 
                 <!-- Indicador sutil de estado de validación -->
                 <div id="validation-status" class="validation-status hidden">
@@ -508,6 +511,71 @@
 
 
 
+            <!-- Nueva sección educativa sobre UVA -->
+            <section class="uva-education-section">
+                <h2>📚 ¿Qué es la UVA y cómo se calcula?</h2>
+                <div class="uva-education-content">
+                    <div class="uva-explanation">
+                        <h3>🔍 ¿Qué significa UVA?</h3>
+                        <p>UVA significa <strong>Unidad de Valor Adquisitivo</strong>. Es un índice que ajusta las cuotas de tu crédito hipotecario según la inflación, manteniendo el valor real de tu deuda a lo largo del tiempo.</p>
+                        
+                        <div class="uva-benefits">
+                            <h4>✅ Ventajas del sistema UVA:</h4>
+                            <ul>
+                                <li><strong>Protección contra la inflación:</strong> Tu cuota se ajusta automáticamente</li>
+                                <li><strong>Plazos más largos:</strong> Hasta 35 años para pagar</li>
+                                <li><strong>Tasas más bajas:</strong> Comparado con créditos tradicionales</li>
+                                <li><strong>Cuotas predecibles:</strong> Sabés exactamente cuánto pagarás</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="uva-calculation">
+                        <h3>🧮 ¿Cómo se calcula la cuota UVA?</h3>
+                        <div class="calculation-steps">
+                            <div class="step">
+                                <span class="step-number">1</span>
+                                <div class="step-content">
+                                    <strong>Cuota inicial:</strong> Se calcula con la fórmula de amortización francesa
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-number">2</span>
+                                <div class="step-content">
+                                    <strong>Ajuste mensual:</strong> Se multiplica por el coeficiente UVA del BCRA
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-number">3</span>
+                                <div class="step-content">
+                                    <strong>Resultado:</strong> Tu cuota se actualiza automáticamente cada mes
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="uva-formula">
+                            <h4>📊 Fórmula simplificada:</h4>
+                            <div class="formula-box">
+                                <strong>Cuota UVA = Cuota inicial × Coeficiente UVA mensual</strong>
+                                <p>El coeficiente UVA se publica diariamente en el sitio del Banco Central</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="uva-example">
+                        <h3>💡 Ejemplo práctico:</h3>
+                        <div class="example-box">
+                            <p><strong>Escenario:</strong> Crédito de $70.000.000 a 20 años con tasa 8.5%</p>
+                            <ul>
+                                <li><strong>Primera cuota:</strong> $580.000 (calculada con nuestra herramienta)</li>
+                                <li><strong>Si la inflación es 3%:</strong> La próxima cuota será $597.400</li>
+                                <li><strong>Tu poder adquisitivo:</strong> Se mantiene igual en términos reales</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sección de consejos mejorada -->
             <section class="tips-section">
                 <h2>💡 Guía Completa para Tu Crédito Hipotecario UVA</h2>
@@ -608,6 +676,72 @@
                     </div>
                 </div>
             </section>
+            
+            <!-- Sección de Preguntas Frecuentes -->
+            <section class="faq-section">
+                <h2>❓ Preguntas Frecuentes sobre Créditos UVA</h2>
+                <div class="faq-content">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Cómo calcular la cuota de un crédito hipotecario UVA en Argentina?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Podés usar nuestra calculadora hipotecaria UVA para simular tu cuota inicial, gastos de escritura e inmobiliaria. Ingresá el valor de la propiedad, el monto del préstamo y el plazo. La cuota se calcula usando la fórmula de amortización con ajuste UVA mensual.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Qué gastos extra hay al comprar una propiedad con crédito hipotecario en Argentina?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Además de la cuota, deberás afrontar gastos de escritura (2-2.5%), inmobiliaria (2.5-3.5%), firmas (0.5-1%) y sellos (1-1.5%) del valor de la propiedad. Estos porcentajes varían según la provincia.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Qué pasa con el tipo de cambio el día de la escritura?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>El tipo de cambio se fija al momento de la firma de la escritura. La calculadora incluye un simulador para que estimes cuántos dólares podrás comprar con tu préstamo en pesos según diferentes escenarios cambiarios.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Cuánto me presta el banco para una hipoteca UVA?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Los bancos en Argentina generalmente prestan hasta el 80-90% del valor de la propiedad. La cuota no debe superar el 25% de tus ingresos familiares. Necesitarás demostrar ingresos estables y capacidad de pago.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Qué significa UVA en los créditos hipotecarios?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas según la inflación medida por el COEFICIE del BCRA. Esto significa que tu cuota aumentará mensualmente pero mantendrá su valor real a lo largo del tiempo.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>¿Cuánto dinero necesito ahorrar para comprar con crédito hipotecario UVA?</h3>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Recomendamos tener: 1) El 10-20% del valor de la propiedad que no cubre el préstamo, 2) Gastos extras (6-8% del valor), 3) Margen de seguridad del 20%, 4) Reserva de emergencia equivalente a 6 meses de cuotas.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <footer>
@@ -622,8 +756,11 @@
 
     <!-- Contenido SEO optimizado para motores de búsqueda e IA (oculto visualmente) -->
     <section id="seo-content" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
-        <h2>Cómo funciona la Calculadora Hipotecaria UVA Argentina</h2>
-        <p>La calculadora hipotecaria UVA permite estimar cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Es ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
+        <h2>Calculadora UVA actualizada HOY - Simulador hipotecario Argentina</h2>
+        <p>Nuestra calculadora UVA permite convertir UVA a pesos y calcular tu crédito hipotecario en segundos. Con datos actualizados diariamente, es la herramienta más precisa para simular cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
+        
+        <h3>¿Qué es la UVA y cómo se calcula?</h3>
+        <p>UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas de tu crédito hipotecario según la inflación, manteniendo el valor real de tu deuda. El valor unidad UVA se publica diariamente en el Banco Central. Para calcular la cuota UVA: Cuota inicial × Coeficiente UVA mensual = Cuota ajustada.</p>
         
         <h3>Gastos incluidos en la compra de una propiedad con crédito hipotecario</h3>
         <p>Además de la cuota mensual del préstamo, deberás considerar los siguientes gastos al comprar una propiedad con crédito hipotecario UVA en Argentina:</p>
@@ -638,10 +775,13 @@
         <p>Nuestra calculadora muestra el costo total real de comprar una propiedad: valor de la casa + gastos de escritura, inmobiliaria, firmas y sellos. El sistema UVA (Unidad de Valor Adquisitivo) ajusta las cuotas según la inflación. La primera cuota se calcula en base al monto prestado, la tasa de interés nominal anual y el plazo del crédito.</p>
         
         <h3>Simulador de escenarios con tipo de cambio</h3>
-        <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar.</p>
+        <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar. La conversión UVA a pesos se realiza automáticamente con el tipo de cambio oficial del día.</p>
         
         <h3>Requisitos y recomendaciones para obtener un crédito hipotecario UVA</h3>
         <p>Los bancos en Argentina generalmente requieren que la cuota no supere el 25% de los ingresos familiares. Es recomendable tener un ahorro adicional equivalente a 6 meses de cuotas como reserva de emergencia, además del dinero necesario para cubrir la diferencia entre el préstamo y el valor total de la propiedad más gastos.</p>
+        
+        <h3>Valor unidad UVA y coeficiente de ajuste</h3>
+        <p>El valor unidad UVA se actualiza diariamente y refleja la inflación acumulada. El coeficiente UVA mensual determina cuánto se ajusta tu cuota. Nuestra calculadora UVA incluye este factor para darte estimaciones precisas de cuánto pagarás mes a mes.</h3>
     </section>
 
     <!-- FAQ Schema para motores de IA (Google, ChatGPT, Gemini, Perplexity) -->
