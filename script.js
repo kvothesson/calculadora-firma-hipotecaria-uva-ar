@@ -288,8 +288,8 @@ function agregarEventListeners() {
                 let previousProvincia = elemento.value;
                 elemento.addEventListener('change', function() {
                     // Analytics: Rastrear cambio de provincia
-                    if (window.calculadoraAnalytics) {
-                        window.calculadoraAnalytics.trackProvinceChange(this.value, previousProvincia);
+                    if (window.AnalyticsTracker) {
+                        window.AnalyticsTracker.trackProvinciaChanged(this.value);
                     }
                     previousProvincia = this.value;
                     
@@ -492,6 +492,11 @@ function calcularTodo() {
     // Actualizar indicador global de estado
     VALIDATION_SYSTEM.updateGlobalStatus();
     
+    // Analytics: Trackear inicio de cálculo
+    if (window.AnalyticsTracker) {
+        window.AnalyticsTracker.trackCalculationStarted(datos);
+    }
+    
     // Siempre intentar calcular, incluso con datos incompletos
     if (validarDatos(datos)) {
         const resultados = calcularCredito(datos);
@@ -501,13 +506,9 @@ function calcularTodo() {
         // Validación progresiva y consejos contextuales
         mostrarValidacionProgresiva(datos, resultados);
         
-        // Analytics: Rastrear cálculo completado
-        if (window.calculadoraAnalytics) {
-            window.calculadoraAnalytics.trackCalculation({
-                ...datos,
-                primeraCuota: resultados.primeraCuota,
-                gastosExtra: resultados.gastosExtra.total
-            });
+        // Analytics: Trackear cálculo completado exitosamente
+        if (window.AnalyticsTracker) {
+            window.AnalyticsTracker.trackCalculationCompleted(resultados, datos);
         }
     } else {
         // Limpiar resultados si los datos no son válidos
@@ -1761,4 +1762,29 @@ function actualizarChecklist(datos, resultados) {
     });
 }
 
+// Función para manejar el toggle de las FAQ
+function toggleFAQ(element) {
+    const faqItem = element.closest('.faq-item');
+    const answer = faqItem.querySelector('.faq-answer');
+    const toggle = element.querySelector('.faq-toggle');
+    
+    // Toggle de la respuesta
+    if (answer.style.display === 'block') {
+        answer.style.display = 'none';
+        toggle.textContent = '+';
+        faqItem.classList.remove('active');
+    } else {
+        answer.style.display = 'block';
+        toggle.textContent = '−';
+        faqItem.classList.add('active');
+    }
+}
 
+// Inicializar FAQ al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Ocultar todas las respuestas por defecto
+    const faqAnswers = document.querySelectorAll('.faq-answer');
+    faqAnswers.forEach(answer => {
+        answer.style.display = 'none';
+    });
+});
