@@ -140,12 +140,7 @@
                         </div>
                     </div>
                     
-                    <!-- Indicador de estado de la cuota - Simplificado -->
-                    <div class="cuota-status-indicator" id="cuotaStatusIndicator" style="display: none;">
-                        <div class="status-message" id="statusMessage">
-                            💡 Ingresá tu sueldo para ver la recomendación
-                        </div>
-                    </div>
+                    
                     
                     <small class="form-help sueldo-helper">
                         💡 <strong>Regla del 25%:</strong> Tu cuota no debe superar el 25% de tus ingresos mensuales
@@ -156,14 +151,6 @@
                     <label for="valorPropiedad">Valor de la Propiedad (USD)</label>
                     <input type="number" id="valorPropiedad" placeholder="0" min="0" step="1000" value="0">
                     <small class="form-help">Equivale a <span id="valorPropiedadPesos">$0</span> en pesos</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="provincia">Provincia</label>
-                    <select id="provincia">
-                        <option value="CABA">CABA</option>
-                        <option value="BSAS">Buenos Aires</option>
-                    </select>
                 </div>
 
                 <div class="form-group">
@@ -250,6 +237,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Campo de provincia movido aquí -->
+                <div class="form-group">
+                    <label for="provincia">Provincia</label>
+                    <select id="provincia">
+                        <option value="CABA">CABA</option>
+                        <option value="BSAS">Buenos Aires</option>
+                    </select>
                 </div>
             </section>
 
