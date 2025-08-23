@@ -1128,7 +1128,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
         const prestamoARS = datos.montoPrestamo;
         const prestamoUSD = prestamoARS / tc;
         const diferenciaARS = totalOperacion - prestamoARS;
-        const diferenciaUSD = diferenciaARS / tc;
+        const diferenciaUSD = diferenciaARS / CONFIG.tiposCambio.oficial;
         
         const setText = (id, value) => {
             const el = document.getElementById(id);
@@ -1194,7 +1194,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     // Calcular baseline para deltas
     const baseline = {
         diferenciaARS: totalOficial - datos.montoPrestamo,
-        diferenciaUSD: (totalOficial - datos.montoPrestamo) / tcOficial
+        diferenciaUSD: (totalOficial - datos.montoPrestamo) / CONFIG.tiposCambio.oficial
     };
 
     // Ahora setear Piso con deltas vs oficial
@@ -2321,13 +2321,13 @@ function actualizarEscenarioPiso(valorTotalUSD, resultados) {
     if (diferenciaPisoARS && diferenciaPisoUSD) {
         const diferenciaPisoPesos = (valorTotalUSD * CONFIG.tiposCambio.piso) - resultados.valores.montoPrestamo;
         diferenciaPisoARS.textContent = formatearPesos(diferenciaPisoPesos);
-        diferenciaPisoUSD.textContent = `USD $${(diferenciaPisoPesos / CONFIG.tiposCambio.piso).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+        diferenciaPisoUSD.textContent = `USD $${(diferenciaPisoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
     
     if (deltaPisoARS && deltaPisoUSD) {
         const deltaPisoPesos = (CONFIG.tiposCambio.piso - CONFIG.tiposCambio.oficial) * valorTotalUSD;
         deltaPisoARS.textContent = formatearPesos(deltaPisoPesos);
-        deltaPisoUSD.textContent = `USD $${(deltaPisoPesos / CONFIG.tiposCambio.piso).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+        deltaPisoUSD.textContent = `USD $${(deltaPisoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
 }
 
@@ -2392,12 +2392,12 @@ function actualizarEscenarioTecho(valorTotalUSD, resultados) {
     if (diferenciaTechoARS && diferenciaTechoUSD) {
         const diferenciaTechoPesos = (valorTotalUSD * CONFIG.tiposCambio.techo) - resultados.valores.montoPrestamo;
         diferenciaTechoARS.textContent = formatearPesos(diferenciaTechoPesos);
-        diferenciaTechoUSD.textContent = `USD $${(diferenciaTechoPesos / CONFIG.tiposCambio.techo).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+        diferenciaTechoUSD.textContent = `USD $${(diferenciaTechoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
     
     if (deltaTechoARS && deltaTechoUSD) {
         const deltaTechoPesos = (CONFIG.tiposCambio.techo - CONFIG.tiposCambio.oficial) * valorTotalUSD;
         deltaTechoARS.textContent = formatearPesos(deltaTechoPesos);
-        deltaTechoUSD.textContent = `USD $${(deltaTechoPesos / CONFIG.tiposCambio.techo).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+        deltaTechoUSD.textContent = `USD $${(deltaTechoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
 }
