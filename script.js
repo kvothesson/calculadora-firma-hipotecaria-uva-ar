@@ -63,6 +63,7 @@ const elementos = {
     montoPrestamo: document.getElementById('montoPrestamo'),
     plazo: document.getElementById('plazo'),
     tasaInteres: document.getElementById('tasaInteres'),
+    sueldoMensual: document.getElementById('sueldoMensual'),
     
     // Resultados
     primeraCuota: document.getElementById('primeraCuota'),
@@ -71,7 +72,14 @@ const elementos = {
     // Simulador (solo si existen)
     diferenciaSimulador: document.getElementById('diferenciaSimulador'),
     diferenciaSimuladorUSD: document.getElementById('diferenciaSimuladorUSD'),
-    tcSimuladorTexto: document.getElementById('tcSimuladorTexto')
+    tcSimuladorTexto: document.getElementById('tcSimuladorTexto'),
+    
+    // Nuevo elemento para máxima cuota sugerida
+    maxCuotaSugerida: document.getElementById('maxCuotaSugerida'),
+    cuotaStatusIndicator: document.getElementById('cuotaStatusIndicator'),
+    cuotaSugeridaValor: document.getElementById('cuotaSugeridaValor'),
+    cuotaCalculadaValor: document.getElementById('cuotaCalculadaValor'),
+    statusMessage: document.getElementById('statusMessage')
 };
 
 // Inicialización
@@ -80,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
     obtenerCotizacionOficial().then(() => {
         // Establecer valores por defecto
         establecerValoresPorDefecto();
+        
+        // Actualizar valores equivalentes
+        actualizarValorPropiedadPesos();
+        actualizarMontoPrestamoEquivalente();
         
         // Agregar event listeners
         agregarEventListeners();
@@ -228,90 +240,107 @@ function guardarCotizacionEnCache(valor, fuente) {
     }
 }
 
+// Función para establecer valores por defecto
 function establecerValoresPorDefecto() {
-    // Establecer valores por defecto
-    elementos.valorPropiedad.value = 155000; // USD 155,000
-    elementos.montoPrestamo.value = 70000000; // $70,000,000 ARS
-    elementos.tasaInteres.value = 8.5;
-    elementos.plazo.value = 20;
+    console.log('⚙️ Estableciendo valores por defecto...');
     
-    // Actualizar también los elementos de visualización de los sliders
-    const plazoValor = document.getElementById('plazoValor');
-    const tasaValor = document.getElementById('tasaValor');
+    // Establecer valores por defecto si los campos están vacíos
+    if (!elementos.valorPropiedad.value) {
+        elementos.valorPropiedad.value = '155000';
+        console.log('✅ Valor propiedad establecido por defecto: 155000');
+    }
+    if (!elementos.montoPrestamo.value) {
+        elementos.montoPrestamo.value = '70000000';
+        console.log('✅ Monto préstamo establecido por defecto: 70000000');
+    }
+    if (!elementos.plazo.value) {
+        elementos.plazo.value = '20';
+        console.log('✅ Plazo establecido por defecto: 20');
+    }
+    if (!elementos.tasaInteres.value) {
+        elementos.tasaInteres.value = '8.5';
+        console.log('✅ Tasa interés establecida por defecto: 8.5');
+    }
     
-    if (plazoValor) plazoValor.textContent = '20';
-    if (tasaValor) tasaValor.textContent = '8.5';
-    
-    // Asegurar que los valores estén establecidos en el DOM
-    console.log('Valores por defecto establecidos:', {
-        valorPropiedad: elementos.valorPropiedad.value,
-        montoPrestamo: elementos.montoPrestamo.value,
-        tasaInteres: elementos.tasaInteres.value,
-        plazo: elementos.plazo.value
-    });
+    console.log('✅ Valores por defecto establecidos');
 }
 
-function agregarEventListeners() {
-    // Recalcular cuando cambien los inputs (excepto el slider de tipo de cambio)
-    Object.values(elementos).forEach(elemento => {
-        if (elemento && elemento.tagName === 'INPUT' && elemento.id !== 'tcInput') {
-            // Validación progresiva no intrusiva
-            elemento.addEventListener('input', function() {
-                // Calcular inmediatamente sin validación visual para mejor UX
-                clearTimeout(this.calculationTimeout);
-                this.calculationTimeout = setTimeout(() => {
-                    calcularTodo();
-                }, 300); // Reducido el delay
-            });
-            
-            // Validación sutil solo cuando el usuario termina de escribir
-            elemento.addEventListener('blur', function() {
-                VALIDATION_SYSTEM.validateField(this);
-            });
-            
-            // Validación inmediata solo para valores claramente inválidos
-            elemento.addEventListener('input', function() {
-                const valor = parseFloat(this.value) || 0;
-                
-                // Solo mostrar errores críticos inmediatamente
-                if (this.value && valor <= 0 && ['valorPropiedad', 'montoPrestamo', 'tasaInteres', 'plazo'].includes(this.id)) {
-                    VALIDATION_SYSTEM.validateField(this);
-                } else if (this.value === '') {
-                    // Limpiar validación cuando el campo está vacío
-                    VALIDATION_SYSTEM.clearFieldState(this);
-                }
-            });
-        }
-        if (elemento && elemento.tagName === 'SELECT') {
-            // Tracking especial para cambio de provincia
-            if (elemento.id === 'provincia') {
-                let previousProvincia = elemento.value;
-                elemento.addEventListener('change', function() {
-                    // Analytics: Rastrear cambio de provincia
-                    if (window.AnalyticsTracker) {
-                        window.AnalyticsTracker.trackProvinciaChanged(this.value);
-                    }
-                    previousProvincia = this.value;
-                    
-                    // Actualizar sliders de gastos para la nueva provincia
-                    actualizarSlidersGastos(this.value);
-                    
-                    calcularTodo();
+// Función para actualizar el valor de la propiedad en pesos
+function actualizarValorPropiedadPesos() {
+    console.log('💱 Actualizando valor de propiedad en pesos...');
+    
+    const valorPropiedadPesos = document.getElementById('valorPropiedadPesos');
+    if (valorPropiedadPesos && elementos.valorPropiedad.value) {
+        const valorUSD = parseFloat(elementos.valorPropiedad.value);
+        const valorPesos = valorUSD * CONFIG.tiposCambio.oficial;
+        
+        valorPropiedadPesos.textContent = formatearPesos(valorPesos);
+        
+        console.log('✅ Valor propiedad actualizado:', {
+            USD: valorUSD,
+            tipoCambio: CONFIG.tiposCambio.oficial,
+            pesos: valorPesos,
+            formateado: formatearPesos(valorPesos)
+        });
+    } else {
+        console.log('❌ No se pudo actualizar valor propiedad en pesos:', {
+            elementoExiste: !!valorPropiedadPesos,
+            valorPropiedad: elementos.valorPropiedad?.value
+        });
+    }
+}
+
+// Función para actualizar el monto del préstamo equivalente en USD
+function actualizarMontoPrestamoEquivalente() {
+    console.log('💱 Actualizando monto préstamo equivalente en USD...');
+    
+    const montoPrestamoEquivalente = document.getElementById('montoPrestamoEquivalente');
+    if (montoPrestamoEquivalente && elementos.montoPrestamo.value) {
+        const montoPesos = parseFloat(elementos.montoPrestamo.value);
+        const montoUSD = montoPesos / CONFIG.tiposCambio.oficial;
+        
+        montoPrestamoEquivalente.textContent = `USD $${montoUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        
+        console.log('✅ Monto préstamo equivalente actualizado:', {
+            pesos: montoPesos,
+            tipoCambio: CONFIG.tiposCambio.oficial,
+            USD: montoUSD,
+            formateado: `USD $${montoUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
                 });
             } else {
-                elemento.addEventListener('change', calcularTodo);
-            }
-        }
+        console.log('❌ No se pudo actualizar monto préstamo equivalente:', {
+            elementoExiste: !!montoPrestamoEquivalente,
+            montoPrestamo: elementos.montoPrestamo?.value
+        });
+    }
+}
+
+// Agregar event listeners a todos los campos
+function agregarEventListeners() {
+    // Event listeners para campos principales
+    elementos.valorPropiedad.addEventListener('input', () => {
+        actualizarValorPropiedadPesos();
+        calcularTodo();
     });
+    elementos.provincia.addEventListener('change', () => {
+        actualizarSlidersGastos(elementos.provincia.value);
+        calcularTodo();
+    });
+    elementos.montoPrestamo.addEventListener('input', () => {
+        actualizarMontoPrestamoEquivalente();
+        calcularTodo();
+    });
+    elementos.plazo.addEventListener('input', actualizarPlazo);
+    elementos.tasaInteres.addEventListener('input', actualizarTasa);
     
-    // Configurar sliders
-    configurarSliders();
+    // Event listener para el campo de sueldo
+    elementos.sueldoMensual.addEventListener('input', calcularMaxCuotaSugerida);
     
-    // Configurar slider de tipo de cambio
-    configurarSliderTC();
-    
-    // Configurar sliders de gastos
-    configurarSlidersGastos();
+    // Event listeners para sliders de gastos
+    document.getElementById('escrituraSlider').addEventListener('input', calcularTodo);
+    document.getElementById('inmobiliariaSlider').addEventListener('input', calcularTodo);
+    document.getElementById('firmasSlider').addEventListener('input', calcularTodo);
+    document.getElementById('sellosSlider').addEventListener('input', calcularTodo);
 }
 
 // Sistema de validación no intrusivo con indicadores visuales sutiles
@@ -486,36 +515,278 @@ function validarCampoIndividual(elemento) {
     return VALIDATION_SYSTEM.validateField(elemento);
 }
 
+// Función principal que calcula todo
 function calcularTodo() {
-    const datos = obtenerDatosEntrada();
+    try {
+        // Obtener valores del formulario
+        const valores = obtenerValoresFormulario();
+        
+        console.log('🔍 Valores obtenidos del formulario:', valores);
+        
+        // Validar que los valores sean válidos
+        if (!validarValores(valores)) {
+            console.log('❌ Validación falló, retornando');
+            return;
+        }
+        
+        // Calcular cuota inicial
+        const cuotaInicial = calcularCuotaInicial(valores.montoPrestamo, valores.tasaInteres, valores.plazo);
+        console.log('💰 Cuota inicial calculada:', cuotaInicial);
+        
+        // Calcular gastos extra
+        const gastosExtra = calcularGastosExtra(valores.valorPropiedad, valores.provincia);
+        console.log('🏠 Gastos extra calculados:', gastosExtra);
+        
+        // Calcular total de la operación
+        const totalOperacion = valores.valorPropiedad + gastosExtra.total;
+        console.log('📊 Total operación:', totalOperacion);
+        
+        // Calcular diferencia (cuánto ponés vos)
+        const diferencia = totalOperacion - valores.montoPrestamo;
+        console.log('💸 Diferencia a pagar:', diferencia);
+        
+        // Crear objeto de resultados
+        const resultados = {
+            cuotaInicial,
+            gastosExtra,
+            totalOperacion,
+            diferencia,
+            valores
+        };
+        
+        console.log('📋 Objeto de resultados completo:', resultados);
+        
+        // Actualizar resultados en el DOM
+        actualizarResultados(resultados);
+        
+        // Calcular escenarios de tipo de cambio
+        calcularEscenariosTipoCambio(valores, totalOperacion, diferencia);
+        
+        // Calcular máximo de cuota sugerido si hay sueldo
+        calcularMaxCuotaSugerida();
+        
+        // Generar consejos dinámicos
+        generarConsejosDinamicos(valores, cuotaInicial, gastosExtra.total);
+        
+        // Trackear evento de cálculo completado
+        if (typeof trackCalculationCompleted === 'function') {
+            trackCalculationCompleted({
+                primeraCuota: cuotaInicial,
+                totalGastos: gastosExtra.total,
+                totalOperacion: totalOperacion
+            }, valores);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error en cálculo:', error);
+        if (typeof trackEvent === 'function') {
+            trackEvent('calculation_error', {
+                error_message: error.message,
+                error_context: 'calcularTodo'
+            });
+        }
+    }
+}
+
+// Función para calcular el máximo de cuota sugerido basado en el sueldo
+function calcularMaxCuotaSugerida() {
+    const sueldo = parseFloat(elementos.sueldoMensual.value);
+    const cuotaStatusIndicator = document.getElementById('cuotaStatusIndicator');
+    const cuotaSugeridaValor = document.getElementById('cuotaSugeridaValor');
+    const cuotaCalculadaValor = document.getElementById('cuotaCalculadaValor');
+    const statusMessage = document.getElementById('statusMessage');
     
-    // Actualizar indicador global de estado
-    VALIDATION_SYSTEM.updateGlobalStatus();
-    
-    // Analytics: Trackear inicio de cálculo
-    if (window.AnalyticsTracker) {
-        window.AnalyticsTracker.trackCalculationStarted(datos);
+    if (!sueldo || sueldo < 100000) {
+        elementos.maxCuotaSugerida.textContent = '$0';
+        if (cuotaStatusIndicator) {
+            cuotaStatusIndicator.style.display = 'none';
+        }
+        return;
     }
     
-    // Siempre intentar calcular, incluso con datos incompletos
-    if (validarDatos(datos)) {
-        const resultados = calcularCredito(datos);
-        mostrarResultados(resultados);
-        mostrarTipsDinamicos(resultados);
+    // Regla del 25%: la cuota no debe superar el 25% del sueldo
+    const maxCuota = sueldo * 0.25;
+    
+    // Formatear el resultado
+    elementos.maxCuotaSugerida.textContent = formatearPesos(maxCuota);
+    
+    // Mostrar el indicador de estado
+    if (cuotaStatusIndicator) {
+        cuotaStatusIndicator.style.display = 'block';
+    }
+    
+    // Actualizar valores en el indicador
+    if (cuotaSugeridaValor) {
+        cuotaSugeridaValor.textContent = formatearPesos(maxCuota);
+    }
+    
+    // Verificar si la cuota actual supera el máximo sugerido
+    const cuotaActual = parseFloat(elementos.primeraCuota.textContent.replace(/[^\d]/g, ''));
+    
+    if (cuotaCalculadaValor) {
+        cuotaCalculadaValor.textContent = cuotaActual > 0 ? formatearPesos(cuotaActual) : 'No calculada';
+    }
+    
+    if (cuotaActual > maxCuota) {
+        // Agregar clase de advertencia
+        elementos.maxCuotaSugerida.classList.add('warning');
         
-        // Validación progresiva y consejos contextuales
-        mostrarValidacionProgresiva(datos, resultados);
+        // Mostrar consejo contextual
+        if (typeof FEEDBACK_SYSTEM !== 'undefined' && FEEDBACK_SYSTEM.showContextualTip) {
+            FEEDBACK_SYSTEM.showContextualTip(
+                `⚠️ Tu cuota sugerida (${formatearPesos(maxCuota)}) es menor que la cuota calculada. Considerá ajustar el monto del préstamo o el plazo.`,
+                'warning'
+            );
+        }
         
-        // Analytics: Trackear cálculo completado exitosamente
-        if (window.AnalyticsTracker) {
-            window.AnalyticsTracker.trackCalculationCompleted(resultados, datos);
+        // Mostrar alerta visual en el campo de sueldo
+        elementos.sueldoMensual.style.borderColor = '#dc2626';
+        elementos.sueldoMensual.style.boxShadow = '0 0 0 4px rgba(220, 38, 38, 0.15)';
+        
+        // Actualizar el mensaje de estado
+        if (statusMessage) {
+            statusMessage.innerHTML = `
+                ⚠️ <strong>¡Atención!</strong> Tu cuota supera el máximo recomendado. 
+                <br>Considerá ajustar el monto del préstamo o el plazo.
+            `;
+            statusMessage.className = 'status-message warning';
+        }
+        
+        // Actualizar el mensaje de ayuda
+        const sueldoHelper = document.querySelector('.sueldo-helper');
+        if (sueldoHelper) {
+            sueldoHelper.innerHTML = `
+                ⚠️ <strong>¡Atención!</strong> Tu cuota sugerida (${formatearPesos(maxCuota)}) es menor que la cuota calculada (${formatearPesos(cuotaActual)}). 
+                <br>Considerá ajustar el monto del préstamo o el plazo.
+            `;
+            sueldoHelper.style.color = '#dc2626';
+            sueldoHelper.style.background = 'rgba(220, 38, 38, 0.1)';
+            sueldoHelper.style.borderLeftColor = '#dc2626';
         }
     } else {
-        // Limpiar resultados si los datos no son válidos
-        limpiarResultados();
-        // Mostrar guía sutil de qué falta completar
-        mostrarGuiaCompletar(datos);
+        // Remover clase de advertencia si existe
+        elementos.maxCuotaSugerida.classList.remove('warning');
+        
+        // Restaurar estilo normal del campo
+        elementos.sueldoMensual.style.borderColor = '';
+        elementos.sueldoMensual.style.boxShadow = '';
+        
+        // Actualizar el mensaje de estado
+        if (statusMessage) {
+            if (cuotaActual > 0) {
+                statusMessage.innerHTML = `
+                    ✅ <strong>¡Perfecto!</strong> Tu cuota está dentro del rango recomendado.
+                `;
+                statusMessage.className = 'status-message success';
+            } else {
+                statusMessage.innerHTML = `
+                    💡 <strong>¡Excelente!</strong> Tu sueldo permite una cuota de hasta ${formatearPesos(maxCuota)}.
+                `;
+                statusMessage.className = 'status-message info';
+            }
+        }
+        
+        // Actualizar el mensaje de ayuda con estado positivo
+        const sueldoHelper = document.querySelector('.sueldo-helper');
+        if (sueldoHelper) {
+            if (cuotaActual > 0) {
+                sueldoHelper.innerHTML = `
+                    ✅ <strong>¡Perfecto!</strong> Tu cuota sugerida (${formatearPesos(maxCuota)}) es mayor que la cuota calculada (${formatearPesos(cuotaActual)}). 
+                    <br>Estás dentro del rango recomendado.
+                `;
+                sueldoHelper.style.color = '#16a34a';
+                sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
+                sueldoHelper.style.borderLeftColor = '#16a34a';
+            } else {
+                sueldoHelper.innerHTML = `
+                    💡 <strong>Regla del 25%:</strong> Tu cuota no debe superar el 25% de tus ingresos mensuales
+                `;
+                sueldoHelper.style.color = '#16a34a';
+                sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
+                sueldoHelper.style.borderLeftColor = '#16a34a';
+            }
+        }
+        
+        // Mostrar mensaje positivo si la cuota está dentro del rango recomendado
+        if (cuotaActual > 0 && cuotaActual <= maxCuota) {
+            console.log(`✅ Tu cuota está dentro del rango recomendado. Máximo sugerido: ${formatearPesos(maxCuota)}`);
+        }
     }
+}
+
+// Función para formatear valores en pesos argentinos
+function formatearPesos(valor) {
+    if (isNaN(valor) || valor === 0) return '$0';
+    
+    return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(valor);
+}
+
+// Función para obtener todos los valores del formulario
+function obtenerValoresFormulario() {
+    const valores = {
+        valorPropiedad: parseFloat(elementos.valorPropiedad.value) || 0,
+        provincia: elementos.provincia.value,
+        montoPrestamo: parseFloat(elementos.montoPrestamo.value) || 0,
+        plazo: parseInt(elementos.plazo.value) || 20,
+        tasaInteres: parseFloat(elementos.tasaInteres.value) || 8.5,
+        sueldoMensual: parseFloat(elementos.sueldoMensual.value) || 0
+    };
+    
+    console.log('📝 Valores obtenidos del formulario:', valores);
+    console.log('🔍 Elementos del DOM:', {
+        valorPropiedad: elementos.valorPropiedad?.value,
+        provincia: elementos.provincia?.value,
+        montoPrestamo: elementos.montoPrestamo?.value,
+        plazo: elementos.plazo?.value,
+        tasaInteres: elementos.tasaInteres?.value,
+        sueldoMensual: elementos.sueldoMensual?.value
+    });
+    
+    return valores;
+}
+
+// Función para validar que los valores del formulario sean válidos
+function validarValores(valores) {
+    console.log('🔍 Validando valores:', valores);
+    
+    // Validar valor de la propiedad
+    if (valores.valorPropiedad <= 0) {
+        console.log('❌ Valor de propiedad inválido:', valores.valorPropiedad);
+        return false;
+    }
+    
+    // Validar monto del préstamo
+    if (valores.montoPrestamo <= 0) {
+        console.log('❌ Monto del préstamo inválido:', valores.montoPrestamo);
+        return false;
+    }
+    
+    // Validar que el préstamo no supere el valor de la propiedad
+    const valorMaximoPrestamo = valores.valorPropiedad * CONFIG.tiposCambio.oficial;
+    if (valores.montoPrestamo > valorMaximoPrestamo) {
+        console.log('❌ Préstamo supera valor máximo:', { montoPrestamo: valores.montoPrestamo, valorMaximo: valorMaximoPrestamo });
+        return false;
+    }
+    
+    // Validar plazo
+    if (valores.plazo < 5 || valores.plazo > 35) {
+        console.log('❌ Plazo inválido:', valores.plazo);
+        return false;
+    }
+    
+    // Validar tasa de interés
+    if (valores.tasaInteres < 4.5 || valores.tasaInteres > 11) {
+        console.log('❌ Tasa de interés inválida:', valores.tasaInteres);
+        return false;
+    }
+    
+    console.log('✅ Todos los valores son válidos');
+    return true;
 }
 
 // Validación progresiva integrada en los resultados
@@ -539,7 +810,7 @@ function mostrarValidacionProgresiva(datos, resultados) {
     
     if (ingresoRecomendado > 500000) { // Si requiere más de $500k de ingreso
         FEEDBACK_SYSTEM.showContextualTip(
-            'Esta cuota requiere ingresos familiares altos. Considerá ajustar el monto o plazo',
+            'Esta cuota requiere ingresos familiares altos. Considerá ajustar el monto o plazo del crédito.',
             'info'
         );
     }
@@ -741,32 +1012,45 @@ function calcularCredito(datos) {
     };
 }
 
-function calcularGastosExtra(valorPropiedad, provincia) {
-    const gastos = CONFIG.gastosExtra[provincia];
-    const valorPesos = valorPropiedad * CONFIG.tiposCambio.oficial;
+// Función para calcular los gastos extra según la provincia
+function calcularGastosExtra(valorPropiedadUSD, provincia) {
+    console.log('🏠 Calculando gastos extra para provincia:', provincia, 'valor propiedad USD:', valorPropiedadUSD);
     
-    // Calcular con valores intermedios
-    const escritura = valorPesos * gastos.escritura.intermedio / 100;
-    const inmobiliaria = valorPesos * gastos.inmobiliaria.intermedio / 100;
-    const firmas = valorPesos * gastos.firmas.intermedio / 100;
-    const sellos = valorPesos * gastos.sellos.intermedio / 100;
+    const gastosConfig = CONFIG.gastosExtra[provincia];
+    if (!gastosConfig) {
+        console.log('❌ No se encontró configuración de gastos para provincia:', provincia);
+        return { total: 0, desglose: {} };
+    }
     
-    const totalIntermedio = escritura + inmobiliaria + firmas + sellos;
+    // Obtener valores de los sliders de gastos
+    const escritura = parseFloat(document.getElementById('escrituraSlider')?.value || gastosConfig.escritura.intermedio);
+    const inmobiliaria = parseFloat(document.getElementById('inmobiliariaSlider')?.value || gastosConfig.inmobiliaria.intermedio);
+    const firmas = parseFloat(document.getElementById('firmasSlider')?.value || gastosConfig.firmas.intermedio);
+    const sellos = parseFloat(document.getElementById('sellosSlider')?.value || gastosConfig.sellos.intermedio);
     
-    return {
-        escritura,
-        inmobiliaria,
-        firmas,
-        sellos,
-        total: totalIntermedio,
-        // Mantener referencias de rangos para información
-        referencias: {
-            escritura: { min: gastos.escritura.min, max: gastos.escritura.max },
-            inmobiliaria: { min: gastos.inmobiliaria.min, max: gastos.inmobiliaria.max },
-            firmas: { min: gastos.firmas.min, max: gastos.firmas.max },
-            sellos: { min: gastos.sellos.min, max: gastos.sellos.max }
+    console.log('📊 Porcentajes de gastos:', { escritura, inmobiliaria, firmas, sellos });
+    
+    // Calcular gastos en USD
+    const gastosEscritura = valorPropiedadUSD * (escritura / 100);
+    const gastosInmobiliaria = valorPropiedadUSD * (inmobiliaria / 100);
+    const gastosFirmas = valorPropiedadUSD * (firmas / 100);
+    const gastosSellos = valorPropiedadUSD * (sellos / 100);
+    
+    const total = gastosEscritura + gastosInmobiliaria + gastosFirmas + gastosSellos;
+    
+    const resultado = {
+        total,
+        desglose: {
+            escritura: gastosEscritura,
+            inmobiliaria: gastosInmobiliaria,
+            firmas: gastosFirmas,
+            sellos: gastosSellos
         }
     };
+    
+    console.log('💰 Gastos calculados:', resultado);
+    
+    return resultado;
 }
 
 // Función para calcular gastos extra con un tipo de cambio específico
@@ -1318,16 +1602,51 @@ function configurarSlidersGastos() {
 
 // Función para actualizar campos de gastos cuando cambie la provincia
 function actualizarSlidersGastos(provincia) {
-    const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
+    console.log('🏠 Actualizando sliders de gastos para provincia:', provincia);
     
-    tiposGasto.forEach(tipo => {
-        const input = document.getElementById(tipo + 'Slider'); // Ahora son inputs numéricos
-        
-        if (input) {
-            const valorIntermedio = CONFIG.gastosExtra[provincia][tipo].intermedio;
-            input.value = valorIntermedio.toFixed(2);
-        }
-    });
+    const gastosConfig = CONFIG.gastosExtra[provincia];
+    if (!gastosConfig) {
+        console.log('❌ No se encontró configuración de gastos para provincia:', provincia);
+        return;
+    }
+    
+    console.log('📊 Configuración de gastos encontrada:', gastosConfig);
+    
+    // Actualizar sliders con valores de la provincia
+    const escrituraSlider = document.getElementById('escrituraSlider');
+    const inmobiliariaSlider = document.getElementById('inmobiliariaSlider');
+    const firmasSlider = document.getElementById('firmasSlider');
+    const sellosSlider = document.getElementById('sellosSlider');
+    
+    if (escrituraSlider) {
+        escrituraSlider.value = gastosConfig.escritura.intermedio;
+        console.log('✅ Slider escritura actualizado:', gastosConfig.escritura.intermedio);
+    } else {
+        console.log('❌ Slider escritura no encontrado');
+    }
+    
+    if (inmobiliariaSlider) {
+        inmobiliariaSlider.value = gastosConfig.inmobiliaria.intermedio;
+        console.log('✅ Slider inmobiliaria actualizado:', gastosConfig.inmobiliaria.intermedio);
+    } else {
+        console.log('❌ Slider inmobiliaria no encontrado');
+    }
+    
+    if (firmasSlider) {
+        firmasSlider.value = gastosConfig.firmas.intermedio;
+        console.log('✅ Slider firmas actualizado:', gastosConfig.firmas.intermedio);
+    } else {
+        console.log('❌ Slider firmas no encontrado');
+    }
+    
+    if (sellosSlider) {
+        sellosSlider.value = gastosConfig.sellos.intermedio;
+        console.log('✅ Slider sellos actualizado:', gastosConfig.sellos.intermedio);
+    } else {
+        console.log('❌ Slider sellos no encontrado');
+    }
+    
+    console.log('✅ Todos los sliders de gastos actualizados');
 }
 
 // Mostrar tips dinámicos simplificados
@@ -1788,3 +2107,313 @@ document.addEventListener('DOMContentLoaded', function() {
         answer.style.display = 'none';
     });
 });
+
+// Función para actualizar los resultados en el DOM
+function actualizarResultados(resultados) {
+    console.log('🔄 Iniciando actualización de resultados en el DOM');
+    
+    // Actualizar primera cuota
+    if (elementos.primeraCuota) {
+        elementos.primeraCuota.textContent = formatearPesos(resultados.cuotaInicial);
+        console.log('✅ Primera cuota actualizada:', formatearPesos(resultados.cuotaInicial));
+    } else {
+        console.log('❌ Elemento primeraCuota no encontrado');
+    }
+    
+    // Actualizar total a pagar
+    if (elementos.totalPagar) {
+        elementos.totalPagar.textContent = formatearPesos(resultados.totalOperacion);
+        console.log('✅ Total a pagar actualizado:', formatearPesos(resultados.totalOperacion));
+    } else {
+        console.log('❌ Elemento totalPagar no encontrado');
+    }
+    
+    // Actualizar valor de la casa en pesos y USD
+    const valorCasaARS = document.getElementById('valorCasaARS');
+    const valorCasaUSD = document.getElementById('valorCasaUSD');
+    if (valorCasaARS && valorCasaUSD) {
+        const valorPesos = resultados.valores.valorPropiedad * CONFIG.tiposCambio.oficial;
+        valorCasaARS.textContent = formatearPesos(valorPesos);
+        valorCasaUSD.textContent = `USD $${resultados.valores.valorPropiedad.toLocaleString('en-US')}`;
+        console.log('✅ Valor casa actualizado:', { ARS: formatearPesos(valorPesos), USD: `USD $${resultados.valores.valorPropiedad.toLocaleString('en-US')}` });
+    } else {
+        console.log('❌ Elementos valorCasa no encontrados');
+    }
+    
+    // Actualizar gastos individuales
+    const gastoEscrituraARS = document.getElementById('gastoEscrituraARS');
+    const gastoEscrituraUSD = document.getElementById('gastoEscrituraUSD');
+    if (gastoEscrituraARS && gastoEscrituraUSD) {
+        const gastoEscrituraPesos = resultados.gastosExtra.desglose.escritura * CONFIG.tiposCambio.oficial;
+        gastoEscrituraARS.textContent = formatearPesos(gastoEscrituraPesos);
+        gastoEscrituraUSD.textContent = `USD $${resultados.gastosExtra.desglose.escritura.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        console.log('✅ Gasto escritura actualizado:', { ARS: formatearPesos(gastoEscrituraPesos), USD: `USD $${resultados.gastosExtra.desglose.escritura.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` });
+    } else {
+        console.log('❌ Elementos gastoEscritura no encontrados');
+    }
+    
+    const gastoInmobiliariaARS = document.getElementById('gastoInmobiliariaARS');
+    const gastoInmobiliariaUSD = document.getElementById('gastoInmobiliariaUSD');
+    if (gastoInmobiliariaARS && gastoInmobiliariaUSD) {
+        const gastoInmobiliariaPesos = resultados.gastosExtra.desglose.inmobiliaria * CONFIG.tiposCambio.oficial;
+        gastoInmobiliariaARS.textContent = formatearPesos(gastoInmobiliariaPesos);
+        gastoInmobiliariaUSD.textContent = `USD $${resultados.gastosExtra.desglose.inmobiliaria.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        console.log('✅ Gasto inmobiliaria actualizado:', { ARS: formatearPesos(gastoInmobiliariaPesos), USD: `USD $${resultados.gastosExtra.desglose.inmobiliaria.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` });
+    } else {
+        console.log('❌ Elementos gastoInmobiliaria no encontrados');
+    }
+    
+    const gastoFirmasARS = document.getElementById('gastoFirmasARS');
+    const gastoFirmasUSD = document.getElementById('gastoFirmasUSD');
+    if (gastoFirmasARS && gastoFirmasUSD) {
+        const gastoFirmasPesos = resultados.gastosExtra.desglose.firmas * CONFIG.tiposCambio.oficial;
+        gastoFirmasARS.textContent = formatearPesos(gastoFirmasPesos);
+        gastoFirmasUSD.textContent = `USD $${resultados.gastosExtra.desglose.firmas.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        console.log('✅ Gasto firmas actualizado:', { ARS: formatearPesos(gastoFirmasPesos), USD: `USD $${resultados.gastosExtra.desglose.firmas.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` });
+    } else {
+        console.log('❌ Elementos gastoFirmas no encontrados');
+    }
+    
+    const gastoSellosARS = document.getElementById('gastoSellosARS');
+    const gastoSellosUSD = document.getElementById('gastoSellosUSD');
+    if (gastoSellosARS && gastoSellosUSD) {
+        const gastoSellosPesos = resultados.gastosExtra.desglose.sellos * CONFIG.tiposCambio.oficial;
+        gastoSellosARS.textContent = formatearPesos(gastoSellosPesos);
+        gastoSellosUSD.textContent = `USD $${resultados.gastosExtra.desglose.sellos.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        console.log('✅ Gasto sellos actualizado:', { ARS: formatearPesos(gastoSellosPesos), USD: `USD $${resultados.gastosExtra.desglose.sellos.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` });
+    } else {
+        console.log('❌ Elementos gastoSellos no encontrados');
+    }
+    
+    // Actualizar total de gastos
+    const gastosTotalARS = document.getElementById('gastosTotalARS');
+    const gastosTotalUSD = document.getElementById('gastosTotalUSD');
+    if (gastosTotalARS && gastosTotalUSD) {
+        const totalGastosPesos = resultados.gastosExtra.total * CONFIG.tiposCambio.oficial;
+        gastosTotalARS.innerHTML = `<strong>${formatearPesos(totalGastosPesos)}</strong>`;
+        gastosTotalUSD.innerHTML = `<strong>USD $${resultados.gastosExtra.total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</strong>`;
+        console.log('✅ Total gastos actualizado:', { ARS: formatearPesos(totalGastosPesos), USD: `USD $${resultados.gastosExtra.total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` });
+    } else {
+        console.log('❌ Elementos gastosTotal no encontrados');
+    }
+    
+    // Actualizar total de la operación en USD
+    const totalPagarUSD = document.getElementById('totalPagarUSD');
+    if (totalPagarUSD) {
+        totalPagarUSD.innerHTML = `<strong>USD $${(resultados.valores.valorPropiedad + resultados.gastosExtra.total).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</strong>`;
+        console.log('✅ Total operación USD actualizado:', `USD $${(resultados.valores.valorPropiedad + resultados.gastosExtra.total).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+    } else {
+        console.log('❌ Elemento totalPagarUSD no encontrado');
+    }
+    
+    console.log('🔄 Finalizando actualización de resultados en el DOM');
+    
+    // Actualizar escenarios de tipo de cambio
+    actualizarEscenariosTipoCambio(resultados);
+}
+
+// Función para calcular la cuota inicial usando la fórmula de amortización francesa
+function calcularCuotaInicial(monto, tasaAnual, plazoAnos) {
+    console.log('🧮 Calculando cuota inicial con:', { monto, tasaAnual, plazoAnos });
+    
+    if (monto <= 0 || tasaAnual <= 0 || plazoAnos <= 0) {
+        console.log('❌ Valores inválidos para calcular cuota');
+        return 0;
+    }
+    
+    // Convertir tasa anual a mensual
+    const tasaMensual = tasaAnual / 100 / 12;
+    
+    // Convertir plazo a meses
+    const plazoMeses = plazoAnos * 12;
+    
+    console.log('📊 Parámetros convertidos:', { tasaMensual, plazoMeses });
+    
+    // Fórmula de amortización francesa
+    // Cuota = P * (r * (1 + r)^n) / ((1 + r)^n - 1)
+    // Donde: P = principal, r = tasa mensual, n = número de pagos
+    
+    if (tasaMensual === 0) {
+        const cuota = monto / plazoMeses;
+        console.log('✅ Cuota calculada (tasa 0%):', cuota);
+        return cuota;
+    }
+    
+    const numerador = tasaMensual * Math.pow(1 + tasaMensual, plazoMeses);
+    const denominador = Math.pow(1 + tasaMensual, plazoMeses) - 1;
+    
+    if (denominador === 0) {
+        console.log('❌ Denominador es 0, no se puede calcular');
+        return 0;
+    }
+    
+    const cuota = monto * (numerador / denominador);
+    console.log('✅ Cuota calculada (fórmula francesa):', cuota);
+    
+    return cuota;
+}
+
+// Función para actualizar el valor mostrado del plazo
+function actualizarPlazo() {
+    const plazoValor = document.getElementById('plazoValor');
+    if (plazoValor) {
+        plazoValor.textContent = elementos.plazo.value;
+    }
+    calcularTodo();
+}
+
+// Función para actualizar el valor mostrado de la tasa
+function actualizarTasa() {
+    const tasaValor = document.getElementById('tasaValor');
+    if (tasaValor) {
+        tasaValor.textContent = elementos.tasaInteres.value;
+    }
+    calcularTodo();
+}
+
+// Función eliminada - duplicada
+
+// Función placeholder para generar consejos dinámicos
+function generarConsejosDinamicos(valores, cuotaInicial, totalGastos) {
+    // Esta función se puede implementar para mostrar consejos personalizados
+    // basados en los valores ingresados
+    console.log('Generando consejos dinámicos...', { valores, cuotaInicial, totalGastos });
+}
+
+// Función para calcular escenarios de tipo de cambio
+function calcularEscenariosTipoCambio(valores, totalOperacion, diferencia) {
+    // Los escenarios se actualizan automáticamente en actualizarResultados
+    // Esta función se mantiene para compatibilidad
+    console.log('Escenarios de tipo de cambio calculados automáticamente');
+}
+
+// Función para actualizar los escenarios de tipo de cambio
+function actualizarEscenariosTipoCambio(resultados) {
+    // Actualizar tipos de cambio en los escenarios
+    const tcPisoEscenario = document.getElementById('tcPisoEscenario');
+    const tcOficialEscenario = document.getElementById('tcOficialEscenario');
+    const tcTechoEscenario = document.getElementById('tcTechoEscenario');
+    
+    if (tcPisoEscenario) tcPisoEscenario.textContent = formatearPesos(CONFIG.tiposCambio.piso);
+    if (tcOficialEscenario) tcOficialEscenario.textContent = formatearPesos(CONFIG.tiposCambio.oficial);
+    if (tcTechoEscenario) tcTechoEscenario.textContent = formatearPesos(CONFIG.tiposCambio.techo);
+    
+    // Calcular valores para cada escenario
+    const valorTotalUSD = resultados.valores.valorPropiedad + resultados.gastosExtra.total;
+    
+    // Escenario Piso (mejor caso)
+    actualizarEscenarioPiso(valorTotalUSD, resultados);
+    
+    // Escenario Oficial (caso base)
+    actualizarEscenarioOficial(valorTotalUSD, resultados);
+    
+    // Escenario Techo (peor caso)
+    actualizarEscenarioTecho(valorTotalUSD, resultados);
+}
+
+// Función para actualizar el escenario piso (mejor caso)
+function actualizarEscenarioPiso(valorTotalUSD, resultados) {
+    const totalPisoARS = document.getElementById('totalPisoARS');
+    const totalPisoUSD = document.getElementById('totalPisoUSD');
+    const prestamoPisoARS = document.getElementById('prestamoPisoARS');
+    const prestamoPisoUSD = document.getElementById('prestamoPisoUSD');
+    const diferenciaPisoARS = document.getElementById('diferenciaPisoARS');
+    const diferenciaPisoUSD = document.getElementById('diferenciaPisoUSD');
+    const deltaPisoARS = document.getElementById('deltaPisoARS');
+    const deltaPisoUSD = document.getElementById('deltaPisoUSD');
+    
+    if (totalPisoARS && totalPisoUSD) {
+        const totalPisoPesos = valorTotalUSD * CONFIG.tiposCambio.piso;
+        totalPisoARS.textContent = formatearPesos(totalPisoPesos);
+        totalPisoUSD.textContent = `USD $${valorTotalUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+    
+    if (prestamoPisoARS && prestamoPisoUSD) {
+        const prestamoPisoPesos = resultados.valores.montoPrestamo;
+        prestamoPisoARS.textContent = formatearPesos(prestamoPisoPesos);
+        prestamoPisoUSD.textContent = `USD $${(resultados.valores.montoPrestamo / CONFIG.tiposCambio.piso).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (diferenciaPisoARS && diferenciaPisoUSD) {
+        const diferenciaPisoPesos = (valorTotalUSD * CONFIG.tiposCambio.piso) - resultados.valores.montoPrestamo;
+        diferenciaPisoARS.textContent = formatearPesos(diferenciaPisoPesos);
+        diferenciaPisoUSD.textContent = `USD $${(diferenciaPisoPesos / CONFIG.tiposCambio.piso).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (deltaPisoARS && deltaPisoUSD) {
+        const deltaPisoPesos = (CONFIG.tiposCambio.piso - CONFIG.tiposCambio.oficial) * valorTotalUSD;
+        deltaPisoARS.textContent = formatearPesos(deltaPisoPesos);
+        deltaPisoUSD.textContent = `USD $${(deltaPisoPesos / CONFIG.tiposCambio.piso).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+}
+
+// Función para actualizar el escenario oficial (caso base)
+function actualizarEscenarioOficial(valorTotalUSD, resultados) {
+    const totalOficialARS = document.getElementById('totalOficialARS');
+    const totalOficialUSD = document.getElementById('totalOficialUSD');
+    const prestamoOficialARS = document.getElementById('prestamoOficialARS');
+    const prestamoOficialUSD = document.getElementById('prestamoOficialUSD');
+    const diferenciaOficialARS = document.getElementById('diferenciaOficialARS');
+    const diferenciaOficialUSD = document.getElementById('diferenciaOficialUSD');
+    const deltaOficialARS = document.getElementById('deltaOficialARS');
+    const deltaOficialUSD = document.getElementById('deltaOficialUSD');
+    
+    if (totalOficialARS && totalOficialUSD) {
+        const totalOficialPesos = valorTotalUSD * CONFIG.tiposCambio.oficial;
+        totalOficialARS.textContent = formatearPesos(totalOficialPesos);
+        totalOficialUSD.textContent = `USD $${valorTotalUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+    
+    if (prestamoOficialARS && prestamoOficialUSD) {
+        const prestamoOficialPesos = resultados.valores.montoPrestamo;
+        prestamoOficialARS.textContent = formatearPesos(prestamoOficialPesos);
+        prestamoOficialUSD.textContent = `USD $${(resultados.valores.montoPrestamo / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (diferenciaOficialARS && diferenciaOficialUSD) {
+        const diferenciaOficialPesos = (valorTotalUSD * CONFIG.tiposCambio.oficial) - resultados.valores.montoPrestamo;
+        diferenciaOficialARS.textContent = formatearPesos(diferenciaOficialPesos);
+        diferenciaOficialUSD.textContent = `USD $${(diferenciaOficialPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (deltaOficialARS && deltaOficialUSD) {
+        deltaOficialARS.textContent = '$0';
+        deltaOficialUSD.textContent = 'USD $0';
+    }
+}
+
+// Función para actualizar el escenario techo (peor caso)
+function actualizarEscenarioTecho(valorTotalUSD, resultados) {
+    const totalTechoARS = document.getElementById('totalTechoARS');
+    const totalTechoUSD = document.getElementById('totalTechoUSD');
+    const prestamoTechoARS = document.getElementById('prestamoTechoARS');
+    const prestamoTechoUSD = document.getElementById('prestamoTechoUSD');
+    const diferenciaTechoARS = document.getElementById('diferenciaTechoARS');
+    const diferenciaTechoUSD = document.getElementById('diferenciaTechoUSD');
+    const deltaTechoARS = document.getElementById('deltaTechoARS');
+    const deltaTechoUSD = document.getElementById('deltaTechoUSD');
+    
+    if (totalTechoARS && totalTechoUSD) {
+        const totalTechoPesos = valorTotalUSD * CONFIG.tiposCambio.techo;
+        totalTechoARS.textContent = formatearPesos(totalTechoPesos);
+        totalTechoUSD.textContent = `USD $${valorTotalUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+    
+    if (prestamoTechoARS && prestamoTechoUSD) {
+        const prestamoTechoPesos = resultados.valores.montoPrestamo;
+        prestamoTechoARS.textContent = formatearPesos(prestamoTechoPesos);
+        prestamoTechoUSD.textContent = `USD $${(resultados.valores.montoPrestamo / CONFIG.tiposCambio.techo).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (diferenciaTechoARS && diferenciaTechoUSD) {
+        const diferenciaTechoPesos = (valorTotalUSD * CONFIG.tiposCambio.techo) - resultados.valores.montoPrestamo;
+        diferenciaTechoARS.textContent = formatearPesos(diferenciaTechoPesos);
+        diferenciaTechoUSD.textContent = `USD $${(diferenciaTechoPesos / CONFIG.tiposCambio.techo).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (deltaTechoARS && deltaTechoUSD) {
+        const deltaTechoPesos = (CONFIG.tiposCambio.techo - CONFIG.tiposCambio.oficial) * valorTotalUSD;
+        deltaTechoARS.textContent = formatearPesos(deltaTechoPesos);
+        deltaTechoUSD.textContent = `USD $${(deltaTechoPesos / CONFIG.tiposCambio.techo).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+}
