@@ -615,17 +615,8 @@ function calcularMaxCuotaSugerida() {
         cuotaStatusIndicator.style.display = 'block';
     }
     
-    // Actualizar valores en el indicador
-    if (cuotaSugeridaValor) {
-        cuotaSugeridaValor.textContent = formatearPesos(maxCuota);
-    }
-    
     // Verificar si la cuota actual supera el máximo sugerido
     const cuotaActual = parseFloat(elementos.primeraCuota.textContent.replace(/[^\d]/g, ''));
-    
-    if (cuotaCalculadaValor) {
-        cuotaCalculadaValor.textContent = cuotaActual > 0 ? formatearPesos(cuotaActual) : 'No calculada';
-    }
     
     if (cuotaActual > maxCuota) {
         // Agregar clase de advertencia
@@ -634,7 +625,7 @@ function calcularMaxCuotaSugerida() {
         // Mostrar consejo contextual
         if (typeof FEEDBACK_SYSTEM !== 'undefined' && FEEDBACK_SYSTEM.showContextualTip) {
             FEEDBACK_SYSTEM.showContextualTip(
-                `⚠️ Tu cuota sugerida (${formatearPesos(maxCuota)}) es menor que la cuota calculada. Considerá ajustar el monto del préstamo o el plazo.`,
+                `⚠️ Tu cuota sugerida es menor que la cuota calculada. Considerá ajustar el monto del préstamo o el plazo.`,
                 'warning'
             );
         }
@@ -656,7 +647,7 @@ function calcularMaxCuotaSugerida() {
         const sueldoHelper = document.querySelector('.sueldo-helper');
         if (sueldoHelper) {
             sueldoHelper.innerHTML = `
-                ⚠️ <strong>¡Atención!</strong> Tu cuota sugerida (${formatearPesos(maxCuota)}) es menor que la cuota calculada (${formatearPesos(cuotaActual)}). 
+                ⚠️ <strong>¡Atención!</strong> Tu cuota supera el máximo recomendado. 
                 <br>Considerá ajustar el monto del préstamo o el plazo.
             `;
             sueldoHelper.style.color = '#dc2626';
@@ -680,7 +671,7 @@ function calcularMaxCuotaSugerida() {
                 statusMessage.className = 'status-message success';
             } else {
                 statusMessage.innerHTML = `
-                    💡 <strong>¡Excelente!</strong> Tu sueldo permite una cuota de hasta ${formatearPesos(maxCuota)}.
+                    💡 <strong>¡Excelente!</strong> Tu sueldo permite una cuota de hasta el máximo sugerido.
                 `;
                 statusMessage.className = 'status-message info';
             }
@@ -691,8 +682,7 @@ function calcularMaxCuotaSugerida() {
         if (sueldoHelper) {
             if (cuotaActual > 0) {
                 sueldoHelper.innerHTML = `
-                    ✅ <strong>¡Perfecto!</strong> Tu cuota sugerida (${formatearPesos(maxCuota)}) es mayor que la cuota calculada (${formatearPesos(cuotaActual)}). 
-                    <br>Estás dentro del rango recomendado.
+                    ✅ <strong>¡Perfecto!</strong> Tu cuota está dentro del rango recomendado.
                 `;
                 sueldoHelper.style.color = '#16a34a';
                 sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
@@ -709,7 +699,7 @@ function calcularMaxCuotaSugerida() {
         
         // Mostrar mensaje positivo si la cuota está dentro del rango recomendado
         if (cuotaActual > 0 && cuotaActual <= maxCuota) {
-            console.log(`✅ Tu cuota está dentro del rango recomendado. Máximo sugerido: ${formatearPesos(maxCuota)}`);
+            console.log(`✅ Tu cuota está dentro del rango recomendado. Máximo sugerido: ${elementos.maxCuotaSugerida.textContent}`);
         }
     }
 }
