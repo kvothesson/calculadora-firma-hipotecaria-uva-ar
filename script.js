@@ -592,9 +592,7 @@ function calcularTodo() {
 function calcularMaxCuotaSugerida() {
     const sueldo = parseFloat(elementos.sueldoMensual.value);
     const cuotaStatusIndicator = document.getElementById('cuotaStatusIndicator');
-    const cuotaSugeridaValor = document.getElementById('cuotaSugeridaValor');
-    const cuotaCalculadaValor = document.getElementById('cuotaCalculadaValor');
-    const statusMessage = document.getElementById('statusMessage');
+    const cuotaStatusText = document.getElementById('cuotaStatusText');
     
     if (!sueldo || sueldo < 100000) {
         elementos.maxCuotaSugerida.textContent = '$0';
@@ -610,96 +608,81 @@ function calcularMaxCuotaSugerida() {
     // Formatear el resultado
     elementos.maxCuotaSugerida.textContent = formatearPesos(maxCuota);
     
-    // Mostrar el indicador de estado
-    if (cuotaStatusIndicator) {
-        cuotaStatusIndicator.style.display = 'block';
+    // Obtener la cuota actual del campo de cuota mensual (en pesos)
+    const cuotaActualElement = document.getElementById('cuotaMensualARS');
+    let cuotaActual = 0;
+    
+    if (cuotaActualElement && cuotaActualElement.textContent) {
+        // Extraer solo los números del texto formateado (ej: "$150,000" -> 150000)
+        const cuotaTexto = cuotaActualElement.textContent;
+        cuotaActual = parseFloat(cuotaTexto.replace(/[^\d]/g, ''));
+        
+        if (isNaN(cuotaActual)) {
+            console.log('⚠️ No se pudo parsear la cuota del texto:', cuotaTexto);
+            cuotaActual = 0;
+        }
     }
     
-    // Verificar si la cuota actual supera el máximo sugerido
-    const cuotaActual = parseFloat(elementos.primeraCuota.textContent.replace(/[^\d]/g, ''));
+    console.log('🔍 Verificando cuota:', { cuotaActual, maxCuota, sueldo });
     
-    if (cuotaActual > maxCuota) {
-        // Agregar clase de advertencia
-        elementos.maxCuotaSugerida.classList.add('warning');
+    // Mostrar el indicador de estado
+    if (cuotaStatusIndicator && cuotaStatusText) {
+        cuotaStatusIndicator.style.display = 'block';
         
-        // Mostrar consejo contextual
-        if (typeof FEEDBACK_SYSTEM !== 'undefined' && FEEDBACK_SYSTEM.showContextualTip) {
-            FEEDBACK_SYSTEM.showContextualTip(
-                `⚠️ Tu cuota sugerida es menor que la cuota calculada. Considerá ajustar el monto del préstamo o el plazo.`,
-                'warning'
-            );
-        }
-        
-        // Mostrar alerta visual en el campo de sueldo
-        elementos.sueldoMensual.style.borderColor = '#dc2626';
-        elementos.sueldoMensual.style.boxShadow = '0 0 0 4px rgba(220, 38, 38, 0.15)';
-        
-        // Actualizar el mensaje de estado
-        if (statusMessage) {
-            statusMessage.innerHTML = `
-                ⚠️ <strong>¡Atención!</strong> Tu cuota supera el máximo recomendado. 
-                <br>Considerá ajustar el monto del préstamo o el plazo.
+        if (cuotaActual > 0) {
+            if (cuotaActual > maxCuota) {
+                // Cuota supera el máximo recomendado
+                cuotaStatusIndicator.className = 'cuota-status-indicator warning';
+                cuotaStatusText.innerHTML = `
+                    ⚠️ <strong>¡Atención!</strong> Tu cuota supera el máximo recomendado. 
+                    Considerá ajustar el monto del préstamo o el plazo.
+                `;
+                
+                // Mostrar alerta visual en el campo de sueldo
+                elementos.sueldoMensual.style.borderColor = '#dc2626';
+                elementos.sueldoMensual.style.boxShadow = '0 0 0 4px rgba(220, 38, 38, 0.15)';
+            } else {
+                // Cuota está dentro del rango recomendado
+                cuotaStatusIndicator.className = 'cuota-status-indicator success';
+                cuotaStatusText.innerHTML = `
+                    ✅ <strong>¡Perfecto!</strong> Tu cuota está dentro del rango recomendado.
+                `;
+                
+                // Restaurar estilo normal del campo
+                elementos.sueldoMensual.style.borderColor = '';
+                elementos.sueldoMensual.style.boxShadow = '';
+            }
+        } else {
+            // No hay cuota calculada aún
+            cuotaStatusIndicator.className = 'cuota-status-indicator info';
+            cuotaStatusText.innerHTML = `
+                💡 <strong>¡Excelente!</strong> Tu sueldo permite una cuota de hasta el máximo sugerido.
             `;
-            statusMessage.className = 'status-message warning';
+            
+            // Restaurar estilo normal del campo
+            elementos.sueldoMensual.style.borderColor = '';
+            elementos.sueldoMensual.style.boxShadow = '';
         }
-        
-        // Actualizar el mensaje de ayuda
-        const sueldoHelper = document.querySelector('.sueldo-helper');
-        if (sueldoHelper) {
+    }
+    
+    // Actualizar el mensaje de ayuda del campo de sueldo
+    const sueldoHelper = document.querySelector('.sueldo-helper');
+    if (sueldoHelper) {
+        if (cuotaActual > 0 && cuotaActual > maxCuota) {
             sueldoHelper.innerHTML = `
                 ⚠️ <strong>¡Atención!</strong> Tu cuota supera el máximo recomendado. 
-                <br>Considerá ajustar el monto del préstamo o el plazo.
+                Considerá ajustar el monto del préstamo o el plazo.
             `;
             sueldoHelper.style.color = '#dc2626';
             sueldoHelper.style.background = 'rgba(220, 38, 38, 0.1)';
             sueldoHelper.style.borderLeftColor = '#dc2626';
-        }
-    } else {
-        // Remover clase de advertencia si existe
-        elementos.maxCuotaSugerida.classList.remove('warning');
-        
-        // Restaurar estilo normal del campo
-        elementos.sueldoMensual.style.borderColor = '';
-        elementos.sueldoMensual.style.boxShadow = '';
-        
-        // Actualizar el mensaje de estado
-        if (statusMessage) {
-            if (cuotaActual > 0) {
-                statusMessage.innerHTML = `
-                    ✅ <strong>¡Perfecto!</strong> Tu cuota está dentro del rango recomendado.
-                `;
-                statusMessage.className = 'status-message success';
-            } else {
-                statusMessage.innerHTML = `
-                    💡 <strong>¡Excelente!</strong> Tu sueldo permite una cuota de hasta el máximo sugerido.
-                `;
-                statusMessage.className = 'status-message info';
-            }
-        }
-        
-        // Actualizar el mensaje de ayuda con estado positivo
-        const sueldoHelper = document.querySelector('.sueldo-helper');
-        if (sueldoHelper) {
-            if (cuotaActual > 0) {
-                sueldoHelper.innerHTML = `
-                    ✅ <strong>¡Perfecto!</strong> Tu cuota está dentro del rango recomendado.
-                `;
-                sueldoHelper.style.color = '#16a34a';
-                sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
-                sueldoHelper.style.borderLeftColor = '#16a34a';
-            } else {
-                sueldoHelper.innerHTML = `
-                    💡 <strong>Regla del 25%:</strong> Tu cuota no debe superar el 25% de tus ingresos mensuales
-                `;
-                sueldoHelper.style.color = '#16a34a';
-                sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
-                sueldoHelper.style.borderLeftColor = '#16a34a';
-            }
-        }
-        
-        // Mostrar mensaje positivo si la cuota está dentro del rango recomendado
-        if (cuotaActual > 0 && cuotaActual <= maxCuota) {
-            console.log(`✅ Tu cuota está dentro del rango recomendado. Máximo sugerido: ${elementos.maxCuotaSugerida.textContent}`);
+        } else {
+            sueldoHelper.innerHTML = `
+                💡 <strong>Regla del 25%:</strong> Tu cuota no debe superar el 25% de tus ingresos mensuales
+            `;
+            sueldoHelper.style.color = '#16a34a';
+            sueldoHelper.style.background = 'rgba(34, 197, 94, 0.1)';
+            sueldoHelper.style.borderLeftColor = '#16a34a';
         }
     }
 }
@@ -2108,6 +2091,17 @@ function actualizarResultados(resultados) {
         console.log('✅ Primera cuota actualizada:', formatearPesos(resultados.cuotaInicial));
     } else {
         console.log('❌ Elemento primeraCuota no encontrado');
+    }
+    
+    // Actualizar cuota mensual en el campo principal
+    const cuotaMensualARS = document.getElementById('cuotaMensualARS');
+    if (cuotaMensualARS) {
+        // La cuota inicial ya está en pesos (ARS), no necesita conversión
+        const cuotaPesos = resultados.cuotaInicial;
+        cuotaMensualARS.textContent = formatearPesos(cuotaPesos);
+        console.log('✅ Cuota mensual actualizada:', { ARS: formatearPesos(cuotaPesos) });
+    } else {
+        console.log('❌ Elemento cuotaMensualARS no encontrado');
     }
     
     // Actualizar total a pagar
