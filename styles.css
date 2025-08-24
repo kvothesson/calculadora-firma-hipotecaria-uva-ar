@@ -2605,20 +2605,7 @@ footer {
 .escenario-table .col-valores .currency-line.ars { color:#fbbf24; font-weight:700; }
 .escenario-table .col-valores .currency-line.usd { color:#34d399; font-weight:700; }
 
-.escenario-table tr.delta-row td { border-top: 1px dashed rgba(148,163,184,0.3); }
-.escenario-table tr.delta-row .concept-cell { color:#cbd5e1; }
-/* Colores intuitivos para diferencia vs oficial */
-.escenario-table tr.delta-row .col-valores.mejor .currency-line.ars, 
-.escenario-table tr.delta-row .col-valores.mejor .currency-line.usd, 
-.escenario-summary.mejor { color:#22c55e !important; } /* Verde: necesitás menos (mejor) */
 
-.escenario-table tr.delta-row .col-valores.peor .currency-line.ars, 
-.escenario-table tr.delta-row .col-valores.peor .currency-line.usd, 
-.escenario-summary.peor { color:#ef4444 !important; } /* Rojo: necesitás más (peor) */
-
-.escenario-table tr.delta-row .col-valores.igual .currency-line.ars, 
-.escenario-table tr.delta-row .col-valores.igual .currency-line.usd, 
-.escenario-summary.igual { color:#f59e0b !important; } /* Dorado: igual al oficial */
 
 /* Colores para tarjetas completas según qué tan bueno es el escenario */
 .escenario-card.mejor .col-valores .currency-line.ars { color:#22c55e !important; } /* Verde: mejor escenario */
