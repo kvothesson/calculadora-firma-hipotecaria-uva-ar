@@ -9,6 +9,7 @@ class CalculatorController {
         this.exchangeRateService = new ExchangeRateService();
         this.validationService = new ValidationService();
         this.utilityService = new UtilityService();
+        this.urlStateService = new URLStateService();
 
         // Elementos del DOM
         this.elementos = {
@@ -58,6 +59,9 @@ class CalculatorController {
             
             // Establecer valores por defecto
             this.establecerValoresPorDefecto();
+            
+            // Restaurar estado desde URL si existe
+            this.restaurarEstadoDesdeURL();
             
             // Actualizar valores equivalentes
             this.actualizarValorPropiedadPesos();
@@ -120,6 +124,37 @@ class CalculatorController {
     }
 
     /**
+     * Restaura el estado desde los parámetros de la URL
+     */
+    restaurarEstadoDesdeURL() {
+        try {
+            if (this.urlStateService.hasURLParams()) {
+                console.log('🔗 Restaurando estado desde URL...');
+                const state = this.urlStateService.deserializeStateFromURL();
+                
+                if (Object.keys(state).length > 0) {
+                    this.urlStateService.applyStateToForm(state);
+                    console.log('✅ Estado restaurado desde URL:', state);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error al restaurar estado desde URL:', error);
+        }
+    }
+
+    /**
+     * Actualiza la URL con el estado actual del formulario
+     */
+    actualizarURL() {
+        try {
+            const currentState = this.urlStateService.getCurrentFormState();
+            this.urlStateService.serializeStateToURL(currentState);
+        } catch (error) {
+            console.error('❌ Error al actualizar URL:', error);
+        }
+    }
+
+    /**
      * Actualiza el valor de la propiedad en pesos
      */
     actualizarValorPropiedadPesos() {
@@ -172,29 +207,45 @@ class CalculatorController {
         this.elementos.valorPropiedad.addEventListener('input', () => {
             this.actualizarValorPropiedadPesos();
             this.calcularTodo();
+            this.actualizarURL();
         });
 
         this.elementos.provincia.addEventListener('change', () => {
             this.actualizarSlidersGastos(this.elementos.provincia.value);
             this.calcularTodo();
+            this.actualizarURL();
         });
 
         this.elementos.montoPrestamo.addEventListener('input', () => {
             this.actualizarMontoPrestamoEquivalente();
             this.calcularTodo();
+            this.actualizarURL();
         });
 
-        this.elementos.plazo.addEventListener('input', () => this.actualizarPlazo());
-        this.elementos.tasaInteres.addEventListener('input', () => this.actualizarTasa());
+        this.elementos.plazo.addEventListener('input', () => {
+            this.actualizarPlazo();
+            this.actualizarURL();
+        });
+        
+        this.elementos.tasaInteres.addEventListener('input', () => {
+            this.actualizarTasa();
+            this.actualizarURL();
+        });
         
         // Event listener para el campo de sueldo
-        this.elementos.sueldoMensual.addEventListener('input', () => this.calcularMaxCuotaSugerida());
+        this.elementos.sueldoMensual.addEventListener('input', () => {
+            this.calcularMaxCuotaSugerida();
+            this.actualizarURL();
+        });
         
         // Event listeners para sliders de gastos
         ['escritura', 'inmobiliaria', 'firmas', 'sellos'].forEach(tipo => {
             const slider = document.getElementById(tipo + 'Slider');
             if (slider) {
-                slider.addEventListener('input', () => this.calcularTodo());
+                slider.addEventListener('input', () => {
+                    this.calcularTodo();
+                    this.actualizarURL();
+                });
             }
         });
     }
