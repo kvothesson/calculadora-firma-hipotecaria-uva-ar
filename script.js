@@ -1124,7 +1124,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const bandasInfo = calcularBandasCambiarias();
     
     // Helper para setear valores por escenario
-    function setEscenario(prefix, tc, totalOperacion, baseline) {
+    function setEscenario(prefix, tc, totalOperacion) {
         const prestamoARS = datos.montoPrestamo;
         const prestamoUSD = prestamoARS / tc;
         const diferenciaARS = totalOperacion - prestamoARS;
@@ -1147,31 +1147,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
         setText(`diferencia${prefix}ARS`, diferenciaARS);
         setText(`diferencia${prefix}USD`, diferenciaUSD);
 
-        // Si tenemos baseline (oficial), mostrar delta vs oficial
-        if (baseline) {
-            const deltaARS = diferenciaARS - baseline.diferenciaARS;
-            const deltaUSD = diferenciaUSD - baseline.diferenciaUSD;
-            setText(`delta${prefix}ARS`, deltaARS);
-            setText(`delta${prefix}USD`, deltaUSD);
 
-            // Colorear según impacto económico intuitivo
-            let cls;
-            if (deltaARS === 0) {
-                cls = 'igual'; // Dorado: sin cambio
-            } else if (deltaARS < 0) {
-                cls = 'mejor'; // Verde: necesitás menos dinero (mejor para vos)
-            } else {
-                cls = 'peor'; // Rojo: necesitás más dinero (peor para vos)
-            }
-
-            const colValores = document.getElementById(`delta${prefix}ARS`)?.closest('.col-valores');
-            if (colValores) {
-                colValores.classList.remove('mejor','peor','igual');
-                colValores.classList.add(cls);
-            }
-
-
-        }
     }
     
     // Escenario Piso (mejor caso)
@@ -1191,14 +1167,8 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const totalOficial = valorCasaOficial + gastosOficial.total;
     setEscenario('Oficial', tcOficial, totalOficial);
 
-    // Calcular baseline para deltas
-    const baseline = {
-        diferenciaARS: totalOficial - datos.montoPrestamo,
-        diferenciaUSD: (totalOficial - datos.montoPrestamo) / CONFIG.tiposCambio.oficial
-    };
-
-    // Ahora setear Piso con deltas vs oficial
-    setEscenario('Piso', tcPiso, totalPiso, baseline);
+    // Ahora setear Piso
+    setEscenario('Piso', tcPiso, totalPiso);
     
     // Escenario Techo (peor caso)
     const tcTecho = bandasInfo.techo;
@@ -1207,7 +1177,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     const valorCasaTecho = datos.valorPropiedad * tcTecho;
     const gastosTecho = calcularGastosExtraConTC(datos.valorPropiedad, datos.provincia, tcTecho);
     const totalTecho = valorCasaTecho + gastosTecho.total;
-    setEscenario('Techo', tcTecho, totalTecho, baseline);
+    setEscenario('Techo', tcTecho, totalTecho);
     
     // Analytics: Rastrear visualización de escenarios
     if (window.calculadoraAnalytics) {
@@ -1227,9 +1197,9 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
     limpiarResultados = function() {
         original();
         const ids = [
-            'prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD','deltaPisoARS','deltaPisoUSD',
-            'prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD','deltaOficialARS','deltaOficialUSD',
-            'prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD','deltaTechoARS','deltaTechoUSD'
+            'prestamoPisoARS','prestamoPisoUSD','diferenciaPisoARS','diferenciaPisoUSD',
+            'prestamoOficialARS','prestamoOficialUSD','diferenciaOficialARS','diferenciaOficialUSD',
+            'prestamoTechoARS','prestamoTechoUSD','diferenciaTechoARS','diferenciaTechoUSD'
         ];
         ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '$0'; });
     }
@@ -2303,8 +2273,7 @@ function actualizarEscenarioPiso(valorTotalUSD, resultados) {
     const prestamoPisoUSD = document.getElementById('prestamoPisoUSD');
     const diferenciaPisoARS = document.getElementById('diferenciaPisoARS');
     const diferenciaPisoUSD = document.getElementById('diferenciaPisoUSD');
-    const deltaPisoARS = document.getElementById('deltaPisoARS');
-    const deltaPisoUSD = document.getElementById('deltaPisoUSD');
+
     
     if (totalPisoARS && totalPisoUSD) {
         const totalPisoPesos = valorTotalUSD * CONFIG.tiposCambio.piso;
@@ -2324,11 +2293,7 @@ function actualizarEscenarioPiso(valorTotalUSD, resultados) {
         diferenciaPisoUSD.textContent = `USD $${(diferenciaPisoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
     
-    if (deltaPisoARS && deltaPisoUSD) {
-        const deltaPisoPesos = (CONFIG.tiposCambio.piso - CONFIG.tiposCambio.oficial) * valorTotalUSD;
-        deltaPisoARS.textContent = formatearPesos(deltaPisoPesos);
-        deltaPisoUSD.textContent = `USD $${(deltaPisoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    }
+
 }
 
 // Función para actualizar el escenario oficial (caso base)
@@ -2339,8 +2304,7 @@ function actualizarEscenarioOficial(valorTotalUSD, resultados) {
     const prestamoOficialUSD = document.getElementById('prestamoOficialUSD');
     const diferenciaOficialARS = document.getElementById('diferenciaOficialARS');
     const diferenciaOficialUSD = document.getElementById('diferenciaOficialUSD');
-    const deltaOficialARS = document.getElementById('deltaOficialARS');
-    const deltaOficialUSD = document.getElementById('deltaOficialUSD');
+
     
     if (totalOficialARS && totalOficialUSD) {
         const totalOficialPesos = valorTotalUSD * CONFIG.tiposCambio.oficial;
@@ -2360,10 +2324,7 @@ function actualizarEscenarioOficial(valorTotalUSD, resultados) {
         diferenciaOficialUSD.textContent = `USD $${(diferenciaOficialPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
     
-    if (deltaOficialARS && deltaOficialUSD) {
-        deltaOficialARS.textContent = '$0';
-        deltaOficialUSD.textContent = 'USD $0';
-    }
+
 }
 
 // Función para actualizar el escenario techo (peor caso)
@@ -2374,8 +2335,7 @@ function actualizarEscenarioTecho(valorTotalUSD, resultados) {
     const prestamoTechoUSD = document.getElementById('prestamoTechoUSD');
     const diferenciaTechoARS = document.getElementById('diferenciaTechoARS');
     const diferenciaTechoUSD = document.getElementById('diferenciaTechoUSD');
-    const deltaTechoARS = document.getElementById('deltaTechoARS');
-    const deltaTechoUSD = document.getElementById('deltaTechoUSD');
+
     
     if (totalTechoARS && totalTechoUSD) {
         const totalTechoPesos = valorTotalUSD * CONFIG.tiposCambio.techo;
@@ -2395,9 +2355,5 @@ function actualizarEscenarioTecho(valorTotalUSD, resultados) {
         diferenciaTechoUSD.textContent = `USD $${(diferenciaTechoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
     
-    if (deltaTechoARS && deltaTechoUSD) {
-        const deltaTechoPesos = (CONFIG.tiposCambio.techo - CONFIG.tiposCambio.oficial) * valorTotalUSD;
-        deltaTechoARS.textContent = formatearPesos(deltaTechoPesos);
-        deltaTechoUSD.textContent = `USD $${(deltaTechoPesos / CONFIG.tiposCambio.oficial).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    }
+
 }
