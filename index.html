@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>Calculadora UVA actualizada HOY | Simulador hipotecario Argentina</title>
-    <meta name="description" content="Convierte UVA a pesos y calcula tu crédito hipotecario en segundos. Datos actualizados diariamente. Gratis y sin registro.">
+    <title>Simulador Hipotecario (UVA) Argentina | Calculadora de crédito actualizada HOY</title>
+    <meta name="description" content="Simulá tu crédito hipotecario UVA en Argentina: primera cuota, gastos y escenarios por dólar. Datos actualizados diariamente. Gratis.">
     <meta name="keywords" content="calculadora uva hoy, calculadora uva, simulador uva, cómo se calcula el uva, conversión uva a pesos, crédito hipotecario uva simulador, valor unidad uva, calculadora crédito hipotecario UVA, simulador hipotecario Argentina, gastos escritura inmobiliaria Argentina">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Calculadora Hipotecaria UVA">
@@ -98,6 +98,7 @@
     <script src="js/services/ValidationService.js"></script>
     <script src="js/services/ExchangeRateService.js"></script>
     <script src="js/services/CalculationService.js"></script>
+    <script src="js/services/URLStateService.js"></script>
     <script src="js/controllers/CalculatorController.js"></script>
     <script src="js/controllers/SimulatorController.js"></script>
     <script src="js/app.js"></script>
@@ -105,8 +106,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>🏠 Calculadora UVA actualizada HOY</h1>
-            <p>Convierte UVA a pesos y calcula tu crédito hipotecario en segundos</p>
+            <h1>Simulador Hipotecario UVA – Calculá tu crédito en segundos</h1>
+            <p>Simulá tu crédito hipotecario UVA en Argentina: primera cuota, gastos y escenarios por dólar</p>
             
 
             
@@ -130,11 +131,11 @@
         <main>
             <!-- Sección de datos de entrada -->
             <section class="input-section">
-                <h2>Calculadora de Crédito Hipotecario UVA en Argentina</h2>
+                <h2>Simulador Hipotecario UVA – Datos de entrada</h2>
                 
                 <!-- Mensaje introductorio sobre el sueldo -->
                 <div class="sueldo-intro">
-                    <p>💡 <strong>Primero, ingresá tu sueldo mensual</strong> para saber cuánto podés pagar de cuota. Luego completá los datos de la propiedad.</p>
+                    <p>💡 <strong>Primero, ingresá tu sueldo mensual</strong> para saber cuánto podés pagar de cuota. Luego completá los datos de la propiedad en el simulador hipotecario.</p>
                 </div>
                 
                 <!-- Campo de sueldo opcional para calcular máximo de cuota sugerido -->
@@ -280,7 +281,7 @@
 
             <!-- Sección de resultados - CORE PRINCIPAL -->
             <section class="results-section core-section">
-                <h2>💰 Tu Crédito Hipotecario UVA en ARS y USD</h2>
+                <h2>💰 Resultados del Simulador Hipotecario UVA</h2>
                 <p class="section-description">Calculá cuánto vas a pagar y cuánto necesitás ahorrar según el tipo de cambio al día de la firma</p>
                 
                 <!-- Tabla principal del CORE -->
@@ -413,8 +414,8 @@
 
                 <!-- Escenarios de tipo de cambio -->
                 <div class="escenarios-tc">
-                    <h3>💱 Escenarios según Tipo de Cambio al día de la firma</h3>
-                    <p class="section-helper">El día de la firma se usa el dólar oficial del momento. Si sube, recibís menos USD y ponés más; si baja, recibís más. Calculá con el techo para estar cubierto.</p>
+                    <h3>💱 Simulador de Escenarios según Tipo de Cambio</h3>
+                    <p class="section-helper">El día de la firma se usa el dólar oficial del momento. Si sube, recibís menos USD y ponés más; si baja, recibís más. Calculá con el techo para estar cubierto usando nuestro simulador hipotecario.</p>
                     <div class="escenarios-grid">
                         <div class="escenario-card mejor">
                             <h4>📉 Mejor Caso (Piso)</h4>
@@ -550,7 +551,7 @@
 
             <!-- Nueva sección educativa sobre UVA -->
             <section class="uva-education-section">
-                <h2>📚 ¿Qué es la UVA y cómo se calcula?</h2>
+                <h2>📚 ¿Qué es la UVA y cómo funciona el simulador hipotecario?</h2>
                 <div class="uva-education-content">
                     <div class="uva-explanation">
                         <h3>🔍 ¿Qué significa UVA?</h3>
@@ -615,7 +616,7 @@
 
             <!-- Sección de consejos mejorada -->
             <section class="tips-section">
-                <h2>💡 Guía Completa para Tu Crédito Hipotecario UVA</h2>
+                <h2>💡 Guía Completa para Usar el Simulador Hipotecario UVA</h2>
                 
                 <!-- Tips Contextuales Dinámicos -->
                 <div class="tips-dynamic" id="tipsDinamicos">
@@ -716,7 +717,7 @@
             
             <!-- Sección de Preguntas Frecuentes -->
             <section class="faq-section">
-                <h2>❓ Preguntas Frecuentes sobre Créditos UVA</h2>
+                <h2>❓ Preguntas Frecuentes sobre el Simulador Hipotecario UVA</h2>
                 <div class="faq-content">
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFAQ(this)">
@@ -724,7 +725,7 @@
                             <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                            <p>Podés usar nuestra calculadora hipotecaria UVA para simular tu cuota inicial, gastos de escritura e inmobiliaria. Ingresá el valor de la propiedad, el monto del préstamo y el plazo. La cuota se calcula usando la fórmula de amortización con ajuste UVA mensual.</p>
+                            <p>Podés usar nuestro simulador hipotecario UVA para simular tu cuota inicial, gastos de escritura e inmobiliaria. Ingresá el valor de la propiedad, el monto del préstamo y el plazo. La cuota se calcula usando la fórmula de amortización con ajuste UVA mensual.</p>
                         </div>
                     </div>
                     
@@ -744,7 +745,7 @@
                             <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                            <p>El tipo de cambio se fija al momento de la firma de la escritura. La calculadora incluye un simulador para que estimes cuántos dólares podrás comprar con tu préstamo en pesos según diferentes escenarios cambiarios.</p>
+                            <p>El tipo de cambio se fija al momento de la firma de la escritura. El simulador hipotecario incluye un simulador de escenarios para que estimes cuántos dólares podrás comprar con tu préstamo en pesos según diferentes escenarios cambiarios.</p>
                         </div>
                     </div>
                     
@@ -793,8 +794,8 @@
 
     <!-- Contenido SEO optimizado para motores de búsqueda e IA (oculto visualmente) -->
     <section id="seo-content" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
-        <h2>Calculadora UVA actualizada HOY - Simulador hipotecario Argentina</h2>
-        <p>Nuestra calculadora UVA permite convertir UVA a pesos y calcular tu crédito hipotecario en segundos. Con datos actualizados diariamente, es la herramienta más precisa para simular cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
+        <h2>Simulador Hipotecario UVA Argentina - Calculadora de crédito actualizada HOY</h2>
+        <p>Nuestro simulador hipotecario UVA permite simular tu crédito hipotecario en segundos. Con datos actualizados diariamente, es la herramienta más precisa para simular cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
         
         <h3>¿Qué es la UVA y cómo se calcula?</h3>
         <p>UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas de tu crédito hipotecario según la inflación, manteniendo el valor real de tu deuda. El valor unidad UVA se publica diariamente en el Banco Central. Para calcular la cuota UVA: Cuota inicial × Coeficiente UVA mensual = Cuota ajustada.</p>
@@ -812,13 +813,13 @@
         <p>Nuestra calculadora muestra el costo total real de comprar una propiedad: valor de la casa + gastos de escritura, inmobiliaria, firmas y sellos. El sistema UVA (Unidad de Valor Adquisitivo) ajusta las cuotas según la inflación. La primera cuota se calcula en base al monto prestado, la tasa de interés nominal anual y el plazo del crédito.</p>
         
         <h3>Simulador de escenarios con tipo de cambio</h3>
-        <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar. La conversión UVA a pesos se realiza automáticamente con el tipo de cambio oficial del día.</p>
+        <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador hipotecario permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar. La conversión UVA a pesos se realiza automáticamente con el tipo de cambio oficial del día.</p>
         
         <h3>Requisitos y recomendaciones para obtener un crédito hipotecario UVA</h3>
         <p>Los bancos en Argentina generalmente requieren que la cuota no supere el 25% de los ingresos familiares. Es recomendable tener un ahorro adicional equivalente a 6 meses de cuotas como reserva de emergencia, además del dinero necesario para cubrir la diferencia entre el préstamo y el valor total de la propiedad más gastos.</p>
         
         <h3>Valor unidad UVA y coeficiente de ajuste</h3>
-        <p>El valor unidad UVA se actualiza diariamente y refleja la inflación acumulada. El coeficiente UVA mensual determina cuánto se ajusta tu cuota. Nuestra calculadora UVA incluye este factor para darte estimaciones precisas de cuánto pagarás mes a mes.</h3>
+        <p>El valor unidad UVA se actualiza diariamente y refleja la inflación acumulada. El coeficiente UVA mensual determina cuánto se ajusta tu cuota. Nuestro simulador hipotecario UVA incluye este factor para darte estimaciones precisas de cuánto pagarás mes a mes.</p>
     </section>
 
     <!-- FAQ Schema para motores de IA (Google, ChatGPT, Gemini, Perplexity) -->
@@ -892,14 +893,14 @@
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Calculadora Hipotecaria UVA Argentina",
-        "description": "Calculadora online gratuita para simular créditos hipotecarios UVA en Argentina. Calcula cuotas, gastos de escritura e inmobiliaria.",
+        "name": "Simulador Hipotecario UVA Argentina",
+        "description": "Simulador online gratuito para créditos hipotecarios UVA en Argentina. Simula cuotas, gastos de escritura e inmobiliaria.",
         "url": "https://kvothesson.github.io/calculadora-firma-hipotecaria-uva-ar/",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web Browser",
         "author": {
             "@type": "Organization",
-            "name": "Calculadora Hipotecaria UVA"
+            "name": "Simulador Hipotecario UVA"
         },
         "offers": {
             "@type": "Offer",
