@@ -1132,7 +1132,7 @@ function mostrarEscenariosTipoCambio(datos, resultados) {
         
         const setText = (id, value) => {
             const el = document.getElementById(id);
-            if (el) el.textContent = typeof value === 'number' ? (id.includes('USD') ? formatearUSD(value) : formatearARS(value)) : value;
+            if (el) el.textContent = typeof value === 'number' ? (id.includes('USD') ? `USD $${formatearUSD(value)}` : formatearARS(value)) : value;
         };
         
         // Totales
@@ -1273,7 +1273,7 @@ function actualizarEquivalenciaMontoPrestado(montoPesos) {
     
     // Siempre mostrar el equivalente en USD del monto en pesos
     const equivalenciaUSD = montoPesos / CONFIG.tiposCambio.oficial;
-    elementoEquivalencia.textContent = formatearUSD(equivalenciaUSD);
+    elementoEquivalencia.textContent = `USD $${formatearUSD(equivalenciaUSD)}`;
 }
 
 function actualizarCotizacionEnInterfaz(fuente = 'Automático', fecha = null) {
@@ -1480,22 +1480,22 @@ function recalcularCoreConNuevoTC(nuevoTC) {
     const diferenciaACubrir = totalOperacion - datos.montoPrestamo;
     document.getElementById('diferenciaACubrir').textContent = formatearARS(diferenciaACubrir);
     const diferenciaACubrirUSD = diferenciaACubrir / nuevoTC;
-    document.getElementById('diferenciaACubrirUSD').textContent = formatearUSD(diferenciaACubrirUSD);
+            document.getElementById('diferenciaACubrirUSD').textContent = `USD $${formatearUSD(diferenciaACubrirUSD)}`;
     
     // Actualizar equivalencia del monto prestado en USD
     const montoPrestamoBancoUSD = datos.montoPrestamo / nuevoTC;
-    document.getElementById('montoPrestamoBancoUSD').textContent = formatearUSD(montoPrestamoBancoUSD);
+            document.getElementById('montoPrestamoBancoUSD').textContent = `USD $${formatearUSD(montoPrestamoBancoUSD)}`;
     
     // Actualizar primera cuota en USD
     const primeraCuota = calcularCredito(datos).primeraCuota;
     const primeraCuotaUSD = primeraCuota / nuevoTC;
     const primeraCuotaUSDEl = document.getElementById('primeraCuotaUSD');
-    if (primeraCuotaUSDEl) primeraCuotaUSDEl.textContent = formatearUSD(primeraCuotaUSD);
+            if (primeraCuotaUSDEl) primeraCuotaUSDEl.textContent = `USD $${formatearUSD(primeraCuotaUSD)}`;
     
     // Actualizar total a pagar en USD
     const totalPagarUSD = totalOperacion / nuevoTC;
     const totalPagarUSDEl = document.getElementById('totalPagarUSD');
-    if (totalPagarUSDEl) totalPagarUSDEl.textContent = formatearUSD(totalPagarUSD);
+            if (totalPagarUSDEl) totalPagarUSDEl.textContent = `USD $${formatearUSD(totalPagarUSD)}`;
     
     console.log('CORE recalculado con TC:', nuevoTC);
 }
@@ -1983,7 +1983,7 @@ function lineaARS(valor, bold = false) {
 }
 
 function lineaUSD(valor, bold = false) {
-    const texto = `USD ${formatearNumeroPlano(valor)}`;
+    const texto = `USD $${formatearNumeroPlano(valor)}`;
     return bold ? `<strong>${texto}</strong>` : texto;
 }
 
