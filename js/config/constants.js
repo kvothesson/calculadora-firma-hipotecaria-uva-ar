@@ -119,9 +119,11 @@ export const API_CONFIG = {
 
 // Configuración de analytics
 export const ANALYTICS_CONFIG = {
-    // Eventos a trackear
+    // Eventos a trackear (usando los mismos nombres que analytics.js)
     EVENTOS: {
         CALCULO_COMPLETADO: 'calculation_completed',
+        CALCULO_INICIADO: 'calculation_started',
+        CALCULO_ERROR: 'calculation_error',
         CAMBIO_PLAZO: 'plazo_change',
         CAMBIO_TASA: 'tasa_change',
         CAMBIO_TC: 'tc_change',
