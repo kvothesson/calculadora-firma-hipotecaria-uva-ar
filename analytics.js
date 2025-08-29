@@ -1,6 +1,15 @@
 // Google Analytics 4 - Configuración avanzada para calculadora UVA
 // Tracking de eventos y conversiones para medir el uso real de la herramienta
 
+// Cache para evitar eventos duplicados
+const analyticsCache = {
+    lastCalculation: null,
+    lastCalculationTime: 0,
+    debounceDelay: 2000, // 2 segundos entre cálculos
+    lastGastosUpdate: null,
+    lastGastosUpdateTime: 0
+};
+
 // Configuración de eventos personalizados
 const ANALYTICS_EVENTS = {
     // Eventos de uso de la calculadora
@@ -79,6 +88,26 @@ function trackCalculationStarted(formData) {
 
 // Función para trackear la finalización de una simulación
 function trackCalculationCompleted(results, formData) {
+    const now = Date.now();
+    const calculationKey = JSON.stringify({
+        valorPropiedad: formData.valorPropiedad,
+        montoPrestamo: formData.montoPrestamo,
+        plazo: formData.plazo,
+        tasaInteres: formData.tasaInteres,
+        provincia: formData.provincia
+    });
+    
+    // Verificar si es un cálculo duplicado reciente
+    if (analyticsCache.lastCalculation === calculationKey && 
+        (now - analyticsCache.lastCalculationTime) < analyticsCache.debounceDelay) {
+        console.log('⚠️ Evento de cálculo duplicado ignorado (debouncing)');
+        return;
+    }
+    
+    // Actualizar cache
+    analyticsCache.lastCalculation = calculationKey;
+    analyticsCache.lastCalculationTime = now;
+    
     trackEvent(ANALYTICS_EVENTS.CALCULATION_COMPLETED, {
         event_category: 'Resultado',
         event_label: 'Simulación_Exitosa',
@@ -116,6 +145,20 @@ function trackCalculationError(error, formData) {
 
 // Función para trackear cambios en gastos
 function trackGastosUpdated(gastosData) {
+    const now = Date.now();
+    const gastosKey = JSON.stringify(gastosData);
+    
+    // Verificar si es una actualización duplicada reciente
+    if (analyticsCache.lastGastosUpdate === gastosKey && 
+        (now - analyticsCache.lastGastosUpdateTime) < 1000) { // 1 segundo entre actualizaciones
+        console.log('⚠️ Evento de gastos duplicado ignorado (debouncing)');
+        return;
+    }
+    
+    // Actualizar cache
+    analyticsCache.lastGastosUpdate = gastosKey;
+    analyticsCache.lastGastosUpdateTime = now;
+    
     trackEvent(ANALYTICS_EVENTS.GASTOS_UPDATED, {
         event_category: 'Configuración',
         event_label: 'Gastos_Modificados',
@@ -220,4 +263,16 @@ window.AnalyticsTracker = {
     trackSimulationConversion
 };
 
+// Función de debug para desarrollo
+window.debugAnalytics = function() {
+    console.group('🔍 Analytics Debug Info');
+    console.log('Cache actual:', analyticsCache);
+    console.log('Eventos disponibles:', ANALYTICS_EVENTS);
+    console.log('gtag disponible:', typeof gtag !== 'undefined');
+    console.log('AnalyticsTracker disponible:', typeof window.AnalyticsTracker !== 'undefined');
+    console.log('Timestamp actual:', new Date().toISOString());
+    console.groupEnd();
+};
+
 console.log('Analytics avanzado cargado para Calculadora UVA');
+console.log('💡 Para debug: ejecuta debugAnalytics() en la consola');

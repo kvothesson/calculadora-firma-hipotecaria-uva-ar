@@ -211,6 +211,11 @@ class CalculatorController {
         });
 
         this.elementos.provincia.addEventListener('change', () => {
+            // Trackear cambio de provincia
+            if (window.AnalyticsTracker && window.AnalyticsTracker.trackProvinciaChanged) {
+                window.AnalyticsTracker.trackProvinciaChanged(this.elementos.provincia.value);
+            }
+            
             this.actualizarSlidersGastos(this.elementos.provincia.value);
             this.calcularTodo();
             this.actualizarURL();
@@ -243,6 +248,17 @@ class CalculatorController {
             const slider = document.getElementById(tipo + 'Slider');
             if (slider) {
                 slider.addEventListener('input', () => {
+                    // Trackear actualización de gastos
+                    if (window.AnalyticsTracker && window.AnalyticsTracker.trackGastosUpdated) {
+                        const gastosData = {
+                            escritura: parseFloat(document.getElementById('escrituraSlider')?.value || 0),
+                            inmobiliaria: parseFloat(document.getElementById('inmobiliariaSlider')?.value || 0),
+                            firmas: parseFloat(document.getElementById('firmasSlider')?.value || 0),
+                            sellos: parseFloat(document.getElementById('sellosSlider')?.value || 0)
+                        };
+                        window.AnalyticsTracker.trackGastosUpdated(gastosData);
+                    }
+                    
                     this.calcularTodo();
                     this.actualizarURL();
                 });
@@ -264,7 +280,17 @@ class CalculatorController {
             const validacion = this.calculationService.validarValores(valores, this.exchangeRateService.getTipoCambioOficial());
             if (!validacion.isValid) {
                 console.log('❌ Validación falló:', validacion.error);
+                
+                // Trackear error de validación
+                if (window.AnalyticsTracker && window.AnalyticsTracker.trackCalculationError) {
+                    window.AnalyticsTracker.trackCalculationError(new Error(validacion.error), valores);
+                }
                 return;
+            }
+            
+            // Trackear inicio de cálculo
+            if (window.AnalyticsTracker && window.AnalyticsTracker.trackCalculationStarted) {
+                window.AnalyticsTracker.trackCalculationStarted(valores);
             }
             
             // Calcular cuota inicial
@@ -316,8 +342,18 @@ class CalculatorController {
             
             this.estado.calculosRealizados = true;
             
+            // Trackear cálculo completado exitosamente
+            if (window.AnalyticsTracker && window.AnalyticsTracker.trackCalculationCompleted) {
+                window.AnalyticsTracker.trackCalculationCompleted(resultados, valores);
+            }
+            
         } catch (error) {
             console.error('❌ Error en cálculo:', error);
+            
+            // Trackear error de cálculo
+            if (window.AnalyticsTracker && window.AnalyticsTracker.trackCalculationError) {
+                window.AnalyticsTracker.trackCalculationError(error, this.obtenerValoresFormulario());
+            }
         }
     }
 
