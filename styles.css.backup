@@ -227,7 +227,7 @@ section h2 {
     display: block;
     margin-top: 3px;
     font-size: 0.8rem;
-    color: #cbd5e1;
+    color: #94a3b8;
     font-style: italic;
 }
 
@@ -558,7 +558,7 @@ section h2 {
     display: flex;
     justify-content: space-between;
     font-size: 0.8rem;
-    color: #cbd5e1;
+    color: #94a3b8;
     margin-top: 2px;
 }
 
