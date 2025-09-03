@@ -42,66 +42,70 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
     
-    <!-- Google Analytics 4 con configuración de consentimiento -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHHDM0RFWY"></script>
+    <!-- Google Analytics 4 - Cargado de forma ultra-optimizada -->
     <script>
+        // Inicializar dataLayer inmediatamente para evitar errores
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
         
-        // Configurar consentimiento por defecto (sin almacenamiento hasta que el usuario acepte)
-        gtag('consent', 'default', {
-            'analytics_storage': 'denied'
-        });
-        
-        gtag('config', 'G-FHHDM0RFWY', {
-            // Configuración estricta de privacidad
-            'anonymize_ip': true,
-            'allow_google_signals': false,
-            'allow_ad_personalization_signals': false,
-            'restricted_data_processing': true
-        });
-        
-        // Función para habilitar analytics cuando se acepte el consentimiento
+        // Funciones globales para analytics (disponibles inmediatamente)
         window.enableAnalytics = function() {
-            gtag('consent', 'update', {
-                'analytics_storage': 'granted'
-            });
-            console.log('Analytics habilitado desde HTML');
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'granted'
+                });
+            }
         };
         
-        // Función para deshabilitar analytics
         window.disableAnalytics = function() {
-            gtag('consent', 'update', {
-                'analytics_storage': 'denied'
-            });
-            console.log('Analytics deshabilitado desde HTML');
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'denied'
+                });
+            }
         };
         
-        // Enviar evento de prueba inmediatamente para verificar funcionamiento
-        setTimeout(() => {
-            gtag('event', 'page_view_test', {
-                'event_category': 'Debug',
-                'event_label': 'HTML_Loaded',
-                'page_title': document.title,
-                'timestamp': new Date().toISOString()
-            });
-            console.log('Evento de prueba enviado desde HTML');
-        }, 2000);
+        // Cargar GA4 solo después de que la página esté completamente interactiva
+        const loadGA = () => {
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FHHDM0RFWY';
+            document.head.appendChild(script);
+            
+            script.onload = () => {
+                gtag('js', new Date());
+                gtag('consent', 'default', {
+                    'analytics_storage': 'denied'
+                });
+                gtag('config', 'G-FHHDM0RFWY', {
+                    'anonymize_ip': true,
+                    'allow_google_signals': false,
+                    'allow_ad_personalization_signals': false,
+                    'restricted_data_processing': true
+                });
+            };
+        };
+        
+        // Cargar GA4 solo cuando el navegador esté inactivo
+        if (window.requestIdleCallback) {
+            requestIdleCallback(loadGA, { timeout: 2000 });
+        } else {
+            setTimeout(loadGA, 2000);
+        }
     </script>
     
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.min.css">
     
-    <!-- Scripts de la nueva arquitectura -->
-    <script src="js/config/constants.js"></script>
-    <script src="js/services/UtilityService.js"></script>
-    <script src="js/services/ValidationService.js"></script>
-    <script src="js/services/ExchangeRateService.js"></script>
-    <script src="js/services/CalculationService.js"></script>
-    <script src="js/services/URLStateService.js"></script>
-    <script src="js/controllers/CalculatorController.js"></script>
-    <script src="js/controllers/SimulatorController.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Scripts de la nueva arquitectura - Cargados de forma optimizada -->
+    <script src="js/config/constants.min.js" defer></script>
+    <script src="js/services/UtilityService.min.js" defer></script>
+    <script src="js/services/ValidationService.min.js" defer></script>
+    <script src="js/services/ExchangeRateService.min.js" defer></script>
+    <script src="js/services/CalculationService.min.js" defer></script>
+    <script src="js/services/URLStateService.min.js" defer></script>
+    <script src="js/controllers/CalculatorController.min.js" defer></script>
+    <script src="js/controllers/SimulatorController.min.js" defer></script>
+    <script src="js/app.min.js" defer></script>
 </head>
 <body>
     <div class="container">
@@ -792,133 +796,158 @@
         </footer>
     </div>
 
-    <!-- Contenido SEO optimizado para motores de búsqueda e IA (oculto visualmente) -->
-    <section id="seo-content" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
-        <h2>Simulador Hipotecario UVA Argentina - Calculadora de crédito actualizada HOY</h2>
-        <p>Nuestro simulador hipotecario UVA permite simular tu crédito hipotecario en segundos. Con datos actualizados diariamente, es la herramienta más precisa para simular cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
-        
-        <h3>¿Qué es la UVA y cómo se calcula?</h3>
-        <p>UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas de tu crédito hipotecario según la inflación, manteniendo el valor real de tu deuda. El valor unidad UVA se publica diariamente en el Banco Central. Para calcular la cuota UVA: Cuota inicial × Coeficiente UVA mensual = Cuota ajustada.</p>
-        
-        <h3>Gastos incluidos en la compra de una propiedad con crédito hipotecario</h3>
-        <p>Además de la cuota mensual del préstamo, deberás considerar los siguientes gastos al comprar una propiedad con crédito hipotecario UVA en Argentina:</p>
-        <ul>
-            <li>Gastos de escritura: Entre 2% y 2.5% del valor de la propiedad</li>
-            <li>Comisión inmobiliaria: Entre 2.5% y 3.5% del valor de la propiedad</li>
-            <li>Gastos de firmas y gestiones: Entre 0.5% y 1% del valor de la propiedad</li>
-            <li>Sellos y timbrados: Entre 1% y 1.5% del valor de la propiedad</li>
-        </ul>
-        
-        <h3>Cálculo del costo total de la operación inmobiliaria</h3>
-        <p>Nuestra calculadora muestra el costo total real de comprar una propiedad: valor de la casa + gastos de escritura, inmobiliaria, firmas y sellos. El sistema UVA (Unidad de Valor Adquisitivo) ajusta las cuotas según la inflación. La primera cuota se calcula en base al monto prestado, la tasa de interés nominal anual y el plazo del crédito.</p>
-        
-        <h3>Simulador de escenarios con tipo de cambio</h3>
-        <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador hipotecario permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar. La conversión UVA a pesos se realiza automáticamente con el tipo de cambio oficial del día.</p>
-        
-        <h3>Requisitos y recomendaciones para obtener un crédito hipotecario UVA</h3>
-        <p>Los bancos en Argentina generalmente requieren que la cuota no supere el 25% de los ingresos familiares. Es recomendable tener un ahorro adicional equivalente a 6 meses de cuotas como reserva de emergencia, además del dinero necesario para cubrir la diferencia entre el préstamo y el valor total de la propiedad más gastos.</p>
-        
-        <h3>Valor unidad UVA y coeficiente de ajuste</h3>
-        <p>El valor unidad UVA se actualiza diariamente y refleja la inflación acumulada. El coeficiente UVA mensual determina cuánto se ajusta tu cuota. Nuestro simulador hipotecario UVA incluye este factor para darte estimaciones precisas de cuánto pagarás mes a mes.</p>
-    </section>
-
-    <!-- FAQ Schema para motores de IA (Google, ChatGPT, Gemini, Perplexity) -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "¿Cómo calcular la cuota de un crédito hipotecario UVA en Argentina?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Podés usar nuestra calculadora hipotecaria UVA para simular tu cuota inicial, gastos de escritura e inmobiliaria. Ingresá el valor de la propiedad, el monto del préstamo y el plazo. La cuota se calcula usando la fórmula de amortización con ajuste UVA mensual."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Qué gastos extra hay al comprar una propiedad con crédito hipotecario en Argentina?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Además de la cuota, deberás afrontar gastos de escritura (2-2.5%), inmobiliaria (2.5-3.5%), firmas (0.5-1%) y sellos (1-1.5%) del valor de la propiedad. Estos porcentajes varían según la provincia."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Qué pasa con el tipo de cambio el día de la escritura?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "El tipo de cambio se fija al momento de la firma de la escritura. La calculadora incluye un simulador para que estimes cuántos dólares podrás comprar con tu préstamo en pesos según diferentes escenarios cambiarios."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Cuánto me presta el banco para una hipoteca UVA?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Los bancos en Argentina generalmente prestan hasta el 80-90% del valor de la propiedad. La cuota no debe superar el 25% de tus ingresos familiares. Necesitarás demostrar ingresos estables y capacidad de pago."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Cómo se calcula la primera cuota de un crédito hipotecario UVA?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "La primera cuota se calcula en base al capital prestado, tasa de interés y plazo, usando la fórmula de amortización francesa. Las cuotas posteriores se ajustan mensualmente según el coeficiente UVA que refleja la inflación."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Qué significa UVA en los créditos hipotecarios?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas según la inflación medida por el COEFICIE del BCRA. Esto significa que tu cuota aumentará mensualmente pero mantendrá su valor real a lo largo del tiempo."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "¿Cuánto dinero necesito ahorrar para comprar con crédito hipotecario UVA?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Recomendamos tener: 1) El 10-20% del valor de la propiedad que no cubre el préstamo, 2) Gastos extras (6-8% del valor), 3) Margen de seguridad del 20%, 4) Reserva de emergencia equivalente a 6 meses de cuotas."
-                }
-            }
-        ]
-    }
+    <!-- Contenido SEO optimizado - Cargado dinámicamente para reducir DOM inicial -->
+    <script>
+        // Cargar contenido SEO después del render inicial para optimizar DOM
+        setTimeout(() => {
+            const seoContent = document.createElement('section');
+            seoContent.id = 'seo-content';
+            seoContent.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;';
+            seoContent.setAttribute('aria-hidden', 'true');
+            seoContent.innerHTML = `
+                <h2>Simulador Hipotecario UVA Argentina - Calculadora de crédito actualizada HOY</h2>
+                <p>Nuestro simulador hipotecario UVA permite simular tu crédito hipotecario en segundos. Con datos actualizados diariamente, es la herramienta más precisa para simular cuotas iniciales, gastos de escritura, inmobiliaria, sellos y firmas en Argentina. Ideal para simular escenarios con tipo de cambio oficial al día de la firma de la escritura.</p>
+                <h3>¿Qué es la UVA y cómo se calcula?</h3>
+                <p>UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas de tu crédito hipotecario según la inflación, manteniendo el valor real de tu deuda. El valor unidad UVA se publica diariamente en el Banco Central. Para calcular la cuota UVA: Cuota inicial × Coeficiente UVA mensual = Cuota ajustada.</p>
+                <h3>Gastos incluidos en la compra de una propiedad con crédito hipotecario</h3>
+                <p>Además de la cuota mensual del préstamo, deberás considerar los siguientes gastos al comprar una propiedad con crédito hipotecario UVA en Argentina:</p>
+                <ul>
+                    <li>Gastos de escritura: Entre 2% y 2.5% del valor de la propiedad</li>
+                    <li>Comisión inmobiliaria: Entre 2.5% y 3.5% del valor de la propiedad</li>
+                    <li>Gastos de firmas y gestiones: Entre 0.5% y 1% del valor de la propiedad</li>
+                    <li>Sellos y timbrados: Entre 1% y 1.5% del valor de la propiedad</li>
+                </ul>
+                <h3>Cálculo del costo total de la operación inmobiliaria</h3>
+                <p>Nuestra calculadora muestra el costo total real de comprar una propiedad: valor de la casa + gastos de escritura, inmobiliaria, firmas y sellos. El sistema UVA (Unidad de Valor Adquisitivo) ajusta las cuotas según la inflación. La primera cuota se calcula en base al monto prestado, la tasa de interés nominal anual y el plazo del crédito.</p>
+                <h3>Simulador de escenarios con tipo de cambio</h3>
+                <p>El tipo de cambio se fija el día de la escritura, por lo que es crucial planificar cuántos dólares podrás comprar con tu préstamo en pesos. Nuestro simulador hipotecario permite evaluar diferentes escenarios cambiarios para calcular el dinero adicional que necesitarás aportar. La conversión UVA a pesos se realiza automáticamente con el tipo de cambio oficial del día.</p>
+                <h3>Requisitos y recomendaciones para obtener un crédito hipotecario UVA</h3>
+                <p>Los bancos en Argentina generalmente requieren que la cuota no supere el 25% de los ingresos familiares. Es recomendable tener un ahorro adicional equivalente a 6 meses de cuotas como reserva de emergencia, además del dinero necesario para cubrir la diferencia entre el préstamo y el valor total de la propiedad más gastos.</p>
+                <h3>Valor unidad UVA y coeficiente de ajuste</h3>
+                <p>El valor unidad UVA se actualiza diariamente y refleja la inflación acumulada. El coeficiente UVA mensual determina cuánto se ajusta tu cuota. Nuestro simulador hipotecario UVA incluye este factor para darte estimaciones precisas de cuánto pagarás mes a mes.</p>
+            `;
+            document.body.appendChild(seoContent);
+        }, 1000);
     </script>
 
-    <!-- WebApplication Schema -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Simulador Hipotecario UVA Argentina",
-        "description": "Simulador online gratuito para créditos hipotecarios UVA en Argentina. Simula cuotas, gastos de escritura e inmobiliaria.",
-        "url": "https://kvothesson.github.io/calculadora-firma-hipotecaria-uva-ar/",
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web Browser",
-        "author": {
-            "@type": "Organization",
-            "name": "Simulador Hipotecario UVA"
-        },
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "ARS"
-        },
-        "featureList": [
-            "Simulador de cuotas hipotecarias UVA",
-            "Cálculo de gastos de escritura e inmobiliaria", 
-            "Simulador de escenarios con tipo de cambio",
-            "Conversión automática peso-dólar",
-            "Consejos financieros personalizados"
-        ],
-        "inLanguage": "es-AR"
-    }
+    <!-- Schema JSON-LD cargado dinámicamente para optimizar DOM inicial -->
+    <script>
+        // Cargar schemas JSON-LD después del render inicial
+        setTimeout(() => {
+            // FAQ Schema
+            const faqSchema = document.createElement('script');
+            faqSchema.type = 'application/ld+json';
+            faqSchema.textContent = JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "¿Cómo calcular la cuota de un crédito hipotecario UVA en Argentina?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Podés usar nuestra calculadora hipotecaria UVA para simular tu cuota inicial, gastos de escritura e inmobiliaria. Ingresá el valor de la propiedad, el monto del préstamo y el plazo. La cuota se calcula usando la fórmula de amortización con ajuste UVA mensual."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Qué gastos extra hay al comprar una propiedad con crédito hipotecario en Argentina?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Además de la cuota, deberás afrontar gastos de escritura (2-2.5%), inmobiliaria (2.5-3.5%), firmas (0.5-1%) y sellos (1-1.5%) del valor de la propiedad. Estos porcentajes varían según la provincia."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Qué pasa con el tipo de cambio el día de la escritura?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "El tipo de cambio se fija al momento de la firma de la escritura. La calculadora incluye un simulador para que estimes cuántos dólares podrás comprar con tu préstamo en pesos según diferentes escenarios cambiarios."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Cuánto me presta el banco para una hipoteca UVA?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Los bancos en Argentina generalmente prestan hasta el 80-90% del valor de la propiedad. La cuota no debe superar el 25% de tus ingresos familiares. Necesitarás demostrar ingresos estables y capacidad de pago."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Cómo se calcula la primera cuota de un crédito hipotecario UVA?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "La primera cuota se calcula en base al capital prestado, tasa de interés y plazo, usando la fórmula de amortización francesa. Las cuotas posteriores se ajustan mensualmente según el coeficiente UVA que refleja la inflación."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Qué significa UVA en los créditos hipotecarios?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "UVA significa Unidad de Valor Adquisitivo. Es un índice que ajusta las cuotas según la inflación medida por el COEFICIE del BCRA. Esto significa que tu cuota aumentará mensualmente pero mantendrá su valor real a lo largo del tiempo."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "¿Cuánto dinero necesito ahorrar para comprar con crédito hipotecario UVA?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Recomendamos tener: 1) El 10-20% del valor de la propiedad que no cubre el préstamo, 2) Gastos extras (6-8% del valor), 3) Margen de seguridad del 20%, 4) Reserva de emergencia equivalente a 6 meses de cuotas."
+                        }
+                    }
+                ]
+            });
+            document.head.appendChild(faqSchema);
+            
+            // WebApplication Schema
+            const webAppSchema = document.createElement('script');
+            webAppSchema.type = 'application/ld+json';
+            webAppSchema.textContent = JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "Simulador Hipotecario UVA Argentina",
+                "description": "Simulador online gratuito para créditos hipotecarios UVA en Argentina. Simula cuotas, gastos de escritura e inmobiliaria.",
+                "url": "https://kvothesson.github.io/calculadora-firma-hipotecaria-uva-ar/",
+                "applicationCategory": "FinanceApplication",
+                "operatingSystem": "Web Browser",
+                "author": {
+                    "@type": "Organization",
+                    "name": "Simulador Hipotecario UVA"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "ARS"
+                },
+                "featureList": [
+                    "Simulador de cuotas hipotecarias UVA",
+                    "Cálculo de gastos de escritura e inmobiliaria", 
+                    "Simulador de escenarios con tipo de cambio",
+                    "Conversión automática peso-dólar",
+                    "Consejos financieros personalizados"
+                ],
+                "inLanguage": "es-AR"
+            });
+            document.head.appendChild(webAppSchema);
+        }, 500);
     </script>
 
-    <script src="analytics.js" defer></script>
-    <script src="privacy-config.js" defer></script>
+    <!-- Scripts de analytics y privacidad - Cargados al final -->
+    <script>
+        // Cargar analytics de forma asíncrona después del contenido crítico
+        setTimeout(() => {
+            const analyticsScript = document.createElement('script');
+            analyticsScript.src = 'analytics.min.js';
+            analyticsScript.defer = true;
+            document.head.appendChild(analyticsScript);
+            
+            const privacyScript = document.createElement('script');
+            privacyScript.src = 'privacy-config.js';
+            privacyScript.defer = true;
+            document.head.appendChild(privacyScript);
+        }, 500);
+    </script>
 </body>
 </html>

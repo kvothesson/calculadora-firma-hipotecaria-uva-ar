@@ -1,0 +1,59 @@
+# Headers para optimización de caché - Calculadora Hipotecaria UVA
+# Compatible con Netlify, Vercel y otros servicios de hosting estático
+
+# Archivos minificados - Caché agresivo (1 año)
+/*.min.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.min.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML - Caché con validación (1 hora)
+/*.html
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Imágenes - Caché muy largo (1 año)
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fuentes - Caché largo (1 año)
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.eot
+  Cache-Control: public, max-age=31536000, immutable
+
+# JSON y XML - Caché medio (1 día)
+/*.json
+  Cache-Control: public, max-age=86400
+
+/*.xml
+  Cache-Control: public, max-age=86400
+
+# Headers de seguridad para todas las páginas
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin

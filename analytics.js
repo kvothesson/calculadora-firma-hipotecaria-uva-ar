@@ -215,41 +215,48 @@ function trackUVAEducationViewed() {
     });
 }
 
-// Inicialización de analytics cuando se carga la página
+// Inicialización de analytics cuando se carga la página - Optimizada
 document.addEventListener('DOMContentLoaded', function() {
-    // Trackear que la calculadora se cargó
-    trackEvent(ANALYTICS_EVENTS.CALCULATOR_LOADED, {
-        event_category: 'Página',
-        event_label: 'Calculadora_Cargada',
-        custom_parameters: {
-            timestamp: new Date().toISOString(),
-            user_agent: navigator.userAgent
-        }
-    });
-    
-    // Trackear visualización de contenido educativo cuando sea visible
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && entry.target.classList.contains('uva-education-section')) {
-                trackUVAEducationViewed();
-                observer.unobserve(entry.target); // Solo trackear una vez
+    // Delay para evitar bloqueo del render inicial
+    setTimeout(() => {
+        // Trackear que la calculadora se cargó
+        trackEvent(ANALYTICS_EVENTS.CALCULATOR_LOADED, {
+            event_category: 'Página',
+            event_label: 'Calculadora_Cargada',
+            custom_parameters: {
+                timestamp: new Date().toISOString(),
+                user_agent: navigator.userAgent
             }
         });
-    });
-    
-    const uvaSection = document.querySelector('.uva-education-section');
-    if (uvaSection) {
-        observer.observe(uvaSection);
-    }
-    
-    // Trackear apertura de FAQ
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.faq-question')) {
-            const faqItem = e.target.closest('.faq-item');
-            const faqIndex = Array.from(document.querySelectorAll('.faq-item')).indexOf(faqItem);
-            trackFAQOpened(faqIndex);
+        
+        // Trackear visualización de contenido educativo cuando sea visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.classList.contains('uva-education-section')) {
+                    trackUVAEducationViewed();
+                    observer.unobserve(entry.target); // Solo trackear una vez
+                }
+            });
+        });
+        
+        const uvaSection = document.querySelector('.uva-education-section');
+        if (uvaSection) {
+            observer.observe(uvaSection);
         }
-    });
+        
+        // Trackear apertura de FAQ con throttling
+        let faqClickTimeout;
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.faq-question')) {
+                clearTimeout(faqClickTimeout);
+                faqClickTimeout = setTimeout(() => {
+                    const faqItem = e.target.closest('.faq-item');
+                    const faqIndex = Array.from(document.querySelectorAll('.faq-item')).indexOf(faqItem);
+                    trackFAQOpened(faqIndex);
+                }, 100);
+            }
+        });
+    }, 1000);
 });
 
 // Exportar funciones para uso en script.js

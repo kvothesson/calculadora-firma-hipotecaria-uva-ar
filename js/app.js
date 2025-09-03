@@ -7,37 +7,44 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Iniciando aplicación de calculadora hipotecaria...');
     
-    try {
-        // Inicializar controlador principal
-        const calculatorController = new CalculatorController();
-        
-        // Inicializar controlador del simulador
-        const simulatorController = new SimulatorController(
-            calculatorController.exchangeRateService,
-            calculatorController.calculationService,
-            calculatorController.utilityService
-        );
-        
-        // Configurar sliders de gastos
-        configurarSlidersGastos();
-        
-        // Configurar FAQ
-        configurarFAQ();
-        
-        // Configurar checklist
-        configurarChecklist();
-        
-        console.log('✅ Aplicación inicializada correctamente');
-        
-        // Exponer controladores globalmente para debugging
-        window.app = {
-            calculatorController,
-            simulatorController
-        };
-        
-    } catch (error) {
-        console.error('❌ Error al inicializar la aplicación:', error);
-    }
+    // Inicialización optimizada - controladores críticos primero
+    const initApp = () => {
+        try {
+            // Inicializar controladores críticos inmediatamente
+            const calculatorController = new CalculatorController();
+            const simulatorController = new SimulatorController(
+                calculatorController.exchangeRateService,
+                calculatorController.calculationService,
+                calculatorController.utilityService
+            );
+            
+            window.app = {
+                calculatorController,
+                simulatorController
+            };
+            
+            // Configurar componentes no críticos de forma asíncrona
+            const configComponents = () => {
+                configurarSlidersGastos();
+                setTimeout(() => configurarFAQ(), 50);
+                setTimeout(() => configurarChecklist(), 100);
+                console.log('✅ Aplicación inicializada correctamente');
+            };
+            
+            // Usar requestIdleCallback solo para componentes no críticos
+            if (window.requestIdleCallback) {
+                requestIdleCallback(configComponents, { timeout: 500 });
+            } else {
+                setTimeout(configComponents, 100);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error al inicializar la aplicación:', error);
+        }
+    };
+    
+    // Inicializar inmediatamente - los controladores son críticos
+    initApp();
 });
 
 /**
@@ -46,71 +53,91 @@ document.addEventListener('DOMContentLoaded', function() {
 function configurarSlidersGastos() {
     const tiposGasto = ['escritura', 'inmobiliaria', 'firmas', 'sellos'];
     
-    tiposGasto.forEach(tipo => {
-        const input = document.getElementById(tipo + 'Slider');
-        
-        if (input) {
-            // Evento para cambios inmediatos
-            input.addEventListener('input', function() {
-                const nuevoValor = parseFloat(this.value) || 0;
+    // Configurar sliders de forma asíncrona para evitar bloqueo
+    const configurarSlider = (tipo, index) => {
+        setTimeout(() => {
+            const input = document.getElementById(tipo + 'Slider');
+            
+            if (input) {
+                // Evento para cambios inmediatos con throttling
+                let inputTimeout;
+                input.addEventListener('input', function() {
+                    const nuevoValor = parseFloat(this.value) || 0;
+                    
+                    // Validar rango
+                    if (nuevoValor < 0) this.value = 0;
+                    if (nuevoValor > 10) this.value = 10;
+                    
+                    // Agregar feedback visual inmediato
+                    this.classList.add('updating');
+                    
+                    // Throttle ultra-optimizado para evitar tareas largas
+                    clearTimeout(inputTimeout);
+                    inputTimeout = setTimeout(() => {
+                        // Dividir cálculos en chunks para evitar bloqueo
+                        const updateCalculations = () => {
+                            // Chunk 1: Actualizar valor intermedio
+                            const provinciaActual = document.getElementById('provincia')?.value || 'CABA';
+                            if (window.app?.calculatorController?.calculationService) {
+                                window.app.calculatorController.calculationService.actualizarValorIntermedio(tipo, parseFloat(this.value), provinciaActual);
+                            }
+                            
+                            // Chunk 2: Cálculo principal en siguiente frame
+                            requestAnimationFrame(() => {
+                                if (window.app?.calculatorController) {
+                                    window.app.calculatorController.calcularTodo();
+                                }
+                                
+                                // Chunk 3: Limpiar UI en siguiente frame
+                                requestAnimationFrame(() => {
+                                    this.classList.remove('updating');
+                                });
+                            });
+                        };
+                        
+                        // Usar requestIdleCallback con timeout más corto
+                        if (window.requestIdleCallback) {
+                            requestIdleCallback(updateCalculations, { timeout: 50 });
+                        } else {
+                            setTimeout(updateCalculations, 0);
+                        }
+                    }, 200);
+                });
                 
-                // Validar rango
-                if (nuevoValor < 0) this.value = 0;
-                if (nuevoValor > 10) this.value = 10;
-                
-                // Actualizar valor intermedio para la provincia actual
-                const provinciaActual = document.getElementById('provincia')?.value || 'CABA';
-                if (window.app?.calculatorController?.calculationService) {
-                    window.app.calculatorController.calculationService.actualizarValorIntermedio(tipo, parseFloat(this.value), provinciaActual);
-                }
-                
-                // Agregar feedback visual inmediato
-                this.classList.add('updating');
-                
-                // Recalcular con delay para mejor performance
-                clearTimeout(this.gastoTimeout);
-                this.gastoTimeout = setTimeout(() => {
-                    if (window.app?.calculatorController) {
-                        window.app.calculatorController.calcularTodo();
+                // Evento para cambios finales (blur)
+                input.addEventListener('blur', function() {
+                    const nuevoValor = parseFloat(this.value) || 0;
+                    
+                    // Validar y formatear el valor
+                    if (nuevoValor < 0) {
+                        this.value = 0;
+                    } else if (nuevoValor > 10) {
+                        this.value = 10;
+                    } else {
+                        // Formatear a 2 decimales
+                        this.value = nuevoValor.toFixed(2);
                     }
-                    // Remover clase de actualización después de un breve delay
+                    
+                    // Feedback visual de confirmación
+                    this.classList.add('confirmed');
                     setTimeout(() => {
-                        this.classList.remove('updating');
-                    }, 500);
-                }, 300);
-            });
-            
-            // Evento para cambios finales (blur)
-            input.addEventListener('blur', function() {
-                const nuevoValor = parseFloat(this.value) || 0;
+                        this.classList.remove('confirmed');
+                    }, 1000);
+                });
                 
-                // Validar y formatear el valor
-                if (nuevoValor < 0) {
-                    this.value = 0;
-                } else if (nuevoValor > 10) {
-                    this.value = 10;
-                } else {
-                    // Formatear a 2 decimales
-                    this.value = nuevoValor.toFixed(2);
-                }
+                // Evento para focus - mejorar la experiencia visual
+                input.addEventListener('focus', function() {
+                    this.closest('.gasto-item')?.classList.add('focused');
+                });
                 
-                // Feedback visual de confirmación
-                this.classList.add('confirmed');
-                setTimeout(() => {
-                    this.classList.remove('confirmed');
-                }, 1000);
-            });
-            
-            // Evento para focus - mejorar la experiencia visual
-            input.addEventListener('focus', function() {
-                this.closest('.gasto-item')?.classList.add('focused');
-            });
-            
-            input.addEventListener('blur', function() {
-                this.closest('.gasto-item')?.classList.remove('focused');
-            });
-        }
-    });
+                input.addEventListener('blur', function() {
+                    this.closest('.gasto-item')?.classList.remove('focused');
+                });
+            }
+        }, index * 10); // Stagger initialization
+    };
+    
+    tiposGasto.forEach(configurarSlider);
 }
 
 /**
