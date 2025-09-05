@@ -110,6 +110,12 @@ export const API_CONFIG = {
         baseUrl: 'https://dolarapi.com/v1/dolares/oficial'
     },
     
+    // API de UVA (ArgentinaDatos)
+    UVA: {
+        baseUrl: 'https://api.argentinadatos.com/v1/finanzas/indices/uva',
+        diasBusqueda: 30
+    },
+    
     // Timeouts
     TIMEOUTS: {
         request: 10000,

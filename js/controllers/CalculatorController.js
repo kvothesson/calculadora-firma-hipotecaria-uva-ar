@@ -5,8 +5,8 @@
 class CalculatorController {
     constructor() {
         // Inicializar servicios
-        this.calculationService = new CalculationService();
         this.exchangeRateService = new ExchangeRateService();
+        this.calculationService = new CalculationService(this.exchangeRateService);
         this.validationService = new ValidationService();
         this.utilityService = new UtilityService();
         this.urlStateService = new URLStateService();
@@ -40,6 +40,7 @@ class CalculatorController {
         // Estado de la aplicación
         this.estado = {
             cotizacionObtenida: false,
+            uvaObtenida: false,
             calculosRealizados: false,
             ultimaValidacion: null
         };
@@ -54,8 +55,11 @@ class CalculatorController {
         try {
             console.log('🚀 Inicializando calculadora...');
             
-            // Obtener cotización oficial del día
-            await this.obtenerCotizacionOficial();
+            // Obtener cotización oficial del día y valor de UVA en paralelo
+            await Promise.all([
+                this.obtenerCotizacionOficial(),
+                this.obtenerValorUVA()
+            ]);
             
             // Establecer valores por defecto
             this.establecerValoresPorDefecto();
@@ -96,6 +100,21 @@ class CalculatorController {
             return cotizacion;
         } catch (error) {
             console.error('Error al obtener cotización:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene el valor actual de UVA
+     */
+    async obtenerValorUVA() {
+        try {
+            const uvaData = await this.exchangeRateService.obtenerValorUVA();
+            this.actualizarUVAEnInterfaz(uvaData.valor, uvaData.fecha, uvaData.fuente);
+            this.estado.uvaObtenida = true;
+            return uvaData;
+        } catch (error) {
+            console.error('Error al obtener valor UVA:', error);
             throw error;
         }
     }
@@ -719,6 +738,34 @@ class CalculatorController {
             }
             
             fechaCotizacion.textContent = textoActualizacion;
+        }
+    }
+
+    /**
+     * Actualiza el valor de UVA en la interfaz
+     */
+    actualizarUVAEnInterfaz(valor, fecha, fuente = 'Automático') {
+        const elementoUVA = document.getElementById('valorUVA');
+        const fechaUVA = document.getElementById('fechaUVA');
+        
+        if (elementoUVA) {
+            // UVA se muestra como número sin símbolo de moneda
+            elementoUVA.textContent = this.utilityService.formatearNumero(valor);
+        }
+        
+        if (fechaUVA) {
+            const ahora = new Date();
+            let textoActualizacion = '';
+            
+            if (fuente === 'ArgentinaDatos API') {
+                textoActualizacion = `✅ ArgentinaDatos - ${fecha || ahora.toLocaleDateString('es-AR')}`;
+            } else if (fuente === 'Valor por defecto') {
+                textoActualizacion = `❌ Sin conexión - Valor estimado`;
+            } else {
+                textoActualizacion = `Desde cache - ${ahora.toLocaleTimeString('es-AR')}`;
+            }
+            
+            fechaUVA.textContent = textoActualizacion;
         }
     }
 
