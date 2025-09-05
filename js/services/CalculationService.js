@@ -3,7 +3,8 @@
  * Contiene toda la lógica de negocio de la calculadora
  */
 class CalculationService {
-    constructor() {
+    constructor(exchangeRateService = null) {
+        this.exchangeRateService = exchangeRateService;
         this.config = {
             // Gastos extra por provincia (en % del valor de la propiedad)
             gastosExtra: {
@@ -127,12 +128,28 @@ class CalculationService {
         let cuotaAcumulada = 0;
         let cuotaActual = cuotaInicial;
 
+        // Usar factor UVA real si está disponible, sino usar el factor por defecto
+        const factorUVA = this.obtenerFactorUVAReal();
+
         for (let mes = 1; mes <= totalMeses; mes++) {
             cuotaAcumulada += cuotaActual;
-            cuotaActual *= this.config.factorUVA;
+            cuotaActual *= factorUVA;
         }
 
         return cuotaAcumulada / totalMeses;
+    }
+
+    /**
+     * Obtiene el factor UVA real basado en datos históricos o usa el factor por defecto
+     */
+    obtenerFactorUVAReal() {
+        if (this.exchangeRateService) {
+            // Usar el coeficiente calculado del ExchangeRateService
+            return this.exchangeRateService.calcularCoeficienteUVAMensual();
+        }
+        
+        // Fallback al factor por defecto
+        return this.config.factorUVA;
     }
 
     /**

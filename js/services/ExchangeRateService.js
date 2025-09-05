@@ -11,6 +11,11 @@ class ExchangeRateService {
             piso: 1000         // Dólar bajo (piso de banda) - BASE (abril 2025)
         };
         
+        this.valorUVA = {
+            actual: 1574.96,   // Valor UVA actual (se actualiza automáticamente)
+            fecha: new Date().toISOString().split('T')[0]
+        };
+        
         this.fechaBase = new Date('2025-04-01'); // Abril 2025
     }
 
@@ -280,6 +285,178 @@ class ExchangeRateService {
      */
     getTiposCambio() {
         return { ...this.tiposCambio };
+    }
+
+    /**
+     * Obtiene el valor actual de UVA
+     */
+    async obtenerValorUVA() {
+        try {
+            // Intentar obtener de cache primero
+            const uvaCacheada = this.obtenerUVAdeCache();
+            if (uvaCacheada) {
+                this.aplicarValorUVA(uvaCacheada.valor, uvaCacheada.fecha);
+                return {
+                    valor: uvaCacheada.valor,
+                    fecha: uvaCacheada.fecha,
+                    fuente: uvaCacheada.fuente
+                };
+            }
+
+            // Intentar API de ArgentinaDatos
+            const valorUVA = await this.obtenerUVAdeAPI();
+            if (valorUVA) {
+                this.aplicarValorUVA(valorUVA.valor, valorUVA.fecha);
+                this.guardarUVAenCache(valorUVA.valor, valorUVA.fecha, valorUVA.fuente);
+                return valorUVA;
+            }
+
+            // Si todo falla, usar valor por defecto
+            throw new Error('No se pudo obtener el valor de UVA');
+            
+        } catch (error) {
+            console.log('No se pudo obtener el valor de UVA, usando valor por defecto');
+            
+            // Si falla, usar valor por defecto
+            this.aplicarValorUVA(1574.96, new Date().toISOString().split('T')[0]);
+            return {
+                valor: 1574.96,
+                fecha: new Date().toISOString().split('T')[0],
+                fuente: 'Valor por defecto'
+            };
+        }
+    }
+
+    /**
+     * Intenta obtener valor de UVA de la API
+     */
+    async obtenerUVAdeAPI() {
+        try {
+            const response = await fetch('https://api.argentinadatos.com/v1/finanzas/indices/uva', {
+                redirect: 'follow' // Seguir redirecciones automáticamente
+            });
+            const data = await response.json();
+            
+            if (data && Array.isArray(data) && data.length > 0) {
+                // Obtener el valor más reciente (último elemento del array)
+                const ultimoValor = data[data.length - 1];
+                const valor = parseFloat(ultimoValor.valor);
+                const fecha = ultimoValor.fecha;
+                
+                if (valor && valor > 0) {
+                    console.log(`Valor UVA obtenido: ${valor} (fecha: ${fecha})`);
+                    return {
+                        valor: valor,
+                        fecha: fecha,
+                        fuente: 'ArgentinaDatos API'
+                    };
+                }
+            }
+        } catch (error) {
+            console.log('API de UVA no disponible:', error.message);
+        }
+        
+        return null;
+    }
+
+    /**
+     * Aplica un valor de UVA obtenido
+     */
+    aplicarValorUVA(valor, fecha) {
+        this.valorUVA.actual = valor;
+        this.valorUVA.fecha = fecha;
+        console.log(`Valor UVA actualizado: ${valor} (fecha: ${fecha})`);
+    }
+
+    /**
+     * Obtiene valor de UVA desde cache
+     */
+    obtenerUVAdeCache() {
+        try {
+            const cache = localStorage.getItem('uva_cache');
+            if (!cache) return null;
+            
+            const datos = JSON.parse(cache);
+            const ahora = new Date();
+            const fechaCache = new Date(datos.timestamp);
+            
+            // Cache válido por 6 horas (UVA se actualiza menos frecuentemente)
+            const horasTranscurridas = (ahora - fechaCache) / (1000 * 60 * 60);
+            
+            if (horasTranscurridas < 6) {
+                console.log(`Usando valor UVA desde cache (${datos.fuente}): ${datos.valor}`);
+                return datos;
+            }
+            
+            // Cache expirado
+            localStorage.removeItem('uva_cache');
+            return null;
+            
+        } catch (error) {
+            console.log('Error al leer cache de UVA:', error);
+            localStorage.removeItem('uva_cache');
+            return null;
+        }
+    }
+
+    /**
+     * Guarda valor de UVA en cache
+     */
+    guardarUVAenCache(valor, fecha, fuente) {
+        try {
+            const datos = {
+                valor: valor,
+                fecha: fecha,
+                fuente: fuente,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('uva_cache', JSON.stringify(datos));
+            console.log(`Valor UVA guardado en cache: ${valor} (${fuente})`);
+            
+        } catch (error) {
+            console.log('Error al guardar UVA en cache:', error);
+        }
+    }
+
+    /**
+     * Obtiene el valor actual de UVA
+     */
+    getValorUVA() {
+        return this.valorUVA.actual;
+    }
+
+    /**
+     * Obtiene la fecha del valor de UVA
+     */
+    getFechaUVA() {
+        return this.valorUVA.fecha;
+    }
+
+    /**
+     * Calcula el coeficiente de ajuste UVA mensual
+     * (útil para calcular cuotas futuras)
+     */
+    calcularCoeficienteUVAMensual() {
+        // El coeficiente se calcula como la variación mensual del UVA
+        // Por simplicidad, usamos un factor aproximado del 2% mensual
+        // En una implementación real, se calcularía comparando valores históricos
+        
+        // Si tenemos datos de UVA reales, podríamos calcular la variación mensual
+        // Por ahora, usamos un factor conservador basado en la inflación argentina
+        const factorBase = 1.02; // 2% mensual base
+        
+        // Ajustar según el valor actual de UVA (valores más altos = mayor inflación)
+        const valorUVA = this.valorUVA.actual;
+        if (valorUVA > 1500) {
+            // Si UVA es muy alto, inflación probablemente mayor
+            return factorBase + 0.005; // 2.5% mensual
+        } else if (valorUVA < 1000) {
+            // Si UVA es bajo, inflación probablemente menor
+            return factorBase - 0.005; // 1.5% mensual
+        }
+        
+        return factorBase; // 2% mensual estándar
     }
 }
 
